@@ -1,13 +1,19 @@
 <script setup>
-import TheWelcome from '../components/TheWelcome.vue'
+
 </script>
 
 <template>
-  <main>
-    <TheWelcome />
+  <main v-if="10>1">
+    <h1>Penus</h1>
+    <h1>Penus</h1>
+    <h1>Penus</h1>
+    <h1>Penus</h1>
   </main>
+  
 </template>
 
 <style scoped>
-
+  main {
+    color: red;
+  }
 </style>
