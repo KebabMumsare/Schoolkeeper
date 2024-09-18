@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  <main v-if="10>1">
+  <main>
     <h1>Penus</h1>
     <h1>Penus</h1>
     <h1>Penus</h1>
