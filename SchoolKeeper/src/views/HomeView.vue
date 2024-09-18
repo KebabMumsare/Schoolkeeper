@@ -13,7 +13,7 @@ export default {
       this.message = response.data.message;
     })
     .catch(error => {
-      console.error('There was an error!', error);
+      console.error('There was an error with server connection!', error);
     });
   }
 };
