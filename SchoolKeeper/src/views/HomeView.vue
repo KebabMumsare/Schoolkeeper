@@ -35,15 +35,6 @@ export default {
         </div>
         
         <div class="form-group">
-          <label for="role">Role:</label>
-          <select v-model="role" required>
-            <option value="student">Student</option>
-            <option value="teacher">Teacher</option>
-            <option value="parent">Parent</option>
-          </select>
-        </div>
-        
-        <div class="form-group">
           <button type="submit">Login</button>
         </div>
       </form>
@@ -69,6 +60,15 @@ main {
   justify-content: center;
   align-items: center;
 }
+
+h2 {
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 20px;
+  letter-spacing: 1px;
+}
+
 
 .login-container {
   max-width: 400px;
