@@ -8,7 +8,7 @@ export default {
     };
   },
   mounted() {
-    axios.get('http://83.250.70.53:3306/api/test')
+    axios.get('http://localhost:1010/api/test')
       .then(response => {
         this.message = response.data.message;
       })
