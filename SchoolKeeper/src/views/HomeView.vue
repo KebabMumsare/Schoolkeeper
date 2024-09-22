@@ -9,15 +9,16 @@ export default {
   },
   mounted() {
     axios.get('http://83.250.70.53:3306/api/test')
-    .then(response => {
-      this.message = response.data.message;
-    })
-    .catch(error => {
-      console.error('There was an error with server connection!', error);
-    });
+      .then(response => {
+        this.message = response.data.message;
+      })
+      .catch(error => {
+        console.error('There was an error!', error);
+      });
   }
 };
 </script>
+
 
 <template>
   <main>
@@ -64,7 +65,7 @@ main {
 h2 {
   font-size: 24px;
   font-weight: bold;
-  text-align: center;
+  text-align: center; 
   margin-bottom: 20px;
   letter-spacing: 1px;
 }
