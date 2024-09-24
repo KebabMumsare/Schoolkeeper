@@ -16,7 +16,7 @@ mongoose.connect(mongoURI)
 
 // Define a test route
 app.get('/api/test', (req, res) => {
-  res.json({ message: 'API is working!' });
+  res.json({ message: 'Mykyta luktar!' });
 });
 
 const PORT = process.env.PORT || 1010;

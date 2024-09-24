@@ -27,7 +27,7 @@ export default {
       <form @submit.prevent="submitLogin">
         <div class="form-group">
           <label for="email">Email:</label>
-          <input type="email" v-model="email" required />
+          <input type="texts" v-model="email" required />
         </div>
         
         <div class="form-group">
@@ -45,9 +45,6 @@ export default {
       </div>
     </div>
   </main>
-  <div>
-    <h1>{{ message }}</h1>
-  </div>
 </template>
 
 
