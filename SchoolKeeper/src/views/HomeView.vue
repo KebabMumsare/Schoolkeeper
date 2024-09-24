@@ -26,11 +26,12 @@ export default {
     <div class="login-container">
       <h2>Login</h2>
       <form @submit.prevent="submitLogin">
+        
         <div class="form-group">
           <label for="email">Email:</label>
           <input type="texts" v-model="email" required />
         </div>
-        
+
         <div class="form-group">
           <label for="password">Password:</label>
           <input type="password" v-model="password" required />
@@ -108,7 +109,7 @@ h2 {
 .form-group button {
   width: 100%;
   padding: 10px;
-  background-color: #5cb85c;
+  background-color: #6184b8;
   color: white;
   border: none;
   border-radius: 4px;
@@ -117,7 +118,7 @@ h2 {
 }
 
 .form-group button:hover {
-  background-color: #4cae4c;
+  background-color: #4c73ae;
   transform: scale(102%);
 }
 
