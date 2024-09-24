@@ -4,18 +4,22 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      message: ''
+      message: '',
+      email: '',
+      password: '',
     };
   },
-  mounted() {
-    axios.get('http://localhost:1010/api/test')
+  methods: {
+    submitLogin() {
+      axios.post('http://localhost:1010/api/login', {name: this.email, password: this.password})
       .then(response => {
         this.message = response.data.message;
       })
       .catch(error => {
         console.error('There was an error!', error);
       });
-  }
+    },
+  },
 };
 </script>
 
