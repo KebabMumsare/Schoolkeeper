@@ -22,6 +22,7 @@ export default {
 
 <template>
   <main>
+    <a href="/start">start</a>
     <div class="login-container">
       <h2>Login</h2>
       <form @submit.prevent="submitLogin">
