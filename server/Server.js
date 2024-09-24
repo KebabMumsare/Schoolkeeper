@@ -41,7 +41,7 @@ app.post('/api/login', async (req, res) => {
   }
 
   if (user.password === req.body.password) {
-    return res.json({user: user});
+    return res.json(user);
   }
 
   return res.sendStatus(401);
