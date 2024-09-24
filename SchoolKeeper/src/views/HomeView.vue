@@ -1,21 +1,40 @@
 <script>
 import axios from 'axios';
+import { useStorage } from '@vueuse/core';
+import { errorMessages } from 'vue/compiler-sfc';
+const currentUser = useStorage('currentUser', {})
+
+
 
 export default {
   data() {
     return {
-      message: ''
+      message: '',
+      email: '',
+      password: '',
+      errorMessage: '',
     };
   },
-  mounted() {
-    axios.get('http://localhost:1010/api/test')
+  methods: {
+    submitLogin() {
+      axios.post('http://localhost:1010/api/login', {name: this.email, password: this.password})
       .then(response => {
+        this.setCurrentUser(response.data)
         this.message = response.data.message;
+        window.location.href = '/start';
+
       })
       .catch(error => {
         console.error('There was an error!', error);
       });
-  }
+    },
+    setCurrentUser(user) {
+      currentUser.value = {
+        name: user.name,
+        access: user.access
+      }
+    }
+  },
 };
 </script>
 
