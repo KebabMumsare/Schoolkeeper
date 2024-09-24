@@ -9,19 +9,25 @@ ul {
     align-items: center;
     background-color: #333;
     height: 60px;
+    border-radius: 0 0 30px 30px;
 }
 
 li {
-    margin: 0 15px;
+    margin: 0 0;
+    display: flex;
+    align-items: center;
+    height: 100%;
 }
 
 a {
-    display: inline-block;
-    padding: 12px 22px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     color: #fff;
     text-decoration: none;
-    border-radius: 4px;
     transition: background-color 0.3s, color 0.3s;
+    height: 100%;
+    padding: .5rem .7rem;
 }
 
 a:hover {
@@ -30,23 +36,25 @@ a:hover {
 }
 
 .schema a {
-    padding: 5px 10px;
+    padding: 0;
     background-color: #444;
     width: 100px;
     height: 100px;
+    display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: 15px;
 }
 .schema a:hover {
     background-color: #666;
     color: #fff;
 }
 
-.schema img {
-    max-width: 100%;
-    max-height: 100%;
-    padding: .51rem;
+img {
+    max-width: 80%;
+    max-height: 80%;
     margin-top: .7rem;
+    padding: .4rem;
 }
 
 main {
@@ -65,6 +73,12 @@ main {
         padding: 0;
         margin: 0;
     }
+    .left-button {
+        border-radius: 0 0 0 30px;
+    }
+    .right-button {
+        border-radius: 0 0 30px 0;
+    }
 
 </style>
 
@@ -78,13 +92,17 @@ main {
         <div>
             <nav>
                 <ul>
-                    <li><a href="">Personal</a></li>
+                    <li><a href="" class="left-button">Personal</a></li>
                     <li class="schema">
                         <a href="">
                             <img src="https://cdn-icons-png.flaticon.com/512/55/55281.png" alt="">
                         </a>
                     </li>
-                    <li><a href="">Notifications</a></li>
+                    <li>
+                        <a href="" class="right-button">
+                            <img src="https://e7.pngegg.com/pngimages/166/839/png-clipart-computer-icons-bell-black-silhouette.png" alt="">
+                    </a>
+                </li>
                 </ul>
             </nav>
         </div>
