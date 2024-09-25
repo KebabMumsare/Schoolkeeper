@@ -5,18 +5,23 @@
           <nav>
             <ul class="nav-list">
               <li class="nav-item">
-                <a href="" class="nav-link">
+                <a href="/persenol" class="nav-link">
                   <img src="https://cdn-icons-png.flaticon.com/128/1077/1077114.png" alt="" class="nav-icon">
                 </a>
               </li>
               <li class="nav-item">
-                <a href="" class="nav-link nav-link-active">
+                <a href="/start" class="nav-link nav-link-active">
                   <img src="https://cdn-icons-png.flaticon.com/512/55/55281.png" alt="" class="nav-icon-selected">
                 </a>
               </li>
               <li class="nav-item">
                 <a href="" class="nav-link">
                   <img src="https://www.iconpacks.net/icons/1/free-bell-icon-860-thumb.png" alt="" class="nav-icon">
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/filer" class="nav-link">
+                  <img src="https://cdn-icons-png.flaticon.com/512/686/686112.png" alt="" class="nav-icon">
                 </a>
               </li>
             </ul>
