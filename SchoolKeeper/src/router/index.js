@@ -24,7 +24,7 @@ const router = createRouter({
     component: filer
   },
   {
-    path: '/Personal',
+    path: '/personal',
     name: 'personal',
     component: personal
   },
