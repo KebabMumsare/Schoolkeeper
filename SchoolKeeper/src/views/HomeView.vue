@@ -22,7 +22,6 @@ export default {
         this.setCurrentUser(response.data)
         this.message = response.data.message;
         window.location.href = '/start';
-
       })
       .catch(error => {
         console.error('There was an error!', error);
@@ -41,6 +40,7 @@ export default {
 
 <template>
   <main>
+    <a href="/filer">filer</a>
     <div class="login-container">
       <h2>Login</h2>
       <form @submit.prevent="submitLogin">
@@ -87,7 +87,6 @@ h2 {
   letter-spacing: 1px;
 }
 
-
 .login-container {
   max-width: 400px;
   width: 100%;
@@ -108,8 +107,7 @@ h2 {
   margin-bottom: 5px;
 }
 
-.form-group input,
-.form-group select {
+.form-group input, .form-group select {
   width: 100%;
   padding: 10px;
   border: 1px solid #ddd;
@@ -117,12 +115,10 @@ h2 {
   transition: border-color 0.3s ease;
 }
 
-.form-group input:focus,
-.form-group select:focus {
+.form-group input:focus, .form-group select:focus {
   border-color: #5cb85c;
   outline: none;
 }
-
 
 .form-group button {
   width: 100%;
