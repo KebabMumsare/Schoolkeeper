@@ -5,7 +5,7 @@
           <nav>
             <ul class="nav-list">
               <li class="nav-item">
-                <a href="" class="nav-link">
+                <a href="/persenol" class="nav-link">
                   <img src="https://cdn-icons-png.flaticon.com/128/1077/1077114.png" alt="" class="nav-icon">
                 </a>
               </li>
