@@ -1,5 +1,4 @@
 <template>
-    <main>
       <div class="nav-wrap">
         <div class="nav-container">
           <nav>
@@ -28,19 +27,9 @@
           </nav>
         </div>
       </div>
-    </main>
   </template>
   
   <style scoped>
-  main {
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    padding: 0;
-    margin: 0;
-  }
   
   .nav-wrap {
     position: fixed;
