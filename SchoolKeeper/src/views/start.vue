@@ -80,6 +80,8 @@ tbody {
 import NavBar from "@/components/Nav-Bar.vue";
 import { useStorage } from "@vueuse/core";  // Named import
 
+//Göra randomizer för lektions tid/länd
+
 export default {
     name: 'Start',
     components: {
@@ -87,7 +89,7 @@ export default {
     },
     data() {
         return {
-            currentUser: useStorage('currentUser', { name: '', access: '', class: '' })  // Default values
+            currentUser: useStorage('currentUser', { name: '', access: '', class: '' })
         };
     },
 };
