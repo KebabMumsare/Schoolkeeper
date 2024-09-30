@@ -30,7 +30,8 @@ export default {
     setCurrentUser(user) {
       currentUser.value = {
         name: user.name,
-        access: user.access
+        access: user.access,
+        class: user.class,
       }
     }
   },
