@@ -1,7 +1,5 @@
 <template>
-    <div>
-        <NavBar/>
-    </div>
+    <NavBar site="personal"/>
     <div>
         <h1>AAAAAA</h1>
     </div>

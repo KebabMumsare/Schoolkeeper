@@ -1,6 +1,6 @@
 <template>
-    <NavBar />
-    <div class="Schedule">
+    <NavBar site="start"/>
+    <main class="Schedule">
         <div class="Container">
             <h3>Schedule</h3>
         </div>
@@ -63,7 +63,7 @@
             </tbody>
         </table>
 
-    </div>
+    </main>
 </template>
 
 <style scoped>
@@ -73,6 +73,14 @@ td {
 }
 tbody {
     border: solid black 1px;
+}
+
+.Schedule {
+    border: solid black 0px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    background-color: #f8f9fa;
+    padding: 1rem;
 }
 </style>
 

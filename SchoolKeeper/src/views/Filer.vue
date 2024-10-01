@@ -44,7 +44,7 @@ export default {
 };
 </script>
 <template>
-  <NavBar />
+  <NavBar site="files"/>
   <main>
     <div id="uppgift">
       <h2>Uppgift #1</h2>
