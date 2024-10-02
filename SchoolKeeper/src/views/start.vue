@@ -67,6 +67,9 @@
 </template>
 
 <style scoped>
+table {
+    text-align: center;
+}
 td {
     padding: 5px;
     border: solid black 1px;

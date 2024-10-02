@@ -1,8 +1,8 @@
 <template>
-    <NavBar site="personal"/>
-    <div>
-        <h1>AAAAAA</h1>
-    </div>
+    <NavBar site="personal" />
+    <main>
+        <h2>{{ user.name }}</h2>
+    </main>
 </template>
 
 <style scoped>
@@ -10,15 +10,48 @@ h1 {
     size: 1000px;
     color: black;
 }
+main {
+    border: solid black 0px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    background-color: #f8f9fa;
+    padding: 1rem;
+}
 </style>
 
 <script>
 import NavBar from "@/components/Nav-Bar.vue";
+import axios from "axios";
+import { useStorage } from "@vueuse/core";
 
 export default {
     name: 'Personal',
     components: {
         NavBar,
-    }
+    },
+    data() {
+        return {
+            currentUser: useStorage('currentUser', { name: '', access: '', class: '' }),
+            user: null,
+            error: null,
+        }
+    },
+    methods: {
+    fetchUser() {
+      const userId = this.currentUser.name; // Assuming the user ID is passed via the route
+
+      axios.get(`http://localhost:1010/api/user/${userId}`)
+        .then(response => {
+          this.user = response.data; // Store user data in component
+        })
+        .catch(error => {
+          console.error('Error fetching user data:', error);
+          this.error = 'Failed to load user data'; // Optional error handling
+        });
+    },
+  },
+  mounted() {
+    this.fetchUser(); // Fetch user data when the component is mounted
+  }
 }
 </script>

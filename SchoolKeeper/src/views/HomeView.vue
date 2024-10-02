@@ -4,8 +4,6 @@ import { useStorage } from '@vueuse/core';
 import { errorMessages } from 'vue/compiler-sfc';
 const currentUser = useStorage('currentUser', {})
 
-
-
 export default {
   data() {
     return {
@@ -41,7 +39,6 @@ export default {
 
 <template>
   <main>
-    <a href="/filer">filer</a>
     <div class="login-container">
       <h2>Login</h2>
       <form @submit.prevent="submitLogin">
@@ -68,9 +65,13 @@ export default {
   </main>
 </template>
 
+<style>
+body {
+  background: linear-gradient(135deg, #f0f4f8, #d9e6f2);
+}
+</style>
 
 <style scoped>
-
 main {
   width: 100vw;
   height: 100vh;

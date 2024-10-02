@@ -3,6 +3,7 @@ import axios from 'axios';
 import NavBar from '@/components/Nav-Bar.vue';
 
 export default {
+  name: 'filer',
   components: {
     NavBar,
   },

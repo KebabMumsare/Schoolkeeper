@@ -30,12 +30,9 @@ const upload = multer({storage: storage})
     name: {
       type: 'string',
     },
-    age: {
-      type: 'number'
-    },
     password: {
       type: 'string'
-    }
+    },
   });
   const UserModel = mongoose.model('User', userSchema);
   
@@ -57,6 +54,23 @@ const upload = multer({storage: storage})
     
     return res.sendStatus(401);
   })
+
+  app.get('/api/user/:name', async (req, res) => {
+    try {
+      // Find user by ID (this can be adjusted to find by email or another field)
+      const user = await UserModel.findById(req.params.name);
+  
+      if (!user) {
+        return res.sendStatus(404); // If user not found, return 404
+      }
+  
+      // Respond with user data
+      res.json(user); 
+    } catch (error) {
+      console.error(error);
+      res.sendStatus(500); // Handle server error
+    }
+  });
   
   app.post('/photos/upload', upload.array('photos', 12), function (req, res, next) {
     // req.files is array of `photos` files
