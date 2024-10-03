@@ -58,7 +58,7 @@ const upload = multer({storage: storage})
   app.get('/api/user/:name', async (req, res) => {
     try {
       // Find user by ID (this can be adjusted to find by email or another field)
-      const user = await UserModel.findById(req.params.name);
+      const user = await UserModel.findOne({name: req.params.name});
   
       if (!user) {
         return res.sendStatus(404); // If user not found, return 404

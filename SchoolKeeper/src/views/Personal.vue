@@ -2,6 +2,10 @@
     <NavBar site="personal" />
     <main>
         <h2>{{ user.name }}</h2>
+        <p v-if="user.age">Age: {{ user.age }}</p>
+        <p v-if="user.email">Email: {{ user.email }}</p>
+        <p v-if="user.phoneNumber">Number: {{ user.phoneNumber }}</p>
+        <p v-if="user.class">Class: {{ user.class }}</p>
     </main>
 </template>
 
@@ -32,7 +36,7 @@ export default {
     data() {
         return {
             currentUser: useStorage('currentUser', { name: '', access: '', class: '' }),
-            user: null,
+            user: {},
             error: null,
         }
     },
