@@ -2,10 +2,26 @@
     <NavBar site="personal" />
     <main>
         <h2>{{ user.name }}</h2>
-        <p v-if="user.age">Age: {{ user.age }}</p>
-        <p v-if="user.email">Email: {{ user.email }}</p>
-        <p v-if="user.phoneNumber">Number: {{ user.phoneNumber }}</p>
-        <p v-if="user.class">Class: {{ user.class }}</p>
+        <table>
+          <tbody>
+            <tr v-if="user.age">
+              <td>Age:</td>
+              <td>{{ user.age }}</td>
+            </tr>
+            <tr v-if="user.email">
+              <td>Email:</td>
+              <td>{{ user.email }}</td>
+            </tr>
+            <tr v-if="user.phoneNumber">
+              <td>Number:</td>
+              <td>{{ user.phoneNumber }}</td>
+            </tr>
+            <tr v-if="user.class">
+              <td>Class:</td>
+              <td>{{ user.class }}</td>
+            </tr>
+          </tbody>
+        </table>
     </main>
 </template>
 
