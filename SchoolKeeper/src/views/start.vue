@@ -12,6 +12,7 @@
         </div>
         <table>
             <thead>
+                <th>Tid</th>
                 <th>Måndag</th>
                 <th>Tisdag </th>
                 <th>Onsdag </th>
@@ -19,9 +20,10 @@
                 <th>Fredag</th>
             </thead>
 
-            <tbody>
+            <tbody>              
                 <!--Row 1-->
                 <tr>
+                    <td>10:00-11:30</td>
                     <td>Svenska</td>
                     <td>Engelska</td>
                     <td>Mattematik</td>
@@ -30,6 +32,7 @@
                 </tr>
                 <!--Row 2-->
                 <tr>
+                    <td>11:30-12:00</td>
                     <td>Engelska</td>
                     <td>Svenska</td>
                     <td>Mattematik</td>
@@ -38,6 +41,7 @@
                 </tr>
                 <!--Row 3-->
                 <tr>
+                    <td>13:00-14:30</td>
                     <td>Svenska</td>
                     <td>Engelska</td>
                     <td>Mattematik</td>
@@ -46,6 +50,7 @@
                 </tr>
                 <!--Row 4-->
                 <tr>
+                    <td>14:30-15:00</td>
                     <td>Engelska</td>
                     <td>Svenska</td>
                     <td>Mattematik</td>
@@ -54,6 +59,7 @@
                 </tr>
                 <!--Row 5-->
                 <tr>
+                    <td>15:00-16:30</td>
                     <td>Svenska</td>
                     <td>Engelska</td>
                     <td>Svenska</td>
