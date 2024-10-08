@@ -68,13 +68,23 @@
                 </tr>
             </tbody>
         </table>
-
+        <button v-if="currentUser.access === 'Admin'"type="submit">Edit</button>
     </main>
 </template>
 
 <style scoped>
 table {
     text-align: center;
+}
+button {
+  width: 100%;
+  padding: 10px;
+  background-color: #6184b8;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
 }
 td {
     padding: 5px;
