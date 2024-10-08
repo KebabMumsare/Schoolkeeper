@@ -10,72 +10,10 @@
         <div class="section">
             <p>Class: {{ currentUser.class }}</p>
         </div>
-<<<<<<< Updated upstream
-        <table>
-            <thead>
-                <th>Tid</th>
-                <th>Måndag</th>
-                <th>Tisdag </th>
-                <th>Onsdag </th>
-                <th>Torsdag </th>
-                <th>Fredag</th>
-            </thead>
-
-            <tbody>              
-                <!--Row 1-->
-                <tr>
-                    <td>10:00-11:30</td>
-                    <td>Svenska</td>
-                    <td>Engelska</td>
-                    <td>Mattematik</td>
-                    <td>Svenska</td>
-                    <td>Engelska</td>
-                </tr>
-                <!--Row 2-->
-                <tr>
-                    <td>11:30-12:00</td>
-                    <td>Engelska</td>
-                    <td>Svenska</td>
-                    <td>Mattematik</td>
-                    <td>Engelska</td>
-                    <td>Svenska</td>
-                </tr>
-                <!--Row 3-->
-                <tr>
-                    <td>13:00-14:30</td>
-                    <td>Svenska</td>
-                    <td>Engelska</td>
-                    <td>Mattematik</td>
-                    <td>Svenska</td>
-                    <td>Engelska</td>
-                </tr>
-                <!--Row 4-->
-                <tr>
-                    <td>14:30-15:00</td>
-                    <td>Engelska</td>
-                    <td>Svenska</td>
-                    <td>Mattematik</td>
-                    <td>Svenska</td>
-                    <td>Mattematik</td>
-                </tr>
-                <!--Row 5-->
-                <tr>
-                    <td>15:00-16:30</td>
-                    <td>Svenska</td>
-                    <td>Engelska</td>
-                    <td>Svenska</td>
-                    <td>Engelska</td>
-                    <td>Mattematik</td>
-                </tr>
-            </tbody>
-        </table>
-        <button v-if="currentUser.access === 'Admin'"type="submit">Edit</button>
-=======
         <div class="table-container">
             <table>
                 <thead>
                     <tr>
-                        <th>Tid</th>
                         <th>Måndag</th>
                         <th>Tisdag</th>
                         <th>Onsdag</th>
@@ -87,53 +25,48 @@
                 <tbody>              
                     <!--Row 1-->
                     <tr>
-                        <td>10:00-11:30</td>
-                        <td>Svenska</td>
-                        <td>Engelska</td>
-                        <td>Mattematik</td>
-                        <td>Svenska</td>
-                        <td>Engelska</td>
+                        <td>10:00-11:30 Svenska</td>
+                        <td>10:00-11:30 Engelska</td>
+                        <td>10:00-11:30 Mattematik</td>
+                        <td>10:00-11:30 Svenska</td>
+                        <td>10:00-11:30 Engelska</td>
                     </tr>
                     <!--Row 2-->
                     <tr>
-                        <td>11:30-12:00</td>
-                        <td>Engelska</td>
-                        <td>Svenska</td>
-                        <td>Mattematik</td>
-                        <td>Engelska</td>
-                        <td>Svenska</td>
+                        <td>11:30-12:00 Engelska</td>
+                        <td>11:30-12:00 Svenska</td>
+                        <td>11:30-12:00 Mattematik</td>
+                        <td>11:30-12:00 Engelska</td>
+                        <td>11:30-12:00 Svenska</td>
                     </tr>
                     <!--Row 3-->
                     <tr>
-                        <td>13:00-14:30</td>
-                        <td>Svenska</td>
-                        <td>Engelska</td>
-                        <td>Mattematik</td>
-                        <td>Svenska</td>
-                        <td>Engelska</td>
+                        <td>13:00-14:30 Svenska</td>
+                        <td>13:00-14:30 Engelska</td>
+                        <td>13:00-14:30 Mattematik</td>
+                        <td>13:00-14:30 Svenska</td>
+                        <td>13:00-14:30 Engelska</td>
                     </tr>
                     <!--Row 4-->
                     <tr>
-                        <td>14:30-15:00</td>
-                        <td>Engelska</td>
-                        <td>Svenska</td>
-                        <td>Mattematik</td>
-                        <td>Svenska</td>
-                        <td>Mattematik</td>
+                        <td>14:30-15:00 Engelska</td>
+                        <td>14:30-15:00 Svenska</td>
+                        <td>14:30-15:00 Mattematik</td>
+                        <td>14:30-15:00 Svenska</td>
+                        <td>14:30-15:00 Mattematik</td>
                     </tr>
                     <!--Row 5-->
                     <tr>
-                        <td>15:00-16:30</td>
-                        <td>Svenska</td>
-                        <td>Engelska</td>
-                        <td>Svenska</td>
-                        <td>Engelska</td>
-                        <td>Mattematik</td>
+                        <td>15:00-16:30 Svenska</td>
+                        <td>15:00-16:30 Engelska</td>
+                        <td>15:00-16:30 Svenska</td>
+                        <td>15:00-16:30 Engelska</td>
+                        <td>15:00-16:30 Mattematik</td>
                     </tr>
                 </tbody>
             </table>
         </div>
->>>>>>> Stashed changes
+        <button v-if="currentUser.access === 'Admin'"type="submit">Edit</button>
     </main>
 </template>
 
@@ -153,7 +86,6 @@ table {
     border-radius: 10px;
     overflow: hidden;
 }
-<<<<<<< Updated upstream
 button {
   width: 100%;
   padding: 10px;
@@ -164,15 +96,9 @@ button {
   cursor: pointer;
   transition: transform 0.2s ease;
 }
-td {
-    padding: 5px;
-    border: solid black 1px;
-=======
-
 th, td {
     padding: 15px;
     border-bottom: 1px solid #dee2e6;
->>>>>>> Stashed changes
 }
 
 thead {
