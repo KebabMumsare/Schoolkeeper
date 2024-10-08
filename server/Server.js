@@ -35,6 +35,18 @@ const upload = multer({storage: storage})
     },
   });
   const UserModel = mongoose.model('User', userSchema);
+  const schedualSchema = mongoose.Schema({
+    day: {
+      type: 'string',
+    },
+    lecture: {
+      type: 'string'
+    },
+    time: {
+      type: 'string'
+    },
+  });
+  const SchedualModel = mongoose.model('Schema', schedualSchema);
   
   // Define a test route
   app.get('/api/test', (req, res) => {
@@ -59,6 +71,23 @@ const upload = multer({storage: storage})
     try {
       // Find user by ID (this can be adjusted to find by email or another field)
       const user = await UserModel.findOne({name: req.params.name});
+  
+      if (!user) {
+        return res.sendStatus(404); // If user not found, return 404
+      }
+  
+      // Respond with user data
+      res.json(user); 
+    } catch (error) {
+      console.error(error);
+      res.sendStatus(500); // Handle server error
+    }
+  });
+
+  app.get('/api/schema/:name', async (req, res) => {
+    try {
+      // Find user by ID (this can be adjusted to find by email or another field)
+      const user = await SchedualModel.findOne({name: req.params.name});
   
       if (!user) {
         return res.sendStatus(404); // If user not found, return 404
