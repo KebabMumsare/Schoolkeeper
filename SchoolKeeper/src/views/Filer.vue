@@ -22,10 +22,8 @@ export default {
         return;
       }
 
-      // Create a new FormData object
       let formData = new FormData();
 
-      // Append each file to the formData object
       for (let i = 0; i < this.files.length; i++) {
         formData.append("photos", this.files[i]);
       }
@@ -59,8 +57,11 @@ export default {
     <hr>
     <div id="inlamning">
       <form @submit.prevent="uploadFiles">
-        <input type="file" multiple @change="onFileChange" />
-        <button type="submit">Upload</button>
+        <div class="button-container">¨
+          <button type="submit" class="button">Upload</button>
+          <label for="file-upload" class="custom-file-upload">Välj filer</label>
+          <input id="file-upload" type="file" multiple @change="onFileChange" />
+        </div>
       </form>
     </div>
   </main>
@@ -82,7 +83,49 @@ main {
   background-color: aqua;
 }
 #inlamning {
+  display: flex;
+  align-items: flex-end;
   background-color: bisque;
   width: 20%;
+  justify-content: center;
+}
+
+.button-container {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: center;
+}
+
+#file-upload {
+  display: none;
+}
+
+.custom-file-upload {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.custom-file-upload:hover {
+  background-color: #45a049;
+}
+
+.button {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.button:hover {
+  background-color: #45a049;
 }
 </style>
