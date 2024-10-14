@@ -1,5 +1,5 @@
 <template>
-    <NavBar site="start"/>
+    <NavBar site="start" />
     <main class="Schedule">
         <div class="Container">
             <h3>Schedule</h3>
@@ -10,14 +10,12 @@
         <div class="section">
             <p>Class: {{ currentUser.class }}</p>
         </div>
+        {{JSON.stringify(schema)}}
         <div class="schedule-container">
             <div class="column">
                 <div class="day-header">Måndag</div>
-                <div class="time-slot">10:00-11:30 Svenska</div>
-                <div class="time-slot">11:30-12:00 Engelska</div>
-                <div class="time-slot">13:00-14:30 Svenska</div>
-                <div class="time-slot">14:30-15:00 Engelska</div>
-                <div class="time-slot">15:00-16:30 Svenska</div>
+                {{ schema }}
+                <div class="time-slot" v-for="lecture of schema[0]">{{lecture.time}}</div>
             </div>
             <div class="column">
                 <div class="day-header">Tisdag</div>
@@ -60,11 +58,11 @@
 .schedule-container {
     display: flex;
     justify-content: space-between;
-    margin-top: 1rem;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 0.5rem;
+    border-radius: 8px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
     background-color: #ffffff;
-    padding: 1rem;
+    padding: 0.5rem;
 }
 
 .column {
@@ -78,17 +76,19 @@
     color: #495057;
     font-weight: bold;
     text-align: center;
-    padding: 15px;
+    padding: 10px;
     border-bottom: 1px solid #dee2e6;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
+    font-size: 0.9rem;
 }
 
 .time-slot {
-    padding: 15px;
+    padding: 8px;
     text-align: center;
     border-bottom: 1px solid #dee2e6;
     background-color: #f8f9fa;
     transition: background-color 0.2s ease;
+    font-size: 0.85rem;
 }
 
 .time-slot:hover {
@@ -96,31 +96,34 @@
 }
 
 .Schedule {
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
     background-color: #f8f9fa;
-    padding: 1.5rem;
+    padding: 1rem;
 }
 
-.name, .section {
-    margin-bottom: 1rem;
-    font-size: 1.1rem;
+.name,
+.section {
+    margin-bottom: 0.8rem;
+    font-size: 1rem;
 }
 
 button {
-  width: 100%;
-  padding: 10px;
-  background-color: #6184b8;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: transform 0.2s ease;
+    width: 100%;
+    padding: 8px;
+    background-color: #6184b8;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    font-size: 0.9rem;
 }
 </style>
 
 <script>
 import NavBar from "@/components/Nav-Bar.vue";
+import axios from "axios";
 import { useStorage } from "@vueuse/core";  // Named import
 
 export default {
@@ -130,8 +133,47 @@ export default {
     },
     data() {
         return {
-            currentUser: useStorage('currentUser', { name: '', access: '', class: '' })
+            currentUser: useStorage('currentUser', { name: '', access: '', class: '' }),
+            schema: [[], [], [], [], []]
         };
     },
+    methods: {
+        fetchSchema(i) {
+            let day = "";
+            switch (i) {
+                case 0:
+                    day = "monday";
+                    break;
+                case 1:
+                    day = "tuesday";
+                    break;
+                case 2:
+                    day = "wednesday";
+                    break;
+                case 3:
+                    day = "thursday";
+                    break;
+                case 4:
+                    day = "friday";
+                    break;
+            }
+
+            axios.get(`http://localhost:1010/api/schema/${day}`)
+                .then(response => {
+                    this.schema[i] = response.data; // Store user data in component
+                    console.log('loaded', response.data)
+                })
+                .catch(error => {
+                    console.error('Error fetching user data:', error);
+                    this.error = 'Failed to load user data'; // Optional error handling
+                });
+        },
+    },
+    mounted() {
+        for (let i = 0; i < 5; i++){
+            this.fetchSchema(i);
+        }
+        
+    }
 };
 </script>
