@@ -87,7 +87,7 @@ const upload = multer({storage: storage})
   app.get('/api/schema/:day', async (req, res) => {
     try {
       // Find user by ID (this can be adjusted to find by email or another field)
-      const user = await SchedualModel.findOne({day: req.params.day});
+      const user = await SchedualModel.find({day: req.params.day});
   
       if (!user) {
         return res.sendStatus(404); // If user not found, return 404

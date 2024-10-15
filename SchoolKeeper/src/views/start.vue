@@ -10,44 +10,12 @@
         <div class="section">
             <p>Class: {{ currentUser.class }}</p>
         </div>
-        {{JSON.stringify(schema)}}
         <div class="schedule-container">
-            <div class="column">
-                <div class="day-header">Måndag</div>
-                {{ schema }}
-                <div class="time-slot" v-for="lecture of schema[0]">{{lecture.time}}</div>
-            </div>
-            <div class="column">
-                <div class="day-header">Tisdag</div>
-                <div class="time-slot">10:00-11:30 Engelska</div>
-                <div class="time-slot">11:30-12:00 Svenska</div>
-                <div class="time-slot">13:00-14:30 Engelska</div>
-                <div class="time-slot">14:30-15:00 Svenska</div>
-                <div class="time-slot">15:00-16:30 Engelska</div>
-            </div>
-            <div class="column">
-                <div class="day-header">Onsdag</div>
-                <div class="time-slot">10:00-11:30 Mattematik</div>
-                <div class="time-slot">11:30-12:00 Mattematik</div>
-                <div class="time-slot">13:00-14:30 Mattematik</div>
-                <div class="time-slot">14:30-15:00 Mattematik</div>
-                <div class="time-slot">15:00-16:30 Svenska</div>
-            </div>
-            <div class="column">
-                <div class="day-header">Torsdag</div>
-                <div class="time-slot">10:00-11:30 Svenska</div>
-                <div class="time-slot">11:30-12:00 Engelska</div>
-                <div class="time-slot">13:00-14:30 Svenska</div>
-                <div class="time-slot">14:30-15:00 Svenska</div>
-                <div class="time-slot">15:00-16:30 Engelska</div>
-            </div>
-            <div class="column">
-                <div class="day-header">Fredag</div>
-                <div class="time-slot">10:00-11:30 Engelska</div>
-                <div class="time-slot">11:30-12:00 Svenska</div>
-                <div class="time-slot">13:00-14:30 Engelska</div>
-                <div class="time-slot">14:30-15:00 Mattematik</div>
-                <div class="time-slot">15:00-16:30 Mattematik</div>
+            <div class="column" v-for="(day, i) in schema" :key="i">
+                <div class="day-header">{{ resolveDay(i) }}</div>
+                <div class="time-slot" v-for="lecture in day" :key="lecture.id">
+                    {{ lecture.time }} {{ lecture.lecture }}
+                </div>
             </div>
         </div>
         <button v-if="currentUser.access === 'Admin'" type="submit">Edit</button>
@@ -138,8 +106,23 @@ export default {
         };
     },
     methods: {
+        resolveDay(i) {
+            switch (i) {
+                case 0:
+                    return "Måndag";
+                case 1:
+                    return "Tisdag";
+                case 2:
+                    return "Onsdag";
+                case 3:
+                    return "Torsdag";
+                case 4:
+                    return "Fredag";
+            }
+        },
         fetchSchema(i) {
-            let day = "";
+            let day = ""; // We're only focusing on Monday for now
+            
             switch (i) {
                 case 0:
                     day = "monday";
@@ -160,12 +143,12 @@ export default {
 
             axios.get(`http://localhost:1010/api/schema/${day}`)
                 .then(response => {
-                    this.schema[i] = response.data; // Store user data in component
-                    console.log('loaded', response.data)
+                    this.schema[i] = response.data; // Store Monday data in the first array element
+                    console.log('loaded Monday data:', response.data);
                 })
                 .catch(error => {
-                    console.error('Error fetching user data:', error);
-                    this.error = 'Failed to load user data'; // Optional error handling
+                    console.error('Error fetching Monday data:', error);
+                    this.error = 'Failed to load Monday data';
                 });
         },
     },
@@ -173,7 +156,6 @@ export default {
         for (let i = 0; i < 5; i++){
             this.fetchSchema(i);
         }
-        
     }
 };
 </script>
