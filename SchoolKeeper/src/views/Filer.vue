@@ -107,6 +107,7 @@ export default {
         </div>
       </div>
     </div>
+    <!--
     <div id="inlamning">
       <form @submit.prevent="uploadFiles">
         <div class="button-container">
@@ -116,6 +117,7 @@ export default {
         </div>
       </form>
     </div>
+    -->
 
     <!-- Modal for creating/editing classrooms -->
     <div v-if="showModal" class="modal">
@@ -129,6 +131,7 @@ export default {
         </div>
       </div>
     </div>
+    <!-- Ska göra ett del där man ska skapa ett nytt klassrum, det som ska vara med är 1. namn på klassrummet, 2. vilken klass det tillhör, 3. vilket ämne som klassrummet ska tillhöra. -->
   </main>
 </template>
 

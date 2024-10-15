@@ -14,7 +14,7 @@
             <div class="column" v-for="(day, i) in schema" :key="i">
                 <div class="day-header">{{ resolveDay(i) }}</div>
                 <div class="time-slot" v-for="lecture in day" :key="lecture.id">
-                    {{ lecture.time }} {{ lecture.lecture }}
+                    {{ lecture.time }} <br> {{ lecture.lecture }}
                 </div>
             </div>
         </div>
@@ -26,37 +26,53 @@
 .schedule-container {
     display: flex;
     justify-content: space-between;
-    margin-top: 0.5rem;
+    margin-top: 0.3rem;
     border-radius: 8px;
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
     background-color: #ffffff;
-    padding: 0.5rem;
+    padding: 0.3rem;
+    gap: 8px;
+    min-height: 350px;
 }
 
 .column {
     display: flex;
     flex-direction: column;
-    width: 18%;
+    flex: 1;
+    min-width: 0;
 }
 
 .day-header {
-    background-color: #f1f3f5;
-    color: #495057;
+    background-color: #6597c9;
+    color: #000000;
     font-weight: bold;
     text-align: center;
-    padding: 10px;
+    padding: 6px;
     border-bottom: 1px solid #dee2e6;
-    margin-bottom: 5px;
-    font-size: 0.9rem;
+    margin-bottom: 3px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    border-radius: 4px 4px 0 0;
 }
 
 .time-slot {
-    padding: 8px;
+    padding: 6px;
     text-align: center;
     border-bottom: 1px solid #dee2e6;
     background-color: #f8f9fa;
     transition: background-color 0.2s ease;
-    font-size: 0.85rem;
+    font-size: 0.75rem;
+    min-height: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    word-wrap: break-word;
+    hyphens: auto;
+}
+
+.time-slot:last-child {
+    border-bottom: none;
+    border-radius: 0 0 4px 4px;
 }
 
 .time-slot:hover {
@@ -67,25 +83,20 @@
     border-radius: 8px;
     box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
     background-color: #f8f9fa;
-    padding: 1rem;
+    padding: 0.75rem;
+    max-width: 1200px;
+    margin-top: 50px;
 }
 
 .name,
 .section {
-    margin-bottom: 0.8rem;
-    font-size: 1rem;
+    margin-bottom: 0.3rem;
+    font-size: 0.85rem;
 }
 
 button {
-    width: 100%;
-    padding: 8px;
-    background-color: #6184b8;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: transform 0.2s ease;
-    font-size: 0.9rem;
+    padding: 6px;
+    font-size: 0.85rem;
 }
 </style>
 
