@@ -15,9 +15,11 @@ export default {
       currentClassroom: {
         id: null,
         name: '',
-        invitees: ''
+        class: '',
+        subject: ''
       },
-      isEditing: false
+      isEditing: false,
+      availableClasses: []
     };
   },
   methods: {
@@ -47,6 +49,7 @@ export default {
         console.error("Error uploading files", error);
       }
     },
+
     createClassroom() {
       const newClassroomNumber = this.classrooms.length + 1;
       this.classrooms.push(`Classroom ${newClassroomNumber}`);
@@ -58,7 +61,7 @@ export default {
     },
     openCreateModal() {
       this.isEditing = false;
-      this.currentClassroom = { id: null, name: '', invitees: '' };
+      this.currentClassroom = { id: null, name: '', class: '', subject: '' };
       this.showModal = true;
     },
     openEditModal(classroom) {
@@ -76,67 +79,113 @@ export default {
           this.classrooms[index] = { ...this.currentClassroom };
         }
       } else {
-        const newId = this.classrooms.length + 1;
+        const newId = this.classrooms.length > 0 ? Math.max(...this.classrooms.map(c => c.id)) + 1 : 1;
         this.classrooms.push({
           id: newId,
-          name: this.currentClassroom.name || `Classroom ${newId}`,
-          invitees: this.currentClassroom.invitees
+          name: this.currentClassroom.name,
+          class: this.currentClassroom.class,
+          subject: this.currentClassroom.subject
         });
       }
-      this.closeModal();
+      this.resetCurrentClassroom();
+      this.showModal = false;
+    },
+    resetCurrentClassroom() {
+      this.currentClassroom = {
+        id: null,
+        name: '',
+        class: '',
+        subject: ''
+      };
+      this.isEditing = false;
     },
     deleteClassroom(id) {
       this.classrooms = this.classrooms.filter(c => c.id !== id);
     },
+
+    async fetchClasses() {
+      try {
+        const response = await axios.get('http://localhost:1010/api/classes');
+        this.availableClasses = response.data;
+        console.log('Fetched classes:', this.availableClasses);
+      } catch (error) {
+        console.error('Error fetching classes:', error);
+        this.availableClasses = []; // Set to empty array in case of error
+      }
+    },
   },
+  mounted() {
+    this.fetchClasses();
+  }
 };
 </script>
 
 <template>
-  <NavBar site="files"/>
+  <NavBar site="files" />
   <main>
     <div id="classrooms">
       <h2>Classrooms</h2>
-      <button @click="openCreateModal" class="create-button">Create Classroom</button>
       <div class="classroom-grid">
         <div v-for="classroom in classrooms" :key="classroom.id" class="classroom-item">
           <h3>{{ classroom.name }}</h3>
-          <p>Invitees: {{ classroom.invitees }}</p>
+          <p>Class: {{ classroom.class }}</p>
+          <p>Subject: {{ classroom.subject }}</p>
           <button @click="openEditModal(classroom)" class="edit-button">Edit</button>
           <button @click="deleteClassroom(classroom.id)" class="delete-button">Delete</button>
         </div>
       </div>
     </div>
-    <!--
-    <div id="inlamning">
-      <form @submit.prevent="uploadFiles">
-        <div class="button-container">
-          <button type="submit" class="button">Upload</button>
-          <label for="file-upload" class="custom-file-upload">Välj filer</label>
-          <input id="file-upload" type="file" multiple @change="onFileChange" />
-        </div>
+    <div id="create-classroom">
+      <h2>Create Classroom</h2>
+      <form @submit.prevent="saveClassroom">
+        <input v-model="currentClassroom.name" placeholder="Classroom Name" required>
+        <select v-model="currentClassroom.class" required>
+          <option value="" disabled>Select Class</option>
+          <option v-for="classOption in availableClasses" :key="classOption" :value="classOption">
+            {{ classOption }}
+          </option>
+        </select>
+        <select v-model="currentClassroom.subject" required>
+          <option value="" disabled>Select Subject</option>
+          <option value="Math">Math</option>
+          <option value="Science">Science</option>
+          <option value="History">History</option>
+          <option value="Literature">Literature</option>
+        </select>
+        <button type="submit" class="create-button">Create Classroom</button>
       </form>
     </div>
-    -->
+  </main>
 
-    <!-- Modal for creating/editing classrooms -->
-    <div v-if="showModal" class="modal">
-      <div class="modal-content">
-        <h2>{{ isEditing ? 'Edit' : 'Create' }} Classroom</h2>
-        <input v-model="currentClassroom.name" placeholder="Classroom Name">
-        <input v-model="currentClassroom.invitees" placeholder="Invitees (comma-separated)">
-        <div class="modal-buttons">
-          <button @click="saveClassroom" class="save-button">Save</button>
-          <button @click="closeModal" class="cancel-button">Cancel</button>
-        </div>
+  <!-- Modal for editing classrooms -->
+  <div v-if="showModal" class="modal">
+    <div class="modal-content">
+      <h2>Edit Classroom</h2>
+      <input v-model="currentClassroom.name" placeholder="Classroom Name">
+      <select v-model="currentClassroom.class">
+        <option value="" disabled>Select Class</option>
+        <option v-for="classOption in availableClasses" :key="classOption" :value="classOption">
+          {{ classOption }}
+        </option>
+      </select>
+      <select v-model="currentClassroom.subject">
+        <option value="" disabled>Select Subject</option>
+        <option value="Math">Math</option>
+        <option value="Science">Science</option>
+        <option value="History">History</option>
+        <option value="Literature">Literature</option>
+      </select>
+      <div class="modal-buttons">
+        <button @click="saveClassroom" class="save-button">Save</button>
+        <button @click="closeModal" class="cancel-button">Cancel</button>
       </div>
     </div>
-    <!-- Ska göra ett del där man ska skapa ett nytt klassrum, det som ska vara med är 1. namn på klassrummet, 2. vilken klass det tillhör, 3. vilket ämne som klassrummet ska tillhöra. -->
-  </main>
+  </div>
 </template>
 
 <style scoped>
 main {
+  display: flex;
   border: solid rgb(212, 212, 212) 1px;
   width: 80vw;
   height: 70vh;
@@ -144,28 +193,29 @@ main {
   border-radius: 1rem;
   box-shadow: 1px 1px 20px 10px rgba(0, 0, 0, 0.1);
   padding: 1rem;
-  display: flex;
 }
 
 #classrooms {
-  width: 80%;
+  width: 70%;
   padding: 1rem;
-  background-color: #e6f2ff; /* Light blue background */
+  background-color: #e6f2ff;
   border-radius: 0.5rem;
-  overflow-y: auto; /* Add scrolling if content exceeds height */
+  overflow-y: auto;
+  margin-right: 1rem;
 }
 
-#inlamning {
-  display: flex;
-  align-items: flex-end;
-  width: 20%;
-  justify-content: center;
+#create-classroom {
+  width: 30%;
   padding: 1rem;
+  background-color: #f0f0f0;
+  border-radius: 0.5rem;
+  display: flex;
+  flex-direction: column;
 }
 
 .classroom-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 1rem;
   margin-top: 1rem;
 }
@@ -176,43 +226,29 @@ main {
   border-radius: 5px;
   padding: 0.5rem;
   text-align: center;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.create-button, .edit-button, .delete-button {
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
 }
 
 .create-button {
   background-color: #4caf50;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-bottom: 1rem;
-}
-
-.delete-button {
-  background-color: #f44336;
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  border-radius: 3px;
-  cursor: pointer;
-  margin-top: 0.5rem;
-  font-size: 0.8rem;
-}
-
-.create-button:hover, .delete-button:hover {
-  opacity: 0.8;
 }
 
 .edit-button {
   background-color: #2196F3;
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  border-radius: 3px;
-  cursor: pointer;
-  margin-top: 0.5rem;
-  font-size: 0.8rem;
+}
+
+.delete-button {
+  background-color: #f44336;
 }
 
 .modal {
@@ -237,7 +273,7 @@ main {
   border-radius: 5px;
 }
 
-.modal-content input {
+input, select {
   width: 100%;
   padding: 10px;
   margin: 10px 0;
@@ -266,5 +302,15 @@ main {
 .cancel-button {
   background-color: #f44336;
   color: white;
+}
+
+select {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: white;
+  font-size: 14px;
 }
 </style>

@@ -33,6 +33,9 @@ const upload = multer({storage: storage})
     password: {
       type: 'string'
     },
+    class: {
+      type: 'string'
+    },
   });
   const UserModel = mongoose.model('User', userSchema);
   const schedualSchema = mongoose.Schema({
@@ -80,6 +83,27 @@ const upload = multer({storage: storage})
       res.json(user); 
     } catch (error) {
       console.error(error);
+      res.sendStatus(500); // Handle server error
+    }
+  });
+  app.get('/api/classes', async (req, res) => {
+    try {
+      // Find all users and select only the 'class' field
+      const users = await UserModel.find({}, 'class');
+
+      if (!users || users.length === 0) {
+        return res.sendStatus(404); // If no users found, return 404
+      }
+
+      // Extract unique classes
+      const uniqueClasses = [...new Set(users.map(user => user.class))];
+
+      // Filter out any null or undefined classes, but keep empty strings
+      const validClasses = uniqueClasses.filter(className => className !== null && className !== undefined);
+
+      res.json(validClasses);
+    } catch (error) {
+      console.error('Error fetching classes:', error);
       res.sendStatus(500); // Handle server error
     }
   });

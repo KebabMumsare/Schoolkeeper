@@ -133,7 +133,7 @@ export default {
         },
         fetchSchema(i) {
             let day = ""; // We're only focusing on Monday for now
-            
+
             switch (i) {
                 case 0:
                     day = "monday";
@@ -164,7 +164,7 @@ export default {
         },
     },
     mounted() {
-        for (let i = 0; i < 5; i++){
+        for (let i = 0; i < 5; i++) {
             this.fetchSchema(i);
         }
     }
