@@ -50,14 +50,17 @@ export default {
       }
     },
 
-    createClassroom() {
-      const newClassroomNumber = this.classrooms.length + 1;
-      this.classrooms.push(`Classroom ${newClassroomNumber}`);
+    async createClassroom() {
+      await axios.post('http://localhost:1010/api/classrooms/', {
+        name: this.currentClassroom.name,
+        class: this.currentClassroom.class,
+        subject: this.currentClassroom.subject
+      });
+      this.loadClasses();
     },
-    deleteClassroom(index) {
-      this.classrooms.splice(index, 1);
-      // Renumber remaining classrooms
-      this.classrooms = this.classrooms.map((_, i) => `Classroom ${i + 1}`);
+    async deleteClassroom(index) {
+      await axios.delete(`http://localhost:1010/api/classrooms/${index}`)
+      this.loadClasses();
     },
     openCreateModal() {
       this.isEditing = false;
@@ -87,8 +90,9 @@ export default {
           subject: this.currentClassroom.subject
         });
       }
-      this.resetCurrentClassroom();
       this.showModal = false;
+      this.resetCurrentClassroom();
+      this.loadClasses();
     },
     resetCurrentClassroom() {
       this.currentClassroom = {
@@ -99,28 +103,31 @@ export default {
       };
       this.isEditing = false;
     },
-    deleteClassroom(id) {
-      this.classrooms = this.classrooms.filter(c => c.id !== id);
-    },
 
     async fetchClasses() {
       try {
         const response = await axios.get('http://localhost:1010/api/classes');
-        const fetchedClasses = response.data;
-        
-        // Add only unique classes that don't already exist in availableClasses
-        fetchedClasses.forEach(fetchedClass => {
-          if (!this.availableClasses.includes(fetchedClass.class)) {
-            this.availableClasses.push(fetchedClass.class);
-          }
-        });
+        this.availableClasses = response.data;
+        console.log('Fetched classes:', this.availableClasses);
       } catch (error) {
         console.error('Error fetching classes:', error);
+        this.availableClasses = []; // Set to empty array in case of error
+      }
+    },
+    async loadClasses() {
+      try {
+        const response = await axios.get('http://localhost:1010/api/classrooms');
+        this.classrooms = response.data;
+        console.log('Fetched classrooms:', this.classrooms);
+      } catch (error) {
+        console.error('Error fetching classrooms:', error);
+        this.classrooms = []; // Set to empty array in case of error
       }
     },
   },
   mounted() {
     this.fetchClasses();
+    this.loadClasses();
   }
 };
 </script>
@@ -130,20 +137,20 @@ export default {
   <main>
     <div id="classrooms">
       <h2>Classrooms</h2>
-      {{ availableClasses }}
       <div class="classroom-grid">
         <div v-for="classroom in classrooms" :key="classroom.id" class="classroom-item">
           <h3>{{ classroom.name }}</h3>
           <p>Class: {{ classroom.class }}</p>
           <p>Subject: {{ classroom.subject }}</p>
+          <p>ID: {{ classroom._id }}</p>
           <button @click="openEditModal(classroom)" class="edit-button">Edit</button>
-          <button @click="deleteClassroom(classroom.id)" class="delete-button">Delete</button>
+          <button @click="deleteClassroom(classroom._id)" class="delete-button">Delete</button>
         </div>
       </div>
     </div>
     <div id="create-classroom">
       <h2>Create Classroom</h2>
-      <form @submit.prevent="saveClassroom">
+      <form @submit.prevent="createClassroom">
         <input v-model="currentClassroom.name" placeholder="Classroom Name" required>
         <select v-model="currentClassroom.class" required>
           <option value="" disabled>Select Class</option>

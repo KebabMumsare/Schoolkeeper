@@ -50,11 +50,18 @@ const upload = multer({storage: storage})
     },
   });
   const SchedualModel = mongoose.model('Schema', schedualSchema);
-  
-  // Define a test route
-  app.get('/api/test', (req, res) => {
-    res.json({ message: 'Mykyta luktar!' });
+  const ClassroomSchema = mongoose.Schema({
+    name: {
+      type: 'string',
+    },
+    class: {
+      type: 'string'
+    },
+    subject: {
+      type: 'string'
+    },
   });
+  const ClassroomModel = mongoose.model('Classroom', ClassroomSchema);
   
   app.post('/api/login', async (req, res) => {
     const user = await UserModel.findOne({name: req.body.name});
@@ -119,6 +126,40 @@ const upload = multer({storage: storage})
   
       // Respond with user data
       res.json(user); 
+    } catch (error) {
+      console.error(error);
+      res.sendStatus(500); // Handle server error
+    }
+  });
+
+  app.get('/api/classrooms/', async (req, res) => {
+    try {
+      const classrooms = await ClassroomModel.find({});
+
+      if (!classrooms || classrooms.length === 0) {
+        return res.sendStatus(404); // If no users found, return 404
+      }
+      res.json(classrooms);
+    } catch (error) {
+      console.error(error);
+      res.sendStatus(500); // Handle server error
+    }
+  });
+  app.post('/api/classrooms/', async (req, res) => {
+    try {
+      const newClassroom = new ClassroomModel(req.body);
+      await newClassroom.save();
+      res.json(newClassroom);
+    } catch (error) {
+      console.error(error);
+      res.sendStatus(500); // Handle server error
+    }
+  });
+  app.delete('/api/classrooms/:id', async (req, res) => {
+    try {
+      console.log("id:", req.params.id);
+      await ClassroomModel.findByIdAndDelete(req.params.id);
+      res.sendStatus(204);
     } catch (error) {
       console.error(error);
       res.sendStatus(500); // Handle server error
