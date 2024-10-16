@@ -106,11 +106,16 @@ export default {
     async fetchClasses() {
       try {
         const response = await axios.get('http://localhost:1010/api/classes');
-        this.availableClasses = response.data;
-        console.log('Fetched classes:', this.availableClasses);
+        const fetchedClasses = response.data;
+        
+        // Add only unique classes that don't already exist in availableClasses
+        fetchedClasses.forEach(fetchedClass => {
+          if (!this.availableClasses.includes(fetchedClass.class)) {
+            this.availableClasses.push(fetchedClass.class);
+          }
+        });
       } catch (error) {
         console.error('Error fetching classes:', error);
-        this.availableClasses = []; // Set to empty array in case of error
       }
     },
   },
@@ -125,6 +130,7 @@ export default {
   <main>
     <div id="classrooms">
       <h2>Classrooms</h2>
+      {{ availableClasses }}
       <div class="classroom-grid">
         <div v-for="classroom in classrooms" :key="classroom.id" class="classroom-item">
           <h3>{{ classroom.name }}</h3>
