@@ -37,7 +37,7 @@
                 </div>
             </div>
             <div class="additional-info">
-                <!-- Add any additional information or components here -->
+                <!-- Lägg till inkommande prov här skulel vara en banger ide (Feedback av Gymasie arebte grupp) -->
                 <h4>Additional Information</h4>
                 <p>This space can be used for announcements, upcoming events, or any other relevant information.</p>
             </div>
