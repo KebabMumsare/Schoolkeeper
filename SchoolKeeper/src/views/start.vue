@@ -39,7 +39,7 @@
             </div>
             <div class="additional-info">
                 <!-- Lägg till inkommande prov här skulel vara en banger ide (Feedback av Gymasie arebte grupp) -->
-                 <!-- Man kan också ha så att lektionerna blir andra färg om man har prov i de ämnet-->
+                <!-- Man kan också ha så att lektionerna blir andra färg om man har prov i de ämnet-->
                 <h4>Additional Information</h4>
                 <p>This space can be used for announcements, upcoming events, or any other relevant information.</p>
             </div>
