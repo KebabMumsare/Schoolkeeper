@@ -19,12 +19,13 @@
             </div>
             <!--Flytta namn och klassrumm till längst upp till vänster (feedback av gymasie arebte grupp)-->
             <div class="weekly-schedule">
+                <!-- behövs inte men Jesper kan klaga om jag tar bort de så de chillar här
                 <div class="name">
                     <p>Namn: {{ currentUser.name }}</p>
                 </div>
                 <div class="section">
                     <p>Class: {{ currentUser.class }}</p>
-                </div>
+                </div>-->
                 <div class="schedule-container">
                     <div class="column" v-for="(day, i) in schema" :key="i">
                         <div class="day-header" :class="{ 'current-day': isCurrentDay(i) }">
