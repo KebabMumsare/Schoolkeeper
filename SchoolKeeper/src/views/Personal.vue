@@ -22,7 +22,6 @@
             </tr>
           </tbody>
         </table>
-        <button type="submit">Login</button>
     </main>
 </template>
 
