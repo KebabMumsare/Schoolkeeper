@@ -1,6 +1,7 @@
 <template>
   <div class="nav-wrap">
     <div class="nav-container">
+      <div class="nav-spacer"></div>
       <nav>
         <ul class="nav-list">
           <li class="nav-item">
@@ -37,12 +38,15 @@
           </li>
         </ul>
       </nav>
+      <!-- Add user info -->
+      <div v-if="currentUser" class="user-info">
+        <p>{{ currentUser.name }} | {{ currentUser.class }}</p>
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-
 .nav-wrap {
   position: fixed;
   height: 7rem;
@@ -58,6 +62,19 @@
   margin-bottom: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   height: 5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-spacer {
+  flex: 1;
+}
+
+nav {
+  flex: 2;
+  display: flex;
+  justify-content: center;
 }
 
 .nav-list {
@@ -107,19 +124,25 @@
 .nav-icon:hover {
   transform: scale(1.3);
 }
+
+.user-info {
+  flex: 1;
+  text-align: right;
+  margin-right: 15px;
+  font-size: 0.9rem;
+  color: #333;
+}
 </style>
+
 <script setup>
 const props = defineProps({
-        site: String,
-      })
+  site: String,
+  currentUser: Object,
+})
 </script>
+
 <script>
 export default {
   name: 'NavBar',
-  data() {
-    return {
-      
-    }
-  },
 }
 </script>

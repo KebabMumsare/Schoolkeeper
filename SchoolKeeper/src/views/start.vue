@@ -1,5 +1,5 @@
 <template>
-    <NavBar site="start" />
+    <NavBar site="start" :currentUser="currentUser" />
     <main class="Schedule">
         <div class="Container">
             <h3>Schedule</h3>
