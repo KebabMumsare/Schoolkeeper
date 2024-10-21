@@ -1,6 +1,6 @@
 <template>
-    <NavBar site="personal" />
-    <main>
+    <NavBar site="personal" :currentUser="currentUser" />
+    <main class="content">
         <h2>{{ user.name }}</h2>
         <table>
           <tbody>

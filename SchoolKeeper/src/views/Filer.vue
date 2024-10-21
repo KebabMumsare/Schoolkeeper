@@ -143,8 +143,8 @@ export default {
 </script>
 
 <template>
-  <NavBar site="files" />
-  <main :class="{ 'student-view': currentUser.access === 'Elev' }">
+  <NavBar site="files" :currentUser="currentUser" />
+  <main class="content">
     <div id="classrooms" :class="{ 'full-width': currentUser.access === 'Elev' }">
       <h2>Classrooms</h2>
       <div class="classroom-grid">
