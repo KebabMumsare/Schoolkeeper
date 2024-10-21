@@ -17,6 +17,7 @@
                     <div class="current-time-indicator" :style="{ top: currentTimePosition + 'px' }"></div>
                 </div>
             </div>
+            <!--Flytta namn och klassrumm till längst upp till vänster (feedback av gymasie arebte grupp)-->
             <div class="weekly-schedule">
                 <div class="name">
                     <p>Namn: {{ currentUser.name }}</p>
