@@ -28,19 +28,19 @@
           <h3>Additional Details</h3>
           <table>
             <tbody>
-              <tr v-if="user.elevdokument">
-                <td>elevdokument:</td>
-                <td>{{ user.elevdokument }}</td>
+              <tr v-if="user.studentdokument">
+                <td>Studentdokument:</td>
+                <td>{{ user.studentdokument }}</td>
               </tr>
-              <tr v-if="user.birthDate">
-                <td>Birth Date:</td>
-                <td>{{ user.birthDate }}</td>
+              <tr v-if="user.birthday">
+                <td>Birthday:</td>
+                <td>{{ user.birthday }}</td>
               </tr>
               <tr v-if="user.emergencyContact">
                 <td>Emergency Contact:</td>
                 <td>{{ user.emergencyContact }}</td>
               </tr>
-              <!-- Add more details as needed -->
+              <!-- Lägg till mer om de behövs-->
             </tbody>
           </table>
         </div>

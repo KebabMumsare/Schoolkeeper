@@ -16,6 +16,7 @@ export default {
   methods: {
     submitLogin() {
       axios.post('http://localhost:1010/api/login', {name: this.email, password: this.password})
+      
       .then(response => {
         this.setCurrentUser(response.data)
         this.message = response.data.message;
