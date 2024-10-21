@@ -1,6 +1,7 @@
 <script>
 import axios from 'axios';
 import NavBar from '@/components/Nav-Bar.vue';
+import { useStorage } from "@vueuse/core";
 
 export default {
   name: 'filer',
@@ -9,6 +10,7 @@ export default {
   },
   data() {
     return {
+      currentUser: useStorage('currentUser', { name: '', access: '', class: '' }),
       files: [],
       classrooms: [],
       showModal: false,
@@ -21,6 +23,14 @@ export default {
       isEditing: false,
       availableClasses: []
     };
+  },
+  computed: {
+    filteredClassrooms() {
+      if (this.currentUser.access === 'Elev') {
+        return this.classrooms.filter(classroom => classroom.class === this.currentUser.class);
+      }
+      return this.classrooms;
+    }
   },
   methods: {
     onFileChange(event) {
@@ -134,21 +144,20 @@ export default {
 
 <template>
   <NavBar site="files" />
-  <main>
-    <div id="classrooms">
+  <main :class="{ 'student-view': currentUser.access === 'Elev' }">
+    <div id="classrooms" :class="{ 'full-width': currentUser.access === 'Elev' }">
       <h2>Classrooms</h2>
       <div class="classroom-grid">
-        <div v-for="classroom in classrooms" :key="classroom.id" class="classroom-item">
+        <div v-for="classroom in filteredClassrooms" :key="classroom.id" class="classroom-item">
           <h3>{{ classroom.name }}</h3>
           <p>Class: {{ classroom.class }}</p>
           <p>Subject: {{ classroom.subject }}</p>
-          <p>ID: {{ classroom._id }}</p>
-          <button @click="openEditModal(classroom)" class="edit-button">Edit</button>
-          <button @click="deleteClassroom(classroom._id)" class="delete-button">Delete</button>
+          <button v-if="currentUser.access === 'Admin' || currentUser.access === 'Lärare'" @click="openEditModal(classroom)" class="edit-button">Edit</button>
+          <button v-if="currentUser.access === 'Admin' || currentUser.access === 'Lärare'" @click="deleteClassroom(classroom._id)" class="delete-button">Delete</button>
         </div>
       </div>
     </div>
-    <div id="create-classroom">
+    <div id="create-classroom" v-if="currentUser.access === 'Admin' || currentUser.access === 'Lärare'">
       <h2>Create Classroom</h2>
       <form @submit.prevent="createClassroom">
         <input v-model="currentClassroom.name" placeholder="Classroom Name" required>
@@ -208,6 +217,8 @@ main {
   padding: 1rem;
 }
 
+
+
 #classrooms {
   width: 70%;
   padding: 1rem;
@@ -215,6 +226,11 @@ main {
   border-radius: 0.5rem;
   overflow-y: auto;
   margin-right: 1rem;
+}
+
+#classrooms.full-width {
+  width: 100%;
+  margin-right: 0;
 }
 
 #create-classroom {
