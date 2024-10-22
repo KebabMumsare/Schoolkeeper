@@ -14,7 +14,6 @@
                             {{ lecture.lecture }}
                         </div>
                     </div>
-                    <div class="current-time-indicator" :style="{ top: currentTimePosition + 'px' }"></div>
                 </div>
             </div>
             <!--Flytta namn och klassrumm till längst upp till vänster (feedback av gymasie arebte grupp)-->
