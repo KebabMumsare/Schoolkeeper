@@ -25,7 +25,7 @@ const upload = multer({storage: storage})
   .then(() => console.log('MongoDB connected successfully'))
   .catch(err => console.log('MongoDB connection error:', err));
   
-  
+  // User Schema 
   const userSchema = mongoose.Schema({
     name: {
       type: 'string',
@@ -38,6 +38,7 @@ const upload = multer({storage: storage})
     },
   });
   const UserModel = mongoose.model('User', userSchema);
+  // Schedual Schema
   const schedualSchema = mongoose.Schema({
     day: {
       type: 'string',
@@ -50,6 +51,7 @@ const upload = multer({storage: storage})
     },
   });
   const SchedualModel = mongoose.model('Schema', schedualSchema);
+  
   const ClassroomSchema = mongoose.Schema({
     name: {
       type: 'string',
@@ -62,7 +64,19 @@ const upload = multer({storage: storage})
     },
   });
   const ClassroomModel = mongoose.model('Classroom', ClassroomSchema);
-  
+  // Prov Schema
+  const ProvSchema = mongoose.Schema({
+    prov: {
+      type: 'string',
+    },
+    class: {
+      type: 'string'
+    },
+    subject: {
+      type: 'string'
+    },
+  });
+  const ProvModel = mongoose.model('Test', ProvSchema);
   app.post('/api/login', async (req, res) => {
     const user = await UserModel.findOne({name: req.body.name});
     
@@ -76,7 +90,7 @@ const upload = multer({storage: storage})
     
     return res.sendStatus(401);
   })
-
+  // User API
   app.get('/api/user/:name', async (req, res) => {
     try {
       // Find user by ID (this can be adjusted to find by email or another field)
@@ -114,7 +128,7 @@ const upload = multer({storage: storage})
       res.sendStatus(500); // Handle server error
     }
   });
-
+  // Schedual API
   app.get('/api/schema/:day', async (req, res) => {
     try {
       // Find user by ID (this can be adjusted to find by email or another field)
@@ -131,7 +145,7 @@ const upload = multer({storage: storage})
       res.sendStatus(500); // Handle server error
     }
   });
-
+  // Classroom API
   app.get('/api/classrooms/', async (req, res) => {
     try {
       const classrooms = await ClassroomModel.find({});
@@ -165,7 +179,21 @@ const upload = multer({storage: storage})
       res.sendStatus(500); // Handle server error
     }
   });
-  
+  // Prov API
+  app.get('/api/tests/', async (req, res) => {
+    try {
+      const tests = await ProvModel.find({});
+
+      if (!tests || tests.length === 0) {
+        return res.sendStatus(404); // If no users found, return 404
+      }
+      res.json(tests);
+    } catch (error) {
+      console.error(error);
+      res.sendStatus(500); // Handle server error
+    }
+  });
+  // Submit API
   app.post('/photos/upload', upload.array('photos', 12), function (req, res, next) {
     // req.files is array of `photos` files
     // req.body will contain the text fields, if there were any
