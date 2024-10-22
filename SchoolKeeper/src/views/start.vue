@@ -3,7 +3,6 @@
     <main class="Schedule">
         <div class="Container">
             <h3>Schedule</h3>
-            {{ testSchedual }}
         </div>
         <div class="schedule-layout">
             <div class="today-schedule">
@@ -333,7 +332,7 @@ export default {
             }
         },
         async fetchTestSchedual() {
-            const response = await axios.get(`http://localhost:1010/api/test/`);
+            const response = await axios.get(`http://localhost:1010/api/tests/`);
             this.testSchedual = response.data;
         },
         updateCurrentTimePosition() {

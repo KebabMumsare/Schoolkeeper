@@ -18,8 +18,7 @@ app.use(express.json());
 app.use(cors());
 
 // MongoDB Atlas connection string
-const mongoURI =
-  "mongodb+srv://SchoolKeeper:Damdam@cluster0.htzr1.mongodb.net/SchoolKeeper?retryWrites=true&w=majority&appName=Cluster0";
+const mongoURI = "mongodb+srv://SchoolKeeper:Damdam@cluster0.htzr1.mongodb.net/SchoolKeeper?retryWrites=true&w=majority&appName=Cluster0";
 
 // Mongoose connection setup
 mongoose
@@ -189,6 +188,7 @@ app.delete("/api/classrooms/:id", async (req, res) => {
 // Prov API
 app.get("/api/tests/", async (req, res) => {
   try {
+    console.log("Attempting to fetch tests...");
     const tests = await ProvModel.find({});
     console.log("Retrieved tests:", tests);
 
