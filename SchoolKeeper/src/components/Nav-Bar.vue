@@ -21,10 +21,10 @@
             </a>
           </li>
           <li class="nav-item">
-            <a v-if="site !== 'notice'" href="" class="nav-link">
+            <a v-if="site !== 'notice'" href="/notice" class="nav-link">
               <img src="https://www.iconpacks.net/icons/1/free-bell-icon-860-thumb.png" alt="" class="nav-icon">
             </a>
-            <a v-if="site === 'notice'" href="" class="nav-link nav-link-active">
+            <a v-if="site === 'notice'" href="/notice" class="nav-link nav-link-active">
               <img src="https://www.iconpacks.net/icons/1/free-bell-icon-860-thumb.png" alt="" class="nav-icon-selected">
             </a>
           </li>
