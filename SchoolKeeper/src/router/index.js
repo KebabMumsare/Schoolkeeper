@@ -3,6 +3,7 @@ import HomeView from '../views/HomeView.vue'
 import start from '../views/start.vue'
 import filer from '../views/Filer.vue'
 import personal from '../views/Personal.vue'
+import notice from '../views/Notice.vue'
 
 
 const router = createRouter({
@@ -27,6 +28,11 @@ const router = createRouter({
     path: '/personal',
     name: 'personal',
     component: personal
+  },
+  {
+    path: '/notice', 
+    name: 'notice', 
+    component: notice 
   },
  ]
 })
