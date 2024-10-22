@@ -72,6 +72,9 @@ const upload = multer({storage: storage})
     class: {
       type: 'string'
     },
+    date: {
+      type: 'string'
+    },
     subject: {
       type: 'string'
     },
@@ -183,14 +186,17 @@ const upload = multer({storage: storage})
   app.get('/api/tests/', async (req, res) => {
     try {
       const tests = await ProvModel.find({});
-
+      console.log('Retrieved tests:', tests);
+      
       if (!tests || tests.length === 0) {
-        return res.sendStatus(404); // If no users found, return 404
+        console.log('No tests found');
+        return res.status(404).json({ message: 'No tests found' });
       }
+      
       res.json(tests);
     } catch (error) {
-      console.error(error);
-      res.sendStatus(500); // Handle server error
+      console.error('Error fetching tests:', error);
+      res.status(500).json({ message: 'Server error', error: error.message });
     }
   });
   // Submit API

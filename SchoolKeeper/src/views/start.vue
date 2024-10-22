@@ -3,6 +3,7 @@
     <main class="Schedule">
         <div class="Container">
             <h3>Schedule</h3>
+            {{ testSchedual }}
         </div>
         <div class="schedule-layout">
             <div class="today-schedule">
@@ -253,6 +254,7 @@ export default {
             testDay: '',
             todaySchedule: [],
             currentTimePosition: 0,
+            testSchedual: [],
         };
     },
     methods: {
@@ -270,7 +272,7 @@ export default {
                     return "Fredag";
             }
         },
-        fetchSchema(i) {
+        async fetchSchema(i) {
             let day = ""; // We're only focusing on Monday for now
 
             switch (i) {
@@ -330,6 +332,10 @@ export default {
                 console.error('Error fetching today\'s schedule:', error);
             }
         },
+        async fetchTestSchedual() {
+            const response = await axios.get(`http://localhost:1010/api/test/`);
+            this.testSchedual = response.data;
+        },
         updateCurrentTimePosition() {
             const now = new Date();
             const startTime = new Date(now.setHours(8, 0, 0)); // Assuming school day starts at 8:00
@@ -358,6 +364,7 @@ export default {
         this.updateDateTime();
         setInterval(this.updateDateTime, 1000);
         this.fetchTodaySchedule();
+        this.fetchTestSchedual();
         setInterval(() => {
             this.updateCurrentTimePosition();
             // Force re-render of the component to update current lecture
