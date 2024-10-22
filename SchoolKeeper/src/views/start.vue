@@ -16,7 +16,6 @@
                     </div>
                 </div>
             </div>
-            <!--Flytta namn och klassrumm till längst upp till vänster (feedback av gymasie arebte grupp)-->
             <div class="weekly-schedule">
                 <!-- behövs inte men Jesper kan klaga om jag tar bort de så de chillar här
                 <div class="name">
