@@ -31,7 +31,10 @@
                         </div>
                         <div class="time-slot" v-for="lecture in day" :key="lecture.id"
                              :class="{ 'current-lecture': isCurrentDay(i) && isCurrentLecture(lecture) }">
-                            {{ lecture.time }} <br> {{ lecture.lecture }}
+                            {{ lecture.time }} <br> 
+                            <span :class="{ 'test-lesson': hasTest(lecture.lecture) }">
+                                {{ lecture.lecture }}
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -291,6 +294,10 @@ button {
 .test-name {
     font-size: 0.9rem;
 }
+
+.test-lesson {
+    color: red;
+}
 </style>
 
 <script>
@@ -416,6 +423,11 @@ export default {
         updateSchedules() {
             this.fetchTodaySchedule();
             // If you need to update the weekly schedule as well, call that method here
+        },
+        hasTest(subject) {
+            return this.testSchedule.some(test => 
+                test.subject.toLowerCase() === subject.toLowerCase()
+            );
         },
     },
     mounted() {
