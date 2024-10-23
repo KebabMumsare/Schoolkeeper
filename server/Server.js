@@ -186,6 +186,15 @@ app.get("/api/classrooms/", async (req, res) => {
   }
 });
 
+app.get("/api/classrooms/:id", async (req, res) => {
+  try {
+    const classroom = await ClassroomModel.findById(req.params.id);
+    res.json(classroom);
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(500); // Handle server error
+  }
+});
 app.post("/api/classrooms/", async (req, res) => {
   try {
     const newClassroom = new ClassroomModel(req.body);

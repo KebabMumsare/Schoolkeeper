@@ -4,7 +4,7 @@ import start from '../views/start.vue'
 import filer from '../views/Filer.vue'
 import personal from '../views/Personal.vue'
 import notice from '../views/Notice.vue'
-
+import classroom from '../views/Classroom.vue'
 
 const router = createRouter({
  history: createWebHistory(import.meta.env.BASE_URL),
@@ -34,6 +34,11 @@ const router = createRouter({
     name: 'notice', 
     component: notice 
   },
+  {
+    path: '/classrooms/:id',
+    name: 'classrooms',
+    component: classroom
+  }
  ]
 })
 

@@ -134,6 +134,10 @@ export default {
         this.classrooms = []; // Set to empty array in case of error
       }
     },
+    enterClassroom(classroom) {
+      console.log(`Entering classroom: ${classroom.name}`);
+      
+    },
   },
   mounted() {
     this.fetchClasses();
@@ -152,6 +156,7 @@ export default {
           <h3>{{ classroom.name }}</h3>
           <p>Class: {{ classroom.class }}</p>
           <p>Subject: {{ classroom.subject }}</p>
+          <button @click="enterClassroom(classroom)" class="enter-button">Enter</button>
           <button v-if="currentUser.access === 'Admin' || currentUser.access === 'Lärare'" @click="openEditModal(classroom)" class="edit-button">Edit</button>
           <button v-if="currentUser.access === 'Admin' || currentUser.access === 'Lärare'" @click="deleteClassroom(classroom._id)" class="delete-button">Delete</button>
         </div>
@@ -341,5 +346,20 @@ select {
   border-radius: 4px;
   background-color: white;
   font-size: 14px;
+}
+
+.enter-button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.enter-button:hover {
+  background-color: #45a049;
 }
 </style>
