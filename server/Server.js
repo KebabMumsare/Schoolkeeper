@@ -11,6 +11,7 @@ const storage = multer.diskStorage({
     cb(null, Date.now() + "-" + file.originalname); // Custom file name
   },
 });
+
 const upload = multer({ storage: storage });
 
 const app = express();
@@ -91,9 +92,9 @@ app.post("/api/login", async (req, res) => {
   if (user.password === req.body.password) {
     return res.json(user);
   }
-
   return res.sendStatus(401);
 });
+
 // User API
 app.get("/api/user/:name", async (req, res) => {
   try {
@@ -111,6 +112,7 @@ app.get("/api/user/:name", async (req, res) => {
     res.sendStatus(500); // Handle server error
   }
 });
+
 app.get("/api/classes", async (req, res) => {
   try {
     // Find all users and select only the 'class' field
@@ -134,6 +136,7 @@ app.get("/api/classes", async (req, res) => {
     res.sendStatus(500); // Handle server error
   }
 });
+
 // Schedual API
 app.get("/api/schema/:day", async (req, res) => {
   try {
@@ -151,6 +154,7 @@ app.get("/api/schema/:day", async (req, res) => {
     res.sendStatus(500); // Handle server error
   }
 });
+
 // Classroom API
 app.get("/api/classrooms/", async (req, res) => {
   try {
@@ -165,6 +169,7 @@ app.get("/api/classrooms/", async (req, res) => {
     res.sendStatus(500); // Handle server error
   }
 });
+
 app.post("/api/classrooms/", async (req, res) => {
   try {
     const newClassroom = new ClassroomModel(req.body);
@@ -175,6 +180,7 @@ app.post("/api/classrooms/", async (req, res) => {
     res.sendStatus(500); // Handle server error
   }
 });
+
 app.delete("/api/classrooms/:id", async (req, res) => {
   try {
     console.log("id:", req.params.id);
@@ -185,6 +191,7 @@ app.delete("/api/classrooms/:id", async (req, res) => {
     res.sendStatus(500); // Handle server error
   }
 });
+
 // Prov API
 app.get("/api/tests/", async (req, res) => {
   try {
@@ -203,16 +210,27 @@ app.get("/api/tests/", async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 });
-// Submit API
-app.post(
-  "/photos/upload",
-  upload.array("photos", 12),
-  function (req, res, next) {
-    // req.files is array of `photos` files
-    // req.body will contain the text fields, if there were any
-    return res.sendStatus(204);
+
+// Notice API
+app.get("/api/notice/", async (req, res) => {
+  try {
+    const notice = await NoticeModel.find({});
+    if (!notice || notice.length === 0) {
+      return res.sendStatus(404);
+    }
+    res.json(notice);
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(500); // Handle server error
   }
-);
+});
+
+// Submit API
+app.post("/photos/upload", upload.array("photos", 12), function (req, res, next) {
+  // req.files is array of `photos` files
+  // req.body will contain the text fields, if there were any
+  return res.sendStatus(204);
+});
 
 const PORT = process.env.PORT || 1010;
 app.listen(PORT, () => {
