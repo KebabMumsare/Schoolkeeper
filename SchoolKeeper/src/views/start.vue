@@ -43,11 +43,14 @@
                 
                 <div class="test-list">
                     <h5>Upcoming Tests</h5>
-                    <ul v-if="testSchedual.length > 0">
-                        <li v-for="test in testSchedual" :key="test._id">
-                            {{ test.subject }} - {{ test.date }} - {{ test.prov }}
+                    <ul v-if="testSchedule.length > 0">
+                        <li v-for="test in testSchedule" :key="test._id" class="test-item">
+                            <span class="test-subject">{{ test.subject }}</span>
+                            <span class="test-date">{{ test.date }}</span>
+                            <span class="test-name">{{ test.prov }}</span>
                         </li>
                     </ul>
+                    
                     <p v-else>No upcoming tests</p>
                 </div>
             
@@ -242,6 +245,52 @@ button {
     border: 2px solid #1890ff !important;
     font-weight: bold;
 }
+
+.test-list {
+    max-height: 300px; /* Adjust this value as needed */
+    overflow-y: auto;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 10px;
+    background-color: #f8f9fa;
+}
+
+.test-list h5 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1rem;
+}
+
+.test-list ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.test-item {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.test-item:last-child {
+    border-bottom: none;
+}
+
+.test-subject {
+    font-weight: bold;
+    color: #007bff;
+}
+
+.test-date {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.test-name {
+    font-size: 0.9rem;
+}
 </style>
 
 <script>
@@ -264,7 +313,7 @@ export default {
             testDay: '',
             todaySchedule: [],
             currentTimePosition: 0,
-            testSchedual: [],
+            testSchedule: [], // Corrected spelling and initialized as an empty array
         };
     },
     methods: {
@@ -342,9 +391,13 @@ export default {
                 console.error('Error fetching today\'s schedule:', error);
             }
         },
-        async fetchTestSchedual() {
-            const response = await axios.get(`http://localhost:1010/api/tests/`);
-            this.testSchedual = response.data;
+        async fetchTestSchedule() {
+            try {
+                const response = await axios.get(`http://localhost:1010/api/tests/`);
+                this.testSchedule = response.data; // Assign the fetched data to the array
+            } catch (error) {
+                console.error('Error fetching test schedule:', error);
+            }
         },
         updateCurrentTimePosition() {
             const now = new Date();
@@ -374,7 +427,7 @@ export default {
         this.updateDateTime();
         setInterval(this.updateDateTime, 1000);
         this.fetchTodaySchedule();
-        this.fetchTestSchedual();
+        this.fetchTestSchedule();
         setInterval(() => {
             this.updateCurrentTimePosition();
             // Force re-render of the component to update current lecture
@@ -388,3 +441,4 @@ export default {
     }
 };
 </script>
+
