@@ -40,7 +40,18 @@
                 <!-- Lägg till inkommande prov här skulel vara en banger ide (Feedback av Gymasie arebte grupp) -->
                 <!-- Man kan också ha så att lektionerna blir andra färg om man har prov i de ämnet-->
                 <h4>Additional Information</h4>
-                <p>This space can be used for announcements, upcoming events, or any other relevant information.</p>
+                
+                <div class="test-list">
+                    <h5>Upcoming Tests</h5>
+                    <ul v-if="testSchedual.length > 0">
+                        <li v-for="test in testSchedual" :key="test._id">
+                            {{ test.subject }} - {{ test.date }} - {{ test.prov }}
+                        </li>
+                    </ul>
+                    <p v-else>No upcoming tests</p>
+                </div>
+            
+            
             </div>
         </div>
         <div class="test-controls">
