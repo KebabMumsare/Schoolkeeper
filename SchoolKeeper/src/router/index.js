@@ -4,6 +4,7 @@ import StartView from '../views/start.vue'
 import NoticeView from '../views/Notice.vue'
 import FilerView from '../views/Filer.vue'
 import ClassroomView from '../views/Classroom.vue'
+import PersonalView from '../views/Personal.vue'
 
 const router = createRouter({
  history: createWebHistory(import.meta.env.BASE_URL),
@@ -23,6 +24,11 @@ const router = createRouter({
      name: 'notice',
      component: NoticeView
    },
+   {
+    path: '/personal',
+    name: 'personal',
+    component: PersonalView
+  },
    {
      path: '/filer',
      name: 'filer',
