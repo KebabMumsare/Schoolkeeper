@@ -156,8 +156,27 @@ export default {
     },
     methods: {
         async fetchNotice() {
-            const response = await axios.get('http://localhost:1010/api/notice/');
-            this.notice = response.data;
+            try {
+                // Fetch all notices from the backend API
+                const response = await axios.get('http://localhost:1010/api/notice/');
+                const allNotices = response.data;
+
+                // Filter notices based on certain conditions
+                this.notice = allNotices.filter(notice => {
+                    // Example condition: Display only notices meant for the user's class or a specific access level
+                    if (notice.targetClass && notice.targetClass === this.currentUser.class) {
+                        return true; // Matches the user's class
+                    }
+                    if (notice.targetAccess && notice.targetAccess.includes(this.currentUser.access)) {
+                        return true; // Matches the user's access level
+                    }
+
+                    // Add more conditions as needed
+                    return false;
+                });
+            } catch (error) {
+                console.error("Error fetching notices:", error);
+            }
         },
         openNotice(item) {
             this.selectedNotice = item;
