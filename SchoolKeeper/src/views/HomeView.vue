@@ -66,17 +66,10 @@ export default {
   </main>
 </template>
 
-<style>
-body {
-  background: linear-gradient(135deg, #f0f4f8, #d9e6f2);
-}
-</style>
-
 <style scoped>
 main {
   width: 100vw;
   height: 100vh;
-  background: linear-gradient(135deg, #f0f4f8, #d9e6f2);
   display: flex;
   justify-content: center;
   align-items: center;
