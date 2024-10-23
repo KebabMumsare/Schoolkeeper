@@ -2,6 +2,7 @@
     <NavBar site="notice" :currentUser="currentUser" />
     <div class="notice-container-wrapper">
     <div class="notice-container">
+        {{ notice }}
         <div v-for="(item, index) in notice" :key="index" class="notice-item" @click="openNotice(item)">
             <h3>{{ item.title }}</h3>
         </div>
@@ -160,11 +161,11 @@ export default {
                 // Fetch all notices from the backend API
                 const response = await axios.get('http://localhost:1010/api/notice/');
                 const allNotices = response.data;
-
+                console.log(response.data);
                 // Filter notices based on certain conditions
-                this.notice = allNotices.filter(notice => {
+                this.notice = allNotices/*.filter(notice => {
                     // Example condition: Display only notices meant for the user's class or a specific access level
-                    if (notice.targetClass && notice.targetClass === this.currentUser.class) {
+                    if (notice.class && notice.class === this.currentUser.class) {
                         return true; // Matches the user's class
                     }
                     if (notice.targetAccess && notice.targetAccess.includes(this.currentUser.access)) {
@@ -173,7 +174,10 @@ export default {
 
                     // Add more conditions as needed
                     return false;
-                });
+                });*/
+                // Filtret funkar inte som det ska
+                // Damian får fixa
+                
             } catch (error) {
                 console.error("Error fetching notices:", error);
             }
@@ -187,6 +191,7 @@ export default {
     },
     mounted() {
         this.fetchNotice();
+        console.log(this.notice);
     }
 };
 </script>
