@@ -82,6 +82,22 @@ const ProvSchema = mongoose.Schema({
   },
 });
 const ProvModel = mongoose.model("Test", ProvSchema);
+const NoticeSchema = mongoose.Schema({
+  title: {
+    type: "string",
+  },
+  message: {
+    type: "string",
+  },
+  class: {
+    type: "string",
+  },
+  student_id: {
+    type: "string",
+  },
+});
+const NoticeModel = mongoose.model("Notification", NoticeSchema);
+// Login API
 app.post("/api/login", async (req, res) => {
   const user = await UserModel.findOne({ name: req.body.name });
 
