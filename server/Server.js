@@ -186,6 +186,7 @@ app.get("/api/classrooms/", async (req, res) => {
   }
 });
 
+app.get("/api/classrooms/:id", async (req, res) => {
   try {
     const classroom = await ClassroomModel.findById(req.params.id);
     res.json(classroom);
