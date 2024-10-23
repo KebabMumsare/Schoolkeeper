@@ -11,6 +11,7 @@ const storage = multer.diskStorage({
     cb(null, Date.now() + "-" + file.originalname); // Custom file name
   },
 });
+<<<<<<< Updated upstream
 const upload = multer({ storage: storage });
 
 const app = express();
@@ -85,6 +86,98 @@ app.post("/api/login", async (req, res) => {
   const user = await UserModel.findOne({ name: req.body.name });
 
   if (!user) {
+=======
+const upload = multer({storage: storage})
+  
+  const app = express();
+  app.use(express.json());
+  app.use(cors());
+  
+  // MongoDB Atlas connection string
+  const mongoURI = "mongodb+srv://SchoolKeeper:Damdam@cluster0.htzr1.mongodb.net/SchoolKeeper?retryWrites=true&w=majority&appName=Cluster0";
+  
+  // Mongoose connection setup
+  mongoose.connect(mongoURI)
+  .then(() => console.log('MongoDB connected successfully'))
+  .catch(err => console.log('MongoDB connection error:', err));
+  
+  // User Schema 
+  const userSchema = mongoose.Schema({
+    name: {
+      type: 'string',
+    },
+    password: {
+      type: 'string'
+    },
+    class: {
+      type: 'string'
+    },
+  });
+  const UserModel = mongoose.model('User', userSchema);
+  // Schedual Schema
+  const schedualSchema = mongoose.Schema({
+    day: {
+      type: 'string',
+    },
+    lecture: {
+      type: 'string'
+    },
+    time: {
+      type: 'string'
+    },
+  });
+  const SchedualModel = mongoose.model('Schema', schedualSchema);
+  
+  const ClassroomSchema = mongoose.Schema({
+    name: {
+      type: 'string',
+    },
+    class: {
+      type: 'string'
+    },
+    subject: {
+      type: 'string'
+    },
+  });
+  const ClassroomModel = mongoose.model('Classroom', ClassroomSchema);
+  // Prov Schema
+  const TestSchema = mongoose.Schema({
+    prov: {
+      type: 'string',
+    },
+    date: {
+      type: 'string'
+    },
+    class: {
+      type: 'string'
+    },
+    subject: {
+      type: 'string'
+    },
+  });
+  const TestModel = mongoose.model('Test', TestSchema);
+
+  const NoticeSchema = mongoose.Schema({
+    title: {
+      type: 'string'
+    },
+    message: {
+      type: 'string'
+    }
+  })
+  const NoticeModel = mongoose.model('Notification', NoticeSchema);
+  app.post('/api/login', async (req, res) => {
+    const user = await UserModel.findOne({name: req.body.name});
+    
+    if (!user) {
+      return res.sendStatus(401);
+    }
+    
+    if (user.password === req.body.password) {
+      return res.json(user);
+    }
+    
+>>>>>>> Stashed changes
     return res.sendStatus(401);
   }
 
@@ -159,6 +252,7 @@ app.get("/api/classrooms/", async (req, res) => {
     if (!classrooms || classrooms.length === 0) {
       return res.sendStatus(404); // If no users found, return 404
     }
+<<<<<<< Updated upstream
     res.json(classrooms);
   } catch (error) {
     console.error(error);
@@ -208,6 +302,42 @@ app.post(
   "/photos/upload",
   upload.array("photos", 12),
   function (req, res, next) {
+=======
+  });
+  // Prov API
+  app.get('/api/tests/', async (req, res) => {
+    try {
+      const tests = await TestModel.find({});
+      console.log('Retrieved tests:', tests);
+      
+      if (!tests || tests.length === 0) {
+        console.log('No tests found');
+        return res.status(404).json({ message: 'No tests found' });
+      }
+      
+      res.json(tests);
+    } catch (error) {
+      console.error('Error fetching tests:', error);
+      res.status(500).json({ message: 'Server error', error: error.message });
+    }
+  });
+  // Notice API
+  app.get('/api/notice/', async (req, res) => {
+    try {
+      const notice = await NoticeModel.find({});
+      if (!notice || notice.length === 0) {
+        return res.sendStatus(404);
+      }
+      res.json(notice);
+    } catch (error) {
+      console.error(error);
+      res.sendStatus(500); // Handle server error
+    }
+  })
+
+  // Submit API
+  app.post('/photos/upload', upload.array('photos', 12), function (req, res, next) {
+>>>>>>> Stashed changes
     // req.files is array of `photos` files
     // req.body will contain the text fields, if there were any
     return res.sendStatus(204);
