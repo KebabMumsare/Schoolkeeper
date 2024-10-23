@@ -2,6 +2,7 @@
 import axios from 'axios';
 import NavBar from '@/components/Nav-Bar.vue';
 import { useStorage } from "@vueuse/core";
+import { useRouter } from 'vue-router'
 
 export default {
   name: 'filer',
@@ -136,8 +137,12 @@ export default {
     },
     enterClassroom(classroom) {
       console.log(`Entering classroom: ${classroom.name}`);
-      
+      this.router.push(`/classroom/${classroom._id}`);
     },
+  },
+  setup() {
+    const router = useRouter()
+    return { router }
   },
   mounted() {
     this.fetchClasses();

@@ -82,6 +82,7 @@ const ProvSchema = mongoose.Schema({
   },
 });
 const ProvModel = mongoose.model("Test", ProvSchema);
+// Notice Schema
 const NoticeSchema = mongoose.Schema({
   title: {
     type: "string",
@@ -97,6 +98,46 @@ const NoticeSchema = mongoose.Schema({
   },
 });
 const NoticeModel = mongoose.model("Notification", NoticeSchema);
+// Flow Schema
+const FlowSchema = mongoose.Schema({
+  title: {
+    type: "string",
+  },
+  message: {
+    type: "string",
+  },
+  classroom_id: {
+    type: "string",
+  },
+  created_at: {
+    type: "string",
+  },
+  updated_at: {
+    type: "string",
+  },
+  type: {
+    type: "string",
+  },
+});
+const FlowModel = mongoose.model("Flow", FlowSchema);
+const SubmissionSchema = mongoose.Schema({
+  flow_id: {
+    type: "string",
+  },
+  created_at: {
+    type: "string",
+  },
+  student_id: {
+    type: "string",
+  },
+  file_id: {
+    type: "string",
+  },
+  grade: {
+    type: "string",
+  },
+});
+const SubmissionModel = mongoose.model("Submission", SubmissionSchema);
 // Login API
 app.post("/api/login", async (req, res) => {
   const user = await UserModel.findOne({ name: req.body.name });
