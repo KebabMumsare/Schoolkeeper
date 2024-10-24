@@ -5,6 +5,7 @@ import NoticeView from '../views/Notice.vue'
 import FilerView from '../views/Filer.vue'
 import ClassroomView from '../views/Classroom.vue'
 import PersonalView from '../views/Personal.vue'
+import IndividualStudyPlan from '@/views/IndividualStudyPlan.vue'
 
 const router = createRouter({
  history: createWebHistory(import.meta.env.BASE_URL),
@@ -39,6 +40,11 @@ const router = createRouter({
      name: 'classroom',
      component: ClassroomView,
      meta: { showSecondaryNav: true }
+   },
+   {
+     path: '/individual-study-plan',
+     name: 'IndividualStudyPlan',
+     component: IndividualStudyPlan
    }
  ]
 })

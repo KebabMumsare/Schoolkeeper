@@ -22,7 +22,10 @@
             </tr>
           </tbody>
         </table>
-        <button @click="toggleDetails" class="more-button">{{ showDetails ? 'Mindre...' : 'Mer...' }}</button>
+        <div class="button-container">
+            <button @click="toggleDetails" class="more-button">{{ showDetails ? 'Mindre...' : 'Mer...' }}</button>
+            <button @click="goToStudyPlan" class="study-plan-button">Individual Study Plan</button>
+        </div>
         
         <div v-if="showDetails" class="details-dropdown">
           <h3>Additional Details</h3>
@@ -60,14 +63,21 @@ main {
     background-color: #f8f9fa;
     padding: 1rem;
 }
-.more-button {
+.button-container {
+    display: flex;
+    gap: 1rem;
     margin-top: 1rem;
+}
+.more-button, .study-plan-button {
     padding: 0.5rem 1rem;
     background-color: #007bff;
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
+}
+.study-plan-button {
+    background-color: #28a745;
 }
 .details-dropdown {
     margin-top: 1rem;
@@ -83,12 +93,17 @@ import NavBar from "@/components/Nav-Bar.vue";
 import axios from "axios";
 import { useStorage } from "@vueuse/core";
 import Footer from "@/components/Footer.vue";
+import { useRouter } from 'vue-router';
 
 export default {
     name: 'Personal',
     components: {
         NavBar,
         Footer,
+    },
+    setup() {
+        const router = useRouter();
+        return { router };
     },
     data() {
         return {
@@ -113,6 +128,9 @@ export default {
         },
         toggleDetails() {
             this.showDetails = !this.showDetails;
+        },
+        goToStudyPlan() {
+            this.router.push('/individual-study-plan');
         }
     },
     mounted() {
