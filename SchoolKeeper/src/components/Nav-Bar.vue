@@ -5,6 +5,8 @@
       <div class="logo-placeholder">
         <img src="/public/pictures/placeholder.png" alt="Logo" class="logo-image">
       </div>
+
+      <!--Search bar would be nice-->
       
       <nav class="nav-center">
         <ul class="nav-list">
