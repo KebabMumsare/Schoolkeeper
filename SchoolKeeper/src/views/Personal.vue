@@ -20,7 +20,6 @@
               <td>Class:</td>
               <td>{{ user.class }}</td>
             </tr>
-            <a href="/">Log out</a>
           </tbody>
         </table>
         <button @click="toggleDetails" class="more-button">{{ showDetails ? 'Mindre...' : 'Mer...' }}</button>
