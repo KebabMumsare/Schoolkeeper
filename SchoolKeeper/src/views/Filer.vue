@@ -157,13 +157,16 @@ export default {
     <div id="classrooms" :class="{ 'full-width': currentUser.access === 'Elev' }">
       <h2>Classrooms</h2>
       <div class="classroom-grid">
-        <div v-for="classroom in filteredClassrooms" :key="classroom.id" class="classroom-item">
+        <div v-for="classroom in filteredClassrooms" :key="classroom.id" 
+             class="classroom-item" 
+             @click="enterClassroom(classroom)">
           <h3>{{ classroom.name }}</h3>
           <p>Class: {{ classroom.class }}</p>
           <p>Subject: {{ classroom.subject }}</p>
-          <button @click="enterClassroom(classroom)" class="enter-button">Enter</button>
-          <button v-if="currentUser.access === 'Admin' || currentUser.access === 'Lärare'" @click="openEditModal(classroom)" class="edit-button">Edit</button>
-          <button v-if="currentUser.access === 'Admin' || currentUser.access === 'Lärare'" @click="deleteClassroom(classroom._id)" class="delete-button">Delete</button>
+          <div v-if="currentUser.access === 'Admin' || currentUser.access === 'Lärare'" class="admin-buttons">
+            <button @click.stop="openEditModal(classroom)" class="edit-button">Edit</button>
+            <button @click.stop="deleteClassroom(classroom._id)" class="delete-button">Delete</button>
+          </div>
         </div>
       </div>
     </div>
@@ -266,6 +269,7 @@ main {
   padding: 0.5rem;
   text-align: center;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
 }
 
 .create-button, .edit-button, .delete-button {
@@ -366,5 +370,9 @@ select {
 
 .enter-button:hover {
   background-color: #45a049;
+}
+
+.admin-buttons {
+  margin-top: 10px;
 }
 </style>
