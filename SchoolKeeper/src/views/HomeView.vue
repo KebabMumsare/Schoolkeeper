@@ -2,6 +2,7 @@
 import axios from 'axios';
 import { useStorage } from '@vueuse/core';
 import { errorMessages } from 'vue/compiler-sfc';
+import Footer from '@/components/Footer.vue';
 const currentUser = useStorage('currentUser', {})
 
 export default {
@@ -34,6 +35,9 @@ export default {
       }
     }
   },
+  components: {
+    Footer,
+  },
 };
 </script>
 
@@ -64,6 +68,7 @@ export default {
       </div>
     </div>
   </main>
+  <Footer />
 </template>
 
 <style scoped>

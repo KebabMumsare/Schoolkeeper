@@ -71,6 +71,7 @@
         </div>
         <button v-if="currentUser.access === 'Admin'" type="submit">Edit</button>
     </main>
+    <Footer />
 </template>
 
 <style scoped>
@@ -304,11 +305,13 @@ button {
 import NavBar from "@/components/Nav-Bar.vue";
 import axios from "axios";
 import { useStorage } from "@vueuse/core";  // Named import
+import Footer from "@/components/Footer.vue";
 
 export default {
     name: 'Start',
     components: {
         NavBar,
+        Footer,
     },
     data() {
         return {

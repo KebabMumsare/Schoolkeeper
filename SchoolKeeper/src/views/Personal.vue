@@ -45,6 +45,7 @@
           </table>
         </div>
     </main>
+    <Footer />
 </template>
 
 <style scoped>
@@ -81,11 +82,13 @@ main {
 import NavBar from "@/components/Nav-Bar.vue";
 import axios from "axios";
 import { useStorage } from "@vueuse/core";
+import Footer from "@/components/Footer.vue";
 
 export default {
     name: 'Personal',
     components: {
         NavBar,
+        Footer,
     },
     data() {
         return {

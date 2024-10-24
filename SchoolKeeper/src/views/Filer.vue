@@ -3,11 +3,13 @@ import axios from 'axios';
 import NavBar from '@/components/Nav-Bar.vue';
 import { useStorage } from "@vueuse/core";
 import { useRouter } from 'vue-router'
+import Footer from '@/components/Footer.vue'
 
 export default {
   name: 'filer',
   components: {
     NavBar,
+    Footer,
   },
   data() {
     return {
@@ -216,6 +218,7 @@ export default {
       </div>
     </div>
   </div>
+  <Footer />
 </template>
 
 <style scoped>
