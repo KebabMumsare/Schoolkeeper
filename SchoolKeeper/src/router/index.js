@@ -39,7 +39,6 @@ const router = createRouter({
      path: '/classroom/:id',
      name: 'classroom',
      component: ClassroomView,
-     meta: { showSecondaryNav: true }
    },
    {
      path: '/individual-study-plan',

@@ -4,16 +4,6 @@
     padding-top: 40px; /* Adjust this value based on your classroom name height */
 }
 
-.classroom-header {
-    position: fixed;
-    top: 0;
-    max-width: 20%;
-    left: 0;
-    right: 0;
-    z-index: 1001; /* Ensure it's above the NavBar */
-    margin: 1.5rem 1.5rem;
-}
-
 .classroom-name {
     margin: 0;
     font-size: 1.5rem;
@@ -27,12 +17,12 @@ main {
 </style>
 <template>
     <div class="classroom-view">
-        <div class="classroom-header">
-            <h1 class="classroom-name">{{ classroom.name }}</h1>
-        </div>
         <NavBar site="classroom" :currentUser="currentUser" />
         <main>
             <!-- Classroom content goes here -->
+            <!-- Vänstra sidan ska ha info om klassrummet, så som klass, ämne, lärare, etc. -->
+            <!-- Mitten ska ha uppgifter för eleverna -->
+            <!-- Högra sidan ska ha ett chatt flöde mellan lärare och elever -->
         </main>
     </div>
 </template>

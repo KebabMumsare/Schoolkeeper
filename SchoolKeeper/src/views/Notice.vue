@@ -2,7 +2,6 @@
     <NavBar site="notice" :currentUser="currentUser" />
     <div class="notice-container-wrapper">
     <div class="notice-container">
-        {{ notice }}
         <div v-for="(item, index) in notice" :key="index" class="notice-item" @click="openNotice(item)">
             <h3>{{ item.title }}</h3>
         </div>

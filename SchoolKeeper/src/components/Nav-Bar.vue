@@ -51,23 +51,6 @@
         <a id="logout-button" href="/">Log out</a>
       </div>
     </div>
-    
-    <div v-if="showSecondaryNav" class="secondary-nav">
-      <ul class="secondary-nav-list">
-        <li class="secondary-nav-item">
-          <a href="#overview">Overview</a>
-        </li>
-        <li class="secondary-nav-item">
-          <a href="#assignments">Assignments</a>
-        </li>
-        <li class="secondary-nav-item">
-          <a href="#resources">Resources</a>
-        </li>
-        <li class="secondary-nav-item">
-          <a href="#discussions">Discussions</a>
-        </li>
-      </ul>
-    </div>
   </div>
 </template>
 
@@ -168,39 +151,9 @@
   color: #333;
 }
 
-.secondary-nav {
-  background-color: #e9ecef;
-  padding: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.secondary-nav-list {
-  display: flex;
-  justify-content: center;
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-}
-
-.secondary-nav-item {
-  margin: 0 15px;
-}
-
-.secondary-nav-item a {
-  text-decoration: none;
-  color: #333;
-  font-size: 0.9rem;
-  transition: color 0.2s ease-in-out;
-}
-
-.secondary-nav-item a:hover {
-  color: #007bff;
-}
-
-/* Adjust the main nav-wrap to accommodate the secondary navbar */
+/* Remove styles related to secondary navbar */
 .nav-wrap {
-  height: auto;
-  min-height: 7rem;
+  height: 5rem; /* Adjust this value if needed */
 }
 
 .nav-container {
@@ -209,22 +162,11 @@
 </style>
 
 <script>
-import { useRoute } from 'vue-router'
-
 export default {
   name: 'NavBar',
   props: {
     site: String,
     currentUser: Object,
-  },
-  setup() {
-    const route = useRoute()
-    return { route }
-  },
-  computed: {
-    showSecondaryNav() {
-      return this.route.meta.showSecondaryNav
-    }
   }
 }
 </script>
