@@ -1,8 +1,12 @@
 <template>
   <div class="nav-wrap">
     <div class="nav-container">
-      <div class="nav-spacer"></div>
-      <nav>
+      <!-- Logo placeholder -->
+      <div class="logo-placeholder">
+        <img src="/public/pictures/placeholder.png" alt="Logo" class="logo-image">
+      </div>
+      
+      <nav class="nav-center">
         <ul class="nav-list">
           <li class="nav-item">
             <a v-if="site !== 'personal'" href="/personal" class="nav-link">
@@ -38,13 +42,14 @@
           </li>
         </ul>
       </nav>
+      
       <!-- Add user info -->
       <div v-if="currentUser" class="user-info">
         <p>{{ currentUser.name }} | {{ currentUser.class }}</p>
         <a id="logout-button" href="/">Log out</a>
       </div>
-      
     </div>
+    
     <div v-if="showSecondaryNav" class="secondary-nav">
       <ul class="secondary-nav-list">
         <li class="secondary-nav-item">
@@ -85,14 +90,24 @@
   align-items: center;
 }
 
-.nav-spacer {
-  flex: 1;
+.logo-placeholder {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-nav {
-  flex: 2;
-  display: flex;
-  justify-content: center;
+.logo-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.nav-center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .nav-list {
