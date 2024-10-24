@@ -41,7 +41,9 @@
       <!-- Add user info -->
       <div v-if="currentUser" class="user-info">
         <p>{{ currentUser.name }} | {{ currentUser.class }}</p>
+        <a id="logout-button" href="/">Log out</a>
       </div>
+      
     </div>
     <div v-if="showSecondaryNav" class="secondary-nav">
       <ul class="secondary-nav-list">
