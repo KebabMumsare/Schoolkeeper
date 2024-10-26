@@ -14,7 +14,7 @@ main {
 
 .box-container {
     display: flex;
-    width: 90vw;
+    width: 95vw;
     height: calc(100vh - 7rem); /* Adjust based on your NavBar height and desired margins */
     gap: 1rem;
 }
@@ -57,6 +57,38 @@ p {
 strong {
     color: #333;
 }
+
+.chat-messages {
+    height: calc(100% - 80px);
+    overflow-y: auto;
+    margin-bottom: 10px;
+}
+
+.chat-input {
+    display: flex;
+    margin-top: 10px;
+}
+
+.chat-input input {
+    flex-grow: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-right: 8px;
+}
+
+.chat-input button {
+    padding: 8px 16px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.chat-input button:hover {
+    background-color: #45a049;
+}
 </style>
 <template>
     <div class="classroom-view">
@@ -74,7 +106,20 @@ strong {
                 </div>
                 <div class="box right-box">
                     <h2>Chat</h2>
-                    <!-- Add chat content here -->
+                    <div class="chat-messages">
+                        <p v-for="(message, index) in messages" :key="index">
+                            {{ user.name }}
+                            {{ message.message }}
+                        </p>
+                    </div>
+                    <div class="chat-input">
+                        <input 
+                            v-model="newMessage" 
+                            @keyup.enter="sendMessage" 
+                            placeholder="Type a message..."
+                        />
+                        <button @click="sendMessage">Send</button>
+                    </div>
                 </div>
             </div>
         </main>
@@ -93,7 +138,10 @@ export default {
     data() {
         return {
             currentUser: useStorage('currentUser', { name: '', access: '', class: '' }),
-            classroom: { name: 'Loading...', subject: '', class: '' }
+            classroom: { name: 'Loading...', subject: '', class: '' },
+            messages: [],
+            user: [],
+            newMessage: ''
         }
     },
     methods: {
@@ -104,10 +152,34 @@ export default {
             } catch (error) {
                 console.error('Error fetching classroom:', error);
             }
+        },
+        async fetchChat() {
+            try {
+                const response = await axios.get(`http://localhost:1010/api/chats/`);
+                this.messages = response.data;
+            } catch (error) {
+                console.error('Error fetching chat:', error);
+            }
+        },
+        async fetchUser() {
+            try {
+                const response = await axios.get(`http://localhost:1010/api/user/`);
+                this.user = response.data;
+            } catch (error) {
+                console.error('Error fetching user:', error);
+            }
+        },
+        sendMessage() {
+            if (this.newMessage.trim()) {
+                this.messages.push(`${this.currentUser.name}: ${this.newMessage}`);
+                this.newMessage = '';
+            }
         }
     },
     mounted() {
         this.fetchClassroom();
+        this.fetchChat();
+        this.fetchUser();
     },
 }
 </script>

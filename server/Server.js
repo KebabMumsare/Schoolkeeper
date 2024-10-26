@@ -99,7 +99,7 @@ const NoticeSchema = mongoose.Schema({
 });
 const NoticeModel = mongoose.model("Notification", NoticeSchema);
 // Flow Schema
-const FlowSchema = mongoose.Schema({
+const ChatSchema = mongoose.Schema({
   title: {
     type: "string",
   },
@@ -115,13 +115,16 @@ const FlowSchema = mongoose.Schema({
   updated_at: {
     type: "string",
   },
-  type: {
+  teacher_id: {
     type: "string",
   },
 });
-const FlowModel = mongoose.model("Flow", FlowSchema);
+const ChatModel = mongoose.model("Chat", ChatSchema);
 const SubmissionSchema = mongoose.Schema({
-  flow_id: {
+  title: {
+    type: "string",
+  },
+  message: {
     type: "string",
   },
   created_at: {
@@ -164,6 +167,22 @@ app.get("/api/user/:name", async (req, res) => {
 
     // Respond with user data
     res.json(user);
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(500); // Handle server error
+  }
+});
+app.get("/api/users/", async (req, res) => {
+  try {
+    // Find user by ID (this can be adjusted to find by email or another field)
+    const users = await UserModel.find({})
+
+    if (!users) {
+      return res.sendStatus(404); // If user not found, return 404
+    }
+
+    // Respond with user data
+    res.json(users);
   } catch (error) {
     console.error(error);
     res.sendStatus(500); // Handle server error
@@ -246,7 +265,6 @@ app.post("/api/classrooms/", async (req, res) => {
     res.sendStatus(500); // Handle server error
   }
 });
-
 app.delete("/api/classrooms/:id", async (req, res) => {
   try {
     console.log("id:", req.params.id);
@@ -291,8 +309,22 @@ app.get("/api/notice/", async (req, res) => {
   }
 });
 
+// Chat API
+app.get("/api/chats/", async (req, res) => {
+  try {
+    const chat = await ChatModel.find({});
+    if (!chat || chat.length === 0) {
+      return res.sendStatus(404);
+    }
+    res.json(chat);
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(500); // Handle server error
+  }
+});
+
 // Submit API
-app.post("/photos/upload", upload.array("photos", 12), function (req, res, next) {
+app.post("/files/upload", upload.array("files", 12), function (req, res, next) {
   // req.files is array of `photos` files
   // req.body will contain the text fields, if there were any
   return res.sendStatus(204);
