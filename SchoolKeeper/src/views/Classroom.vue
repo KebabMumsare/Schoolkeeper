@@ -108,8 +108,8 @@ strong {
                     <h2>Chat</h2>
                     <div class="chat-messages">
                         <p v-for="(message, index) in messages" :key="index">
-                            {{ user.name }}
-                            {{ message.message }}
+                            <strong>{{ message.user_id }}:</strong>
+                            <br> {{ message.message }}
                         </p>
                     </div>
                     <div class="chat-input">
@@ -140,7 +140,6 @@ export default {
             currentUser: useStorage('currentUser', { name: '', access: '', class: '' }),
             classroom: { name: 'Loading...', subject: '', class: '' },
             messages: [],
-            user: [],
             newMessage: ''
         }
     },
@@ -149,37 +148,42 @@ export default {
             try {
                 const response = await axios.get(`http://localhost:1010/api/classrooms/${this.$route.params.id}`);
                 this.classroom = response.data;
+                this.fetchChat(); // Fetch chat messages after classroom data is loaded
             } catch (error) {
                 console.error('Error fetching classroom:', error);
             }
         },
         async fetchChat() {
             try {
-                const response = await axios.get(`http://localhost:1010/api/chats/`);
+                const response = await axios.get(`http://localhost:1010/api/chats/${this.classroom._id}`);
                 this.messages = response.data;
             } catch (error) {
                 console.error('Error fetching chat:', error);
             }
         },
-        async fetchUser() {
-            try {
-                const response = await axios.get(`http://localhost:1010/api/user/`);
-                this.user = response.data;
-            } catch (error) {
-                console.error('Error fetching user:', error);
-            }
-        },
-        sendMessage() {
+        async sendMessage() {
             if (this.newMessage.trim()) {
-                this.messages.push(`${this.currentUser.name}: ${this.newMessage}`);
-                this.newMessage = '';
+                try {
+                    const payload = {
+                        message: this.newMessage,
+                        classroom_id: this.$route.params.id,
+                        user_id: this.currentUser.name,
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString()
+                    };
+                    console.log('Sending message payload:', payload);
+                    const response = await axios.post('http://localhost:1010/api/chats', payload);
+                    console.log('Server response:', response.data);
+                    this.messages.push(response.data);
+                    this.newMessage = '';
+                } catch (error) {
+                    console.error('Error sending message:', error.response ? error.response.data : error.message);
+                }
             }
         }
     },
     mounted() {
         this.fetchClassroom();
-        this.fetchChat();
-        this.fetchUser();
     },
 }
 </script>

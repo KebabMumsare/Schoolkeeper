@@ -100,24 +100,26 @@ const NoticeSchema = mongoose.Schema({
 const NoticeModel = mongoose.model("Notification", NoticeSchema);
 // Flow Schema
 const ChatSchema = mongoose.Schema({
-  title: {
-    type: "string",
-  },
   message: {
-    type: "string",
+    type: String,
+    required: true
   },
   classroom_id: {
-    type: "string",
+    type: String,
+    required: true
+  },
+  user_id: {
+    type: String,
+    required: true
   },
   created_at: {
-    type: "string",
+    type: Date,
+    default: Date.now
   },
   updated_at: {
-    type: "string",
-  },
-  teacher_id: {
-    type: "string",
-  },
+    type: Date,
+    default: Date.now
+  }
 });
 const ChatModel = mongoose.model("Chat", ChatSchema);
 const SubmissionSchema = mongoose.Schema({
@@ -320,6 +322,30 @@ app.get("/api/chats/", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.sendStatus(500); // Handle server error
+  }
+});
+app.get("/api/chats/:classroomId", async (req, res) => {
+  try {
+    const chat = await ChatModel.find({ classroom_id: req.params.classroomId });
+    if (!chat || chat.length === 0) {
+      return res.status(404).json({ message: "No messages found for this classroom" });
+    }
+    res.json(chat);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
+app.post("/api/chats", async (req, res) => {
+  try {
+    console.log('Received chat message:', req.body);
+    const newChat = new ChatModel(req.body);
+    const savedChat = await newChat.save();
+    console.log('Saved chat message:', savedChat);
+    res.status(201).json(savedChat);
+  } catch (error) {
+    console.error('Error saving chat message:', error);
+    res.status(500).json({ message: "Error saving chat message", error: error.message });
   }
 });
 
