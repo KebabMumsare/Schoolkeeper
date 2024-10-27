@@ -20,38 +20,48 @@ main {
 }
 
 .box {
-    flex: 1;
     background-color: #f8f9fa;
     border-radius: 8px;
-    padding: 2rem; /* Increased padding */
+    padding: 1.5rem;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    overflow-y: auto; /* Allow scrolling if content exceeds box height */
-    min-width: 30vw; /* Set a minimum width for each box */
+    overflow-y: auto;
 }
 
-.left-box {
+.left-column {
+    display: flex;
+    flex-direction: column;
+    width: 25%;
+    gap: 1rem;
+}
+
+.info-box {
     background-color: #e6f2ff;
+    flex: 0 0 auto;
 }
 
-.middle-box {
-    background-color: #fff0f5;
+.chat-box {
+    background-color: #f0fff0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .right-box {
-    background-color: #f0fff0;
+    background-color: #fff0f5;
+    flex: 1;
 }
 
 h2 {
     margin-top: 0;
     color: #333;
-    font-size: 1.8rem; /* Increased font size */
-    margin-bottom: 1.5rem; /* Increased margin */
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
 }
 
 p {
-    margin: 0.8rem 0; /* Increased margin */
+    margin: 0.5rem 0;
     color: #666;
-    font-size: 1.2rem; /* Increased font size */
+    font-size: 1rem;
 }
 
 strong {
@@ -59,7 +69,7 @@ strong {
 }
 
 .chat-messages {
-    height: calc(100% - 80px);
+    flex-grow: 1;
     overflow-y: auto;
     margin-bottom: 10px;
 }
@@ -95,31 +105,33 @@ strong {
         <NavBar site="classroom" :currentUser="currentUser" />
         <main>
             <div class="box-container">
-                <div class="box left-box">
-                    <h2>{{ classroom.name }}</h2>
-                    <p><strong>Subject:</strong> {{ classroom.subject }}</p>
-                    <p><strong>Class:</strong> {{ classroom.class }}</p>
-                </div>
-                <div class="box middle-box">
-                    <h2>Assignments</h2>
-                    <!-- Add assignment content here -->
+                <div class="left-column">
+                    <div class="box info-box">
+                        <h2>{{ classroom.name }}</h2>
+                        <p><strong>Subject:</strong> {{ classroom.subject }}</p>
+                        <p><strong>Class:</strong> {{ classroom.class }}</p>
+                    </div>
+                    <div class="box chat-box">
+                        <h2>Chat</h2>
+                        <div class="chat-messages">
+                            <p v-for="(message, index) in messages" :key="index">
+                                <strong>{{ message.user_id }}:</strong>
+                                <br> {{ message.message }}
+                            </p>
+                        </div>
+                        <div class="chat-input">
+                            <input 
+                                v-model="newMessage" 
+                                @keyup.enter="sendMessage" 
+                                placeholder="Type a message..."
+                            />
+                            <button @click="sendMessage">Send</button>
+                        </div>
+                    </div>
                 </div>
                 <div class="box right-box">
-                    <h2>Chat</h2>
-                    <div class="chat-messages">
-                        <p v-for="(message, index) in messages" :key="index">
-                            <strong>{{ message.user_id }}:</strong>
-                            <br> {{ message.message }}
-                        </p>
-                    </div>
-                    <div class="chat-input">
-                        <input 
-                            v-model="newMessage" 
-                            @keyup.enter="sendMessage" 
-                            placeholder="Type a message..."
-                        />
-                        <button @click="sendMessage">Send</button>
-                    </div>
+                    <h2>Assignments</h2>
+                    <!-- Add assignment content here -->
                 </div>
             </div>
         </main>
