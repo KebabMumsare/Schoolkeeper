@@ -4,5 +4,8 @@ import { RouterView } from 'vue-router'
 
 
 <template>
- <RouterView />
+    <head>
+        <link rel="icon" href="/public/pictures/duck.jpg" type="image/x-icon"/>
+    </head>
+    <RouterView />
 </template>
