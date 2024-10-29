@@ -4,15 +4,13 @@
     <main class="content">
       <h1>Individual Study Plan</h1>
       
-      <!-- Grid for subjects, grades, and points -->
       <div class="grades-grid">
         <div class="grid-header">
           <div><h4 class="classtitle">Subject</h4></div>
           <div><h4 class="classtitle">Grade</h4></div>
-          <div><h4 class="classtitle">Points</h4></div> <!-- New header for points -->
+          <div><h4 class="classtitle">Points</h4></div> 
         </div>
         
-        <!-- Iterate over todaySchedule to display lessons -->
         <div class="grid-item" v-for="(lecture, index) in todaySchedule" :key="index">
           <div class="lecture-name">{{ lecture.lecture }}</div>
           <div class="lecture-grade">{{ lecture.grade }}</div> 
@@ -56,13 +54,13 @@ export default {
     }
   },
   mounted() {
-    // Example data, replace with actual data fetching
+    // Example data, ändras om till riktita när Jesper gör dom i databassen
     this.todaySchedule = [
       { lecture: 'Math', grade: 'A', points: 100 },
       { lecture: 'Science', grade: 'B+', points: 50 },
       { lecture: 'History', grade: 'A-', points: 150 },
       { lecture: 'Literature', grade: 'B', points: 75 },
-    ]; // Example data with points
+    ]; 
   }
 }
 </script>
