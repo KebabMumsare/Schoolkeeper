@@ -13,7 +13,7 @@
         </div>
         
         <!-- Iterate over todaySchedule to display lessons -->
-        <div v-for="(lecture, index) in todaySchedule" :key="index" class="grid-item">
+        <div class="grid-item" v-for="(lecture, index) in todaySchedule" :key="index">
           <div class="lecture-name">{{ lecture.lecture }}</div>
           <div class="lecture-grade">{{ lecture.grade }}</div> 
           <div class="lecture-points">{{ lecture.points }}</div>
@@ -56,12 +56,13 @@ export default {
     }
   },
   mounted() {
+    // Example data, replace with actual data fetching
     this.todaySchedule = [
       { lecture: 'Math', grade: 'A', points: 100 },
       { lecture: 'Science', grade: 'B+', points: 50 },
       { lecture: 'History', grade: 'A-', points: 150 },
       { lecture: 'Literature', grade: 'B', points: 75 },
-    ]; // Exempel så länge, tas bort efer vi faktsikt har inforamtion från databas
+    ]; // Example data with points
   }
 }
 </script>
@@ -97,6 +98,10 @@ h1 {
 }
 
 .grid-item {
+  display: contents; /* Use contents to allow proper column alignment */
+}
+
+.lecture-name, .lecture-grade, .lecture-points {
   background-color: #f0f0f0; /* Light background for items */
   padding: 10px;
   border-radius: 5px;
