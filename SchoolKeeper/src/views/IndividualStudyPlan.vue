@@ -3,8 +3,23 @@
     <NavBar site="individual-study-plan" :currentUser="currentUser" />
     <main class="content">
       <h1>Individual Study Plan</h1>
-      <!-- Add content for the Individual Study Plan page -->
       
+      <!-- Grid for subjects, grades, and points -->
+      <div class="grades-grid">
+        <div class="grid-header">
+          <div><h4 class="classtitle">Subject</h4></div>
+          <div><h4 class="classtitle">Grade</h4></div>
+          <div><h4 class="classtitle">Points</h4></div> <!-- New header for points -->
+        </div>
+        
+        <!-- Iterate over todaySchedule to display lessons -->
+        <div v-for="(lecture, index) in todaySchedule" :key="index" class="grid-item">
+          <div class="lecture-name">{{ lecture.lecture }}</div>
+          <div class="lecture-grade">{{ lecture.grade }}</div> 
+          <div class="lecture-points">{{ lecture.points }}</div>
+        </div>
+      </div>
+
       <div class="button-container">
         <button @click="goBack" class="back-button">Back to Personal Page</button>
       </div>
@@ -32,12 +47,21 @@ export default {
   data() {
     return {
       currentUser: useStorage('currentUser', { name: '', access: '', class: '' }),
+      todaySchedule: [] // Ensure this is populated with lesson data
     };
   },
   methods: {
     goBack() {
       this.router.push('/personal');
     }
+  },
+  mounted() {
+    this.todaySchedule = [
+      { lecture: 'Math', grade: 'A', points: 100 },
+      { lecture: 'Science', grade: 'B+', points: 50 },
+      { lecture: 'History', grade: 'A-', points: 150 },
+      { lecture: 'Literature', grade: 'B', points: 75 },
+    ]; // Exempel så länge, tas bort efer vi faktsikt har inforamtion från databas
   }
 }
 </script>
@@ -59,6 +83,25 @@ h1 {
   margin-bottom: 20px;
 }
 
+.grades-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr; /* Three columns for Subject, Grade, and Points */
+  gap: 10px;
+  margin: 20px 0; /* Space around the grid */
+}
+
+.grid-header {
+  font-weight: bold;
+  color: #333; /* Header color */
+  display: contents; /* Use contents to keep the grid layout */
+}
+
+.grid-item {
+  background-color: #f0f0f0; /* Light background for items */
+  padding: 10px;
+  border-radius: 5px;
+}
+
 .button-container {
   display: flex;
   justify-content: center;
@@ -78,5 +121,9 @@ h1 {
 
 .back-button:hover {
   background-color: #0056b3;
+}
+
+.classtitle {
+  color: white; /* Title color for subjects and grades */
 }
 </style>
