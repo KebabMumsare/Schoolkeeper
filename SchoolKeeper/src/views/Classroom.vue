@@ -261,7 +261,7 @@ strong {
 </style>
 <template>
     <div class="classroom-view">
-        <NavBar site="classroom" :currentUser="currentUser" />
+        <NavBar site="files" :currentUser="currentUser" />
         <main>
             <div class="box-container">
                 <div class="left-column">
@@ -293,7 +293,9 @@ strong {
                         <h2>Assignments</h2>
                         <div class="assignments-list">
                             <div v-for="assignment in assignments" :key="assignment._id" class="assignment-item">
-                                <h3>{{ assignment.title }}</h3>
+                                <router-link :to="{ name: 'assignment', params: { id: classroom._id, assignmentId: assignment._id } }">
+                                    <h3>{{ assignment.title }}</h3>
+                                </router-link>
                                 <p>Due: {{ new Date(assignment.due_date).toLocaleDateString() }}</p>
                             </div>
                         </div>
@@ -308,14 +310,13 @@ strong {
             </div>
         </main>
 
+        
         <!-- Modal for creating assignments -->
         <div v-if="showModal" class="modal">
             <div class="modal-content create-assignment">
                 <h3>Create New Assignment</h3>
                 <form @submit.prevent="createAssignment">
-                    <!-- Fält för att ta in titel -->
                     <input v-model="newAssignment.title" placeholder="Assignment Title" required>
-                    <!-- Fält för att skriva en beskrivning -->
                     <textarea v-model="newAssignment.message" placeholder="Assignment Description" required></textarea>
                     <input v-model="newAssignment.due_date" type="date" required>
                     <div class="modal-buttons">
@@ -331,6 +332,7 @@ strong {
 import NavBar from '@/components/Nav-Bar.vue';
 import { useStorage } from "@vueuse/core";
 import axios from 'axios';
+import { useRouter } from 'vue-router';
 
 export default {
     name: 'Classroom',
@@ -351,6 +353,10 @@ export default {
             },
             showModal: false
         }
+    },
+    setup() {
+        const router = useRouter();
+        return { router };
     },
     methods: {
         async fetchClassroom() {
@@ -404,12 +410,15 @@ export default {
                     const payload = {
                         ...this.newAssignment,
                         classroom_id: this.$route.params.id,
-                        created_at: new Date().toISOString()
+                        created_at: new Date().toISOString(),
                     };
                     const response = await axios.post('http://localhost:1010/api/assignments', payload);
                     this.assignments.push(response.data);
                     this.newAssignment = { title: '', message: '', due_date: '' };
                     this.showModal = false;
+
+                    // Navigate to the newly created assignment under the classroom
+                    this.router.push({ name: 'assignment', params: { id: this.$route.params.id, assignmentId: response.data._id } });
                 } catch (error) {
                     console.error('Error creating assignment:', error);
                 }

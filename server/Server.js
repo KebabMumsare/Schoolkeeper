@@ -357,6 +357,15 @@ app.get("/api/assignments/:classroomId", async (req, res) => {
     res.sendStatus(500); // Handle server error
   }
 });
+app.get("/api/assignment/:assignmentId", async (req, res) => {
+  try {
+    const assignments = await AssignmentModel.find({ classroom_id: req.params.assignmentId });
+    res.json(assignments);
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(500); // Handle server error
+  }
+});
 app.post("/api/assignments", async (req, res) => {
   try {
     const newAssignment = new AssignmentModel(req.body);
