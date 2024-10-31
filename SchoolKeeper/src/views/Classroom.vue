@@ -99,6 +99,165 @@ strong {
 .chat-input button:hover {
     background-color: #45a049;
 }
+
+.assignments-list {
+    margin-bottom: 1rem;
+}
+
+.assignment-item {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.create-assignment {
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    padding: 1rem;
+}
+
+.create-assignment h3 {
+    margin-top: 0;
+}
+
+.create-assignment form {
+    display: flex;
+    flex-direction: column;
+}
+
+.create-assignment input,
+.create-assignment textarea {
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.create-assignment textarea {
+    height: 100px;
+    resize: vertical;
+}
+
+.create-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.create-button:hover {
+    background-color: #45a049;
+}
+
+.right-column {
+    flex: 1;
+    display: flex;
+    gap: 1rem;
+}
+
+.assignments-box {
+    flex: 3;
+    background-color: #fff0f5;
+}
+
+.create-assignment {
+    flex: 2;
+    background-color: #f0f0f0;
+    align-self: flex-start;
+}
+
+.modal {
+    position: fixed !important;
+    z-index: 1000 !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background-color: rgba(0,0,0,0.4) !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+.modal-content {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    background-color: #fefefe !important;
+    padding: 20px !important;
+    border: 1px solid #888 !important;
+    width: 80% !important;
+    max-width: 500px !important;
+    max-height: 80vh !important;
+    border-radius: 5px !important;
+    overflow-y: auto !important;
+}
+
+.modal-buttons {
+    margin-top: auto;
+}
+
+.cancel-button {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.cancel-button:hover {
+    background-color: #d32f2f;
+}
+
+/* Adjust the create-button style to be used in both places */
+.create-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.create-button:hover {
+    background-color: #45a049;
+}
+
+/* Styles for the create assignment form within the modal */
+.create-assignment {
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    padding: 1rem;
+}
+
+.create-assignment h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+
+.create-assignment form {
+    display: flex;
+    flex-direction: column;
+}
+
+.create-assignment input,
+.create-assignment textarea {
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.create-assignment textarea {
+    height: 100px;
+    resize: vertical;
+}
 </style>
 <template>
     <div class="classroom-view">
@@ -129,12 +288,43 @@ strong {
                         </div>
                     </div>
                 </div>
-                <div class="box right-box">
-                    <h2>Assignments</h2>
-                    <!-- Add assignment content here -->
+                <div class="right-column">
+                    <div class="box assignments-box">
+                        <h2>Assignments</h2>
+                        <div class="assignments-list">
+                            <div v-for="assignment in assignments" :key="assignment._id" class="assignment-item">
+                                <h3>{{ assignment.title }}</h3>
+                                <p>Due: {{ new Date(assignment.due_date).toLocaleDateString() }}</p>
+                            </div>
+                        </div>
+                        <button 
+                            v-if="currentUser.access === 'Admin' || currentUser.access === 'Lärare'" 
+                            @click="openModal" 
+                            class="create-button">
+                            Create New Assignment
+                        </button>
+                    </div>
                 </div>
             </div>
         </main>
+
+        <!-- Modal for creating assignments -->
+        <div v-if="showModal" class="modal">
+            <div class="modal-content create-assignment">
+                <h3>Create New Assignment</h3>
+                <form @submit.prevent="createAssignment">
+                    <!-- Fält för att ta in titel -->
+                    <input v-model="newAssignment.title" placeholder="Assignment Title" required>
+                    <!-- Fält för att skriva en beskrivning -->
+                    <textarea v-model="newAssignment.message" placeholder="Assignment Description" required></textarea>
+                    <input v-model="newAssignment.due_date" type="date" required>
+                    <div class="modal-buttons">
+                        <button type="submit" class="create-button">Create Assignment</button>
+                        <button @click="showModal = false" class="cancel-button">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </template>
 <script>
@@ -152,7 +342,14 @@ export default {
             currentUser: useStorage('currentUser', { name: '', access: '', class: '' }),
             classroom: { name: 'Loading...', subject: '', class: '' },
             messages: [],
-            newMessage: ''
+            newMessage: '',
+            assignments: [],
+            newAssignment: {
+                title: '',
+                message: '',
+                due_date: ''
+            },
+            showModal: false
         }
     },
     methods: {
@@ -192,10 +389,40 @@ export default {
                     console.error('Error sending message:', error.response ? error.response.data : error.message);
                 }
             }
+        },
+        async fetchAssignments() {
+            try {
+                const response = await axios.get(`http://localhost:1010/api/assignments/${this.$route.params.id}`);
+                this.assignments = response.data;
+            } catch (error) {
+                console.error('Error fetching assignments:', error);
+            }
+        },
+        async createAssignment() {
+            if (this.newAssignment.title && this.newAssignment.message && this.newAssignment.due_date) {
+                try {
+                    const payload = {
+                        ...this.newAssignment,
+                        classroom_id: this.$route.params.id,
+                        created_at: new Date().toISOString()
+                    };
+                    const response = await axios.post('http://localhost:1010/api/assignments', payload);
+                    this.assignments.push(response.data);
+                    this.newAssignment = { title: '', message: '', due_date: '' };
+                    this.showModal = false;
+                } catch (error) {
+                    console.error('Error creating assignment:', error);
+                }
+            }
+        },
+        openModal() {
+            this.showModal = true;
+            console.log('Modal should be open:', this.showModal);
         }
     },
     mounted() {
         this.fetchClassroom();
+        this.fetchAssignments();
     },
 }
 </script>

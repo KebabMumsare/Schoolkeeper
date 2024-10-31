@@ -123,12 +123,6 @@ const ChatSchema = mongoose.Schema({
 });
 const ChatModel = mongoose.model("Chat", ChatSchema);
 const SubmissionSchema = mongoose.Schema({
-  title: {
-    type: "string",
-  },
-  message: {
-    type: "string",
-  },
   created_at: {
     type: "string",
   },
@@ -141,6 +135,19 @@ const SubmissionSchema = mongoose.Schema({
   grade: {
     type: "string",
   },
+  classroom_id: {
+    type: "string",
+  },
+  message: {
+    type: "string",
+  },
+  title: {
+    type: "string",
+  },
+  due_date: {
+    type: "string",
+  }
+
 });
 const SubmissionModel = mongoose.model("Submission", SubmissionSchema);
 // Login API
@@ -349,6 +356,26 @@ app.post("/api/chats", async (req, res) => {
   }
 });
 
+// Assignment API
+app.get("/api/assignments/:classroomId", async (req, res) => {
+  try {
+    const assignments = await SubmissionModel.find({ classroom_id: req.params.classroomId });
+    res.json(assignments);
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(500); // Handle server error
+  }
+});
+app.post("/api/assignments", async (req, res) => {
+  try {
+    const newAssignment = new SubmissionModel(req.body);
+    await newAssignment.save();
+    res.json(newAssignment);
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(500); // Handle server error
+  }
+});
 // Submit API
 app.post("/files/upload", upload.array("files", 12), function (req, res, next) {
   // req.files is array of `photos` files
