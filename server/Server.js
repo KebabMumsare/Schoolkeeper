@@ -122,17 +122,8 @@ const ChatSchema = mongoose.Schema({
   }
 });
 const ChatModel = mongoose.model("Chat", ChatSchema);
-const SubmissionSchema = mongoose.Schema({
+const AssignmentSchema = mongoose.Schema({
   created_at: {
-    type: "string",
-  },
-  student_id: {
-    type: "string",
-  },
-  file_id: {
-    type: "string",
-  },
-  grade: {
     type: "string",
   },
   classroom_id: {
@@ -149,7 +140,7 @@ const SubmissionSchema = mongoose.Schema({
   }
 
 });
-const SubmissionModel = mongoose.model("Submission", SubmissionSchema);
+const AssignmentModel = mongoose.model("Assignment", AssignmentSchema);
 // Login API
 app.post("/api/login", async (req, res) => {
   const user = await UserModel.findOne({ name: req.body.name });
@@ -359,7 +350,7 @@ app.post("/api/chats", async (req, res) => {
 // Assignment API
 app.get("/api/assignments/:classroomId", async (req, res) => {
   try {
-    const assignments = await SubmissionModel.find({ classroom_id: req.params.classroomId });
+    const assignments = await AssignmentModel.find({ classroom_id: req.params.classroomId });
     res.json(assignments);
   } catch (error) {
     console.error(error);
@@ -368,7 +359,7 @@ app.get("/api/assignments/:classroomId", async (req, res) => {
 });
 app.post("/api/assignments", async (req, res) => {
   try {
-    const newAssignment = new SubmissionModel(req.body);
+    const newAssignment = new AssignmentModel(req.body);
     await newAssignment.save();
     res.json(newAssignment);
   } catch (error) {
