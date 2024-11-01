@@ -39,14 +39,12 @@ const router = createRouter({
    {
      path: '/classroom/:id',
      name: 'classroom',
-     component: ClassroomView,
-     children: [
-       {
-         path: 'assignment/:assignmentId',
-         name: 'assignment',
-         component: AssignmentView,
-       },
-     ],
+     component: ClassroomView
+   },
+   {
+     path: '/classroom/:id/assignment/:assignmentId',
+     name: 'assignment',
+     component: AssignmentView
    },
    {
      path: '/individual-study-plan',

@@ -110,6 +110,12 @@ strong {
     border-radius: 4px;
     padding: 0.5rem;
     margin-bottom: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.assignment-item:hover {
+    background-color: #f0f0f0;
 }
 
 .create-assignment {
@@ -293,10 +299,10 @@ strong {
                         <h2>Assignments</h2>
                         <div class="assignments-list">
                             <div v-for="assignment in assignments" :key="assignment._id" class="assignment-item">
-                                <router-link :to="{ name: 'assignment', params: { id: classroom._id, assignmentId: assignment._id } }">
+                                <div @click="navigateToAssignment(assignment._id)" style="cursor: pointer;">
                                     <h3>{{ assignment.title }}</h3>
-                                </router-link>
-                                <p>Due: {{ new Date(assignment.due_date).toLocaleDateString() }}</p>
+                                    <p>Due: {{ new Date(assignment.due_date).toLocaleDateString() }}</p>
+                                </div>
                             </div>
                         </div>
                         <button 
@@ -428,7 +434,11 @@ export default {
         openModal() {
             this.showModal = true;
             console.log('Modal should be open:', this.showModal);
-        }
+        },
+        navigateToAssignment(assignmentId) {
+            console.log(`Navigating to assignment: ${assignmentId}`);
+            this.router.push(`/classroom/${this.$route.params.id}/assignment/${assignmentId}`);
+        },
     },
     mounted() {
         this.fetchClassroom();

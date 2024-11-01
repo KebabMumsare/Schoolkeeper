@@ -367,7 +367,7 @@ app.get("/api/assignments/:classroomId", async (req, res) => {
 });
 app.get("/api/assignment/:assignmentId", async (req, res) => {
   try {
-    const assignments = await AssignmentModel.find({ classroom_id: req.params.assignmentId });
+    const assignments = await AssignmentModel.find({ _id: req.params.assignmentId });
     res.json(assignments);
   } catch (error) {
     console.error(error);
