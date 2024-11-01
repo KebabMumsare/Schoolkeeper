@@ -90,10 +90,7 @@ const NoticeSchema = mongoose.Schema({
   message: {
     type: "string",
   },
-  class: {
-    type: "string",
-  },
-  student_id: {
+  created_at: {
     type: "string",
   },
 });
@@ -296,7 +293,7 @@ app.get("/api/tests/", async (req, res) => {
 });
 
 // Notice API
-app.get("/api/notice/", async (req, res) => {
+app.get("/api/notices", async (req, res) => {
   try {
     const notice = await NoticeModel.find({});
     if (!notice || notice.length === 0) {
@@ -306,6 +303,16 @@ app.get("/api/notice/", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.sendStatus(500); // Handle server error
+  }
+});
+app.post("/api/notice", async (req, res) => {
+  try {
+    const newNotice = new NoticeModel(req.body);
+    const savedNotice = await newNotice.save();
+    res.status(201).json(savedNotice);
+  } catch (error) {
+    console.error('Error creating notice:', error);
+    res.status(500).json({ message: "Error creating notice", error: error.message });
   }
 });
 

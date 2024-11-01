@@ -273,7 +273,7 @@ export default {
     methods: {
         async fetchNotice() {
             try {
-                const response = await axios.get('http://localhost:1010/api/notice/');
+                const response = await axios.get('http://localhost:1010/api/notices');
                 this.notice = response.data; // Fetch all notices
             } catch (error) {
                 console.error("Error fetching notices:", error);
