@@ -316,6 +316,7 @@ app.post("/api/notice", async (req, res) => {
   }
 });
 
+
 // Chat API
 app.get("/api/chats/", async (req, res) => {
   try {

@@ -6,7 +6,7 @@
                 <div class="notice-title">{{ item.title }}</div>
                 <div class="notice-date">{{ new Date(item.created_at).toLocaleString() }}</div>
             </div>
-            <button v-if="currentUser.access === 'admin' || currentUser.access === 'Lärare'" @click="openModal" class="create-button">Create New Notice</button>
+            <button v-if="currentUser.access === 'Admin' || currentUser.access === 'Lärare'" @click="openModal" class="create-button">Create New Notice</button>
         </div>
         <div v-if="showModal" class="modal">
             <div class="modal-content create-notice">
