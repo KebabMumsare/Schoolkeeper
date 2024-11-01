@@ -327,6 +327,7 @@ strong {
             </div>
         </div>
     </div>
+    <Footer />
 </template>
 <script>
 import NavBar from '@/components/Nav-Bar.vue';

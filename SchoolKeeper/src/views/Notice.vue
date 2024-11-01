@@ -1,25 +1,39 @@
 <template>
     <NavBar site="notice" :currentUser="currentUser" />
     <div class="notice-container-wrapper">
-    <div class="notice-container">
-        <div v-for="(item, index) in notice" :key="index" class="notice-item" @click="openNotice(item)">
-            <h3>{{ item.title }}</h3>
+        <div class="notice-container">
+            <div v-for="(item, index) in notice" :key="index" class="notice-item" @click="openNotice(item)">
+                <h3>{{ item.title }}</h3>
+            </div>
+            <button @click="openModal" class="create-button">Create New Notice</button>
+        </div>
+        <div v-if="showModal" class="modal">
+            <div class="modal-content create-notice">
+                <h3>Create New Notice</h3>
+                <form @submit.prevent="createNotice">
+                    <input v-model="newNotice.title" placeholder="Notice Title" required>
+                    <textarea v-model="newNotice.message" placeholder="Notice Message" required></textarea>
+                    <div class="modal-buttons">
+                        <button type="submit" class="create-button">Create Notice</button>
+                        <button @click="closeModal" class="cancel-button">Cancel</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
-<div class="notice-details-wrapper">
-    <div v-if="selectedNotice" class="notice-details" @click="closeNotice">
-        <div class="notice-details-content" @click.stop>
-            <div class="notice-details-header">
-                <h2>{{ selectedNotice.title }}</h2>
-                <button class="close-button" @click="closeNotice">&times;</button>
-            </div>
-            <div class="notice-details-body">
-                <p>{{ selectedNotice.message }}</p>
+    <div class="notice-details-wrapper">
+        <div v-if="selectedNotice" class="notice-details" @click="closeNotice">
+            <div class="notice-details-content" @click.stop>
+                <div class="notice-details-header">
+                    <h2>{{ selectedNotice.title }}</h2>
+                    <button class="close-button" @click="closeNotice">&times;</button>
+                </div>
+                <div class="notice-details-body">
+                    <p>{{ selectedNotice.message }}</p>
+                </div>
             </div>
         </div>
     </div>
-</div>
 </template>
 
 <style scoped>
@@ -29,19 +43,23 @@
     padding-left: 1rem;
     padding-top: 1.5rem;
     display: flex;
-    justify-content: flex-start;
-    align-items: flex-start;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .notice-container {
-    height: 80vh;
+    max-height: 40vh;
     overflow-y: auto;
     border: 1px solid #ccc;
     padding: 1rem;
     border-radius: 10px;
-    margin-top: 5rem;
+    margin-bottom: 1rem;
     background-color: #f8f9fa;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .notice-item {
@@ -135,10 +153,70 @@
     background-color: #f0f0f0;
 }
 
+.create-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+}
+
+.create-button:hover {
+    background-color: #007bff;
+    cursor: pointer;
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: #fff;
+    border-radius: 5px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    width: 80%;
+    max-width: 600px;
+    padding: 2rem;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+}
+
+.cancel-button {
+    background-color: #f0f0f0;
+    color: #007bff;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.cancel-button:hover {
+    background-color: #e0e0e0;
+}
+
 </style>
 
 <script>
 import NavBar from '@/components/Nav-Bar.vue';
+import Footer from "@/components/Footer.vue";
 import axios from 'axios';
 import { useStorage } from "@vueuse/core";
 
@@ -152,6 +230,11 @@ export default {
             currentUser: useStorage('currentUser', { name: '', access: '', class: '' }),
             notice: [],
             selectedNotice: null,
+            showModal: false,
+            newNotice: {
+                title: '',
+                message: ''
+            }
         };
     },
     methods: {
@@ -186,6 +269,29 @@ export default {
         },
         closeNotice() {
             this.selectedNotice = null;
+        },
+        openModal() {
+            this.showModal = true;
+        },
+        closeModal() {
+            this.showModal = false;
+        },
+        async createNotice() {
+            if (this.newNotice.title && this.newNotice.message) {
+                try {
+                    const payload = {
+                        title: this.newNotice.title,
+                        message: this.newNotice.message,
+                        created_at: new Date().toISOString(),
+                    };
+                    const response = await axios.post('http://localhost:1010/api/notice', payload);
+                    this.notice.push(response.data);
+                    this.newNotice = { title: '', message: '' };
+                    this.closeModal();
+                } catch (error) {
+                    console.error('Error creating notice:', error);
+                }
+            }
         }
     },
     mounted() {
