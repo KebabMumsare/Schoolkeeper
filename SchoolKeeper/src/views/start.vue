@@ -45,7 +45,10 @@
                 <h4>Additional Information</h4>
                 
                 <div class="test-list">
-                    <h5>Upcoming Tests</h5>
+                    <h5 class="upcoming-tests">
+                        Upcoming tests
+                        <span class="bullet-point"></span>
+                    </h5>
                     <ul v-if="testSchedule.length > 0">
                         <li v-for="test in testSchedule" :key="test._id" class="test-item">
                             <span class="test-subject">{{ test.subject }}</span>
@@ -297,7 +300,20 @@ button {
 }
 
 .test-lesson {
-    color: red;
+    color: #ff0000;
+}
+
+.upcoming-tests {
+    display: flex;
+    align-items: center;
+}
+
+.bullet-point {
+    width: 10px;
+    height: 10px;
+    background-color: #ff0000;
+    border-radius: 50%;
+    margin-left: 8px;
 }
 </style>
 
