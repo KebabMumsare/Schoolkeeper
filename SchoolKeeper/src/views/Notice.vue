@@ -31,11 +31,12 @@
                 </div>
                 <div class="notice-details-body">
                     <p>{{ selectedNotice.message }}</p>
-                    <p>Created on: {{ new Date(selectedNotice.created_at).toLocaleString() }}</p>
+                    <p>Sent on: {{ new Date(selectedNotice.created_at).toLocaleString() }}</p>
                 </div>
             </div>
         </div>
     </div>
+    <Footer />
 </template>
 
 <style scoped>
@@ -247,6 +248,7 @@
 
 <script>
 import NavBar from '@/components/Nav-Bar.vue';
+import Footer from '@/components/Footer.vue';
 import axios from 'axios';
 import { useStorage } from "@vueuse/core";
 
@@ -254,6 +256,7 @@ export default {
     name: 'notice',
     components: {
         NavBar,
+        Footer,
     },
     data() {
         return {
