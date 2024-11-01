@@ -3,7 +3,8 @@
     <div class="notice-container-wrapper">
         <div class="notice-container">
             <div v-for="(item, index) in notice" :key="index" class="notice-item" @click="openNotice(item)">
-                <h3>{{ item.title }}</h3>
+                <div class="notice-title">{{ item.title }}</div>
+                <div class="notice-date">{{ new Date(item.created_at).toLocaleString() }}</div>
             </div>
             <button @click="openModal" class="create-button">Create New Notice</button>
         </div>
@@ -30,6 +31,7 @@
                 </div>
                 <div class="notice-details-body">
                     <p>{{ selectedNotice.message }}</p>
+                    <p>Created on: {{ new Date(selectedNotice.created_at).toLocaleString() }}</p>
                 </div>
             </div>
         </div>
@@ -50,6 +52,7 @@
 
 .notice-container {
     max-height: 40vh;
+    width: 100vh;
     overflow-y: auto;
     border: 1px solid #ccc;
     padding: 1rem;
@@ -63,8 +66,8 @@
 }
 
 .notice-item {
-    height: 2rem;
-    width: 20rem;
+    height: 10vh;
+    width: 100%;
     margin-bottom: 10px;
     padding: 10px;
     background-color: #b6c9f2;
@@ -72,6 +75,9 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     cursor: pointer;
     font-size: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     transition: all 0.3s ease;
 }
 
@@ -79,6 +85,16 @@
     background-color: #95b3e6;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     transform: translateY(-2px);
+}
+
+.notice-title {
+    flex: 1;
+}
+
+.notice-date {
+    margin-left: 10px;
+    font-size: 0.9rem;
+    color: #333;
 }
 
 .notice-details {
@@ -192,6 +208,21 @@
     padding: 2rem;
 }
 
+.modal-content input,
+.modal-content textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+    box-sizing: border-box;
+}
+
+.modal-content textarea {
+    height: 100px;
+    resize: vertical;
+}
+
 .modal-buttons {
     display: flex;
     justify-content: space-between;
@@ -216,7 +247,6 @@
 
 <script>
 import NavBar from '@/components/Nav-Bar.vue';
-import Footer from "@/components/Footer.vue";
 import axios from 'axios';
 import { useStorage } from "@vueuse/core";
 
@@ -240,26 +270,8 @@ export default {
     methods: {
         async fetchNotice() {
             try {
-                // Fetch all notices from the backend API
                 const response = await axios.get('http://localhost:1010/api/notice/');
-                const allNotices = response.data;
-                console.log(response.data);
-                // Filter notices based on certain conditions
-                this.notice = allNotices/*.filter(notice => {
-                    // Example condition: Display only notices meant for the user's class or a specific access level
-                    if (notice.class && notice.class === this.currentUser.class) {
-                        return true; // Matches the user's class
-                    }
-                    if (notice.targetAccess && notice.targetAccess.includes(this.currentUser.access)) {
-                        return true; // Matches the user's access level
-                    }
-
-                    // Add more conditions as needed
-                    return false;
-                });*/
-                // Filtret funkar inte som det ska
-                // Damian får fixa
-                
+                this.notice = response.data; // Fetch all notices
             } catch (error) {
                 console.error("Error fetching notices:", error);
             }
@@ -282,12 +294,12 @@ export default {
                     const payload = {
                         title: this.newNotice.title,
                         message: this.newNotice.message,
-                        created_at: new Date().toISOString(),
+                        created_at: new Date().toISOString(), // Include created_at timestamp
                     };
                     const response = await axios.post('http://localhost:1010/api/notice', payload);
-                    this.notice.push(response.data);
-                    this.newNotice = { title: '', message: '' };
-                    this.closeModal();
+                    this.notice.push(response.data); // Add the new notice to the notices array
+                    this.newNotice = { title: '', message: '' }; // Clear the input fields
+                    this.closeModal(); // Close the modal
                 } catch (error) {
                     console.error('Error creating notice:', error);
                 }
@@ -296,7 +308,6 @@ export default {
     },
     mounted() {
         this.fetchNotice();
-        console.log(this.notice);
     }
 };
 </script>
