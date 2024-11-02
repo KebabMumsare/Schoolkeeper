@@ -4,6 +4,7 @@ import NavBar from '@/components/Nav-Bar.vue';
 import Footer from '@/components/Footer.vue';
 import { useStorage } from "@vueuse/core";
 
+
 const currentUser = useStorage('currentUser', { name: '', access: '', class: '' });
 </script>
 
