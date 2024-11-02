@@ -13,7 +13,7 @@ const currentUser = useStorage('currentUser', { name: '', access: '', class: '' 
         <link rel="icon" href="/public/pictures/duck.jpg" type="image/x-icon"/>
     </head>
     <div id="app">
-        <NavBar site="home" :currentUser="currentUser" />
+        <NavBar v-if="showNavBar" site="home" :currentUser="currentUser" />
         <router-view />
         <Footer />
     </div>
