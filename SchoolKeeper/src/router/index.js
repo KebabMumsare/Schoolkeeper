@@ -7,9 +7,6 @@ import ClassroomView from '../views/Classroom.vue'
 import PersonalView from '../views/Personal.vue'
 import IndividualStudyPlan from '@/views/IndividualStudyPlan.vue'
 import AssignmentView from '../views/Assignment.vue'
-import Vue from 'vue'
-import Vuetify from 'vuetify'
-Vue.use(Vuetify)
 
 const router = createRouter({
  history: createWebHistory(import.meta.env.BASE_URL),

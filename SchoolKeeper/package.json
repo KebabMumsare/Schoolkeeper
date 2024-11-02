@@ -12,13 +12,10 @@
     "@vueuse/core": "^11.1.0",
     "axios": "^1.7.7",
     "vue": "^3.4.29",
-    "vue-router": "^4.3.3",
-    "vuetify": "^3.7.3"
+    "vue-router": "^4.3.3"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.5",
-    "stylus": "^0.64.0",
-    "stylus-loader": "^8.1.1",
     "vite": "^5.3.1"
   }
 }

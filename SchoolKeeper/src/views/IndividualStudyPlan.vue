@@ -67,7 +67,7 @@ export default {
 
 <style scoped>
 .individual-study-plan {
-  
+  /* Add any necessary styles */
 }
 
 .content {
