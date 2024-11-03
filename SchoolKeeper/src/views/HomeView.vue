@@ -1,7 +1,6 @@
 <script>
 import axios from 'axios';
 import { useStorage } from '@vueuse/core';
-import { errorMessages } from 'vue/compiler-sfc';
 import Footer from '@/components/Footer.vue';
 const currentUser = useStorage('currentUser', {})
 
