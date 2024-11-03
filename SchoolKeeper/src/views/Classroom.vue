@@ -9,13 +9,15 @@ main {
     flex-grow: 1;
     display: flex;
     padding: 1rem;
-    margin-top: 5rem; /* Adjust based on your NavBar height */
+    margin-top: 5rem;
+    /* Adjust based on your NavBar height */
 }
 
 .box-container {
     display: flex;
     width: 95vw;
-    height: calc(100vh - 7rem); /* Adjust based on your NavBar height and desired margins */
+    height: calc(100vh - 10rem);
+    /* Adjust based on your NavBar height and desired margins */
     gap: 1rem;
 }
 
@@ -23,7 +25,7 @@ main {
     background-color: #f8f9fa;
     border-radius: 8px;
     padding: 1.5rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     overflow-y: auto;
 }
 
@@ -108,7 +110,6 @@ strong {
     background-color: #fff;
     border: 1px solid #ddd;
     border-radius: 4px;
-    padding: 0.5rem;
     margin-bottom: 0.5rem;
     cursor: pointer;
     transition: background-color 0.2s ease;
@@ -183,7 +184,7 @@ strong {
     top: 0 !important;
     width: 100% !important;
     height: 100% !important;
-    background-color: rgba(0,0,0,0.4) !important;
+    background-color: rgba(0, 0, 0, 0.4) !important;
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
@@ -264,6 +265,53 @@ strong {
     height: 100px;
     resize: vertical;
 }
+
+.v-expansion-panel-title--active {
+    background-color: #e8f5e9 !important;  /* Light green background when active */
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.v-expansion-panel-title {
+    transition: background-color 0.2s ease;
+    padding: 8px 16px !important;  /* Reduce left/right padding */
+}
+
+.v-expansion-panel-title:hover {
+    background-color: #f5f5f5;
+}
+
+.v-expansion-panel-text {
+    padding: 8px 16px 16px !important;  /* Adjust padding for the content */
+}
+
+/* Optional: If you want to adjust the icon position */
+.v-expansion-panel-title__icon {
+    margin-right: 8px !important;
+}
+
+/* Make the expansion panels more compact */
+.v-expansion-panels {
+    width: 100% !important;
+}
+
+.v-expansion-panel {
+    box-shadow: none !important;
+    border: 1px solid #ddd !important;
+}
+
+.assignment-title-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.due-date {
+    font-size: 0.9rem;
+    color: #666;
+    margin-right: 24px; /* Add space for the expansion icon */
+}
 </style>
 <template>
     <div class="classroom-view">
@@ -285,11 +333,7 @@ strong {
                             </p>
                         </div>
                         <div class="chat-input">
-                            <input 
-                                v-model="newMessage" 
-                                @keyup.enter="sendMessage" 
-                                placeholder="Type a message..."
-                            />
+                            <input v-model="newMessage" @keyup.enter="sendMessage" placeholder="Type a message..." />
                             <button @click="sendMessage">Send</button>
                         </div>
                     </div>
@@ -298,17 +342,22 @@ strong {
                     <div class="box assignments-box">
                         <h2>Assignments</h2>
                         <div class="assignments-list">
-                            <div v-for="assignment in assignments" :key="assignment._id" class="assignment-item">
-                                <div @click="navigateToAssignment(assignment._id)" style="cursor: pointer;">
-                                    <h3>{{ assignment.title }}</h3>
-                                    <p>Due: {{ new Date(assignment.due_date).toLocaleDateString() }}</p>
-                                </div>
-                            </div>
+                            <v-expansion-panels v-for="assignment in assignments" :key="assignment._id" class="assignment-item">
+                                <v-expansion-panel>
+                                    <v-expansion-panel-title :class="{ 'v-expansion-panel-title--active': $attrs.modelValue }">
+                                        <div class="assignment-title-container">
+                                            <span>{{ assignment.title }}</span>
+                                            <span class="due-date">Due: {{ new Date(assignment.due_date).toLocaleDateString() }}</span>
+                                        </div>
+                                    </v-expansion-panel-title>
+                                    <v-expansion-panel-text>
+                                        {{ assignment.message }}
+                                    </v-expansion-panel-text>
+                                </v-expansion-panel>
+                            </v-expansion-panels>
                         </div>
-                        <button 
-                            v-if="currentUser.access === 'Admin' || currentUser.access === 'Lärare'" 
-                            @click="openModal" 
-                            class="create-button">
+                        <button v-if="currentUser.access === 'Admin' || currentUser.access === 'Lärare'"
+                            @click="openModal" class="create-button">
                             Create New Assignment
                         </button>
                     </div>
@@ -316,7 +365,7 @@ strong {
             </div>
         </main>
 
-        
+
         <!-- Modal for creating assignments -->
         <div v-if="showModal" class="modal">
             <div class="modal-content create-assignment">
