@@ -1,5 +1,5 @@
 import './assets/main.css'
-
+import 'vuetify/styles'; // Import Vuetify styles
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
@@ -18,12 +18,5 @@ const app = createApp(App).use(vuetify)
 app.use(router)
 
 app.mount('#app')
-
-// Import Vuetify styles and Material Design Icons
-import '@mdi/font/css/materialdesignicons.css'; // Import Material Design Icons
-import 'vuetify/styles'; // Import Vuetify styles
-
-
-
 
 
