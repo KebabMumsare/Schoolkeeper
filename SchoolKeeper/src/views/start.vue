@@ -32,7 +32,7 @@
                         <div class="time-slot" v-for="lecture in day" :key="lecture.id"
                              :class="{ 'current-lecture': isCurrentDay(i) && isCurrentLecture(lecture) }">
                             {{ lecture.time }} <br> 
-                            <span :class="{ 'test-lesson': hasTest(lecture.lecture) }">
+                            <span>
                                 {{ lecture.lecture }}
                             </span>
                         </div>
@@ -297,10 +297,6 @@ button {
 
 .test-name {
     font-size: 0.9rem;
-}
-
-.test-lesson {
-    color: #ff0000;
 }
 
 .upcoming-tests {
