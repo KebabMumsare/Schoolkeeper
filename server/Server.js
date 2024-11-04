@@ -95,7 +95,7 @@ const NoticeSchema = mongoose.Schema({
   },
 });
 const NoticeModel = mongoose.model("Notification", NoticeSchema);
-// Flow Schema
+// Chat Schema
 const ChatSchema = mongoose.Schema({
   message: {
     type: String,
@@ -119,6 +119,7 @@ const ChatSchema = mongoose.Schema({
   }
 });
 const ChatModel = mongoose.model("Chat", ChatSchema);
+// Assignment Schema
 const AssignmentSchema = mongoose.Schema({
   created_at: {
     type: "string",
@@ -138,6 +139,8 @@ const AssignmentSchema = mongoose.Schema({
 
 });
 const AssignmentModel = mongoose.model("Assignment", AssignmentSchema);
+
+
 // Login API
 app.post("/api/login", async (req, res) => {
   const user = await UserModel.findOne({ name: req.body.name });
@@ -151,7 +154,6 @@ app.post("/api/login", async (req, res) => {
   }
   return res.sendStatus(401);
 });
-
 // User API
 app.get("/api/user/:name", async (req, res) => {
   try {
@@ -185,7 +187,7 @@ app.get("/api/users/", async (req, res) => {
     res.sendStatus(500); // Handle server error
   }
 });
-
+// Class API
 app.get("/api/classes", async (req, res) => {
   try {
     // Find all users and select only the 'class' field
@@ -242,7 +244,6 @@ app.get("/api/classrooms/", async (req, res) => {
     res.sendStatus(500); // Handle server error
   }
 });
-
 app.get("/api/classrooms/:id", async (req, res) => {
   try {
     const classroom = await ClassroomModel.findById(req.params.id);
@@ -315,7 +316,6 @@ app.post("/api/notice", async (req, res) => {
     res.status(500).json({ message: "Error creating notice", error: error.message });
   }
 });
-
 
 // Chat API
 app.get("/api/chats/", async (req, res) => {

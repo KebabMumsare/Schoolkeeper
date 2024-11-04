@@ -342,7 +342,8 @@ strong {
                     <div class="box assignments-box">
                         <h2>Assignments</h2>
                         <div class="assignments-list">
-                            <v-expansion-panels v-for="assignment in assignments" :key="assignment._id" class="assignment-item">
+                            <!-- class="assignment-item" -->
+                            <v-expansion-panels v-for="assignment in assignments" :key="assignment._id" >
                                 <v-expansion-panel>
                                     <v-expansion-panel-title :class="{ 'v-expansion-panel-title--active': $attrs.modelValue }">
                                         <div class="assignment-title-container">
