@@ -274,7 +274,7 @@ strong {
 
 .v-expansion-panel-title {
     transition: background-color 0.2s ease;
-    padding: 8px 16px !important;  /* Reduce left/right padding */
+    padding: 8px 16px !important;
 }
 
 .v-expansion-panel-title:hover {
@@ -283,7 +283,7 @@ strong {
 
 .v-expansion-panel-text {
     padding: 8px 16px 16px !important;  /* Adjust padding for the content */
-}
+}   
 
 /* Optional: If you want to adjust the icon position */
 .v-expansion-panel-title__icon {

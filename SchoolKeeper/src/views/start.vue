@@ -72,7 +72,7 @@
                 </option>
             </select>
         </div>
-        <button v-if="currentUser.access === 'Admin'" type="submit">Edit</button>
+        <button v-if="currentUser.access === 'Admin'" type="submit" ><a href="/ScheduleCreator">Edit</a></button>
     </main>
     <Footer />
 </template>
@@ -322,6 +322,7 @@ import NavBar from "@/components/Nav-Bar.vue";
 import axios from "axios";
 import { useStorage } from "@vueuse/core";  // Named import
 import Footer from "@/components/Footer.vue";
+import draggable from 'vuedraggable';
 
 export default {
     name: 'Start',
@@ -472,4 +473,3 @@ export default {
     }
 };
 </script>
-

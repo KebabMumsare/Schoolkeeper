@@ -10,7 +10,7 @@ body {
   align-items: center;       
   min-height: 100vh;         
   margin: 0;
-  background-image: url('/public/pictures/background3.webp');
+  /*background-image: url('/public/pictures/background3.webp');*/
   background-size: cover;
   background-position: center;
   font-family: 'Open Sans', sans-serif;
