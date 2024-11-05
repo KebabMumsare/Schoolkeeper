@@ -32,7 +32,7 @@ main {
 .left-column {
     display: flex;
     flex-direction: column;
-    width: 25%;
+    width: 20%;
     gap: 1rem;
 }
 
@@ -74,28 +74,40 @@ strong {
     flex-grow: 1;
     overflow-y: auto;
     margin-bottom: 10px;
+    font-size: 0.85rem;
+}
+
+.chat-messages p {
+    margin: 0.3rem 0;
+    color: #666;
+    font-size: 0.85rem;
 }
 
 .chat-input {
     display: flex;
     margin-top: 10px;
+    gap: 6px;
 }
 
 .chat-input input {
     flex-grow: 1;
-    padding: 8px;
+    padding: 4px 6px;
     border: 1px solid #ccc;
     border-radius: 4px;
-    margin-right: 8px;
+    font-size: 0.85rem;
+    height: 28px;
+    width: 80%;
 }
 
 .chat-input button {
-    padding: 8px 16px;
+    padding: 4px 10px;
     background-color: #4CAF50;
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    font-size: 0.85rem;
+    height: 28px;
 }
 
 .chat-input button:hover {
@@ -117,6 +129,39 @@ strong {
 
 .assignment-item:hover {
     background-color: #f0f0f0;
+}
+
+.create-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.create-button:hover {
+    background-color: #45a049;
+}
+
+.right-column {
+    flex: 1;
+    display: flex;
+    gap: 1rem;
+}
+
+.assignments-box {
+    flex: 3;
+    background-color: #fff0f5;
+}
+.assignments-box::-webkit-scrollbar {
+  display: none;
+}
+
+.create-assignment {
+    flex: 2;
+    background-color: #f0f0f0;
+    align-self: flex-start;
 }
 
 .create-assignment {
@@ -146,37 +191,6 @@ strong {
     height: 100px;
     resize: vertical;
 }
-
-.create-button {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    padding: 0.5rem;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.create-button:hover {
-    background-color: #45a049;
-}
-
-.right-column {
-    flex: 1;
-    display: flex;
-    gap: 1rem;
-}
-
-.assignments-box {
-    flex: 3;
-    background-color: #fff0f5;
-}
-
-.create-assignment {
-    flex: 2;
-    background-color: #f0f0f0;
-    align-self: flex-start;
-}
-
 .modal {
     position: fixed !important;
     z-index: 1000 !important;
@@ -282,8 +296,9 @@ strong {
 }
 
 .v-expansion-panel-text {
-    padding: 8px 16px 16px !important;  /* Adjust padding for the content */
-}   
+    padding: 8px 16px 16px !important;
+    font-size: 0.9rem !important;
+}
 
 /* Optional: If you want to adjust the icon position */
 .v-expansion-panel-title__icon {
@@ -298,6 +313,19 @@ strong {
 .v-expansion-panel {
     box-shadow: none !important;
     border: 1px solid #ddd !important;
+    margin-bottom: 0.5rem !important;
+    overflow: hidden !important;
+    transition: none !important;
+}
+
+.v-expansion-panel-text__wrapper {
+    padding: 0 !important;
+    transition: none !important;
+}
+
+.v-expansion-panel-text {
+    padding: 8px 16px 16px !important;
+    font-size: 0.9rem !important;
 }
 
 .assignment-title-container {
@@ -311,6 +339,132 @@ strong {
     font-size: 0.9rem;
     color: #666;
     margin-right: 24px; /* Add space for the expansion icon */
+}
+
+.message-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 0.5rem 0 !important;
+    margin: 0 !important;
+}
+
+.message-container p {
+    flex: 1;
+}
+
+.side-box {
+    width: 25%;
+    max-height: 100%;
+    background-color: #f5f5f5;
+    padding: 0.75rem;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-size: 0.85rem;
+}
+
+.side-box h3 {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.file-upload {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.file-input {
+    position: relative;
+    padding: 2rem;
+    border: 2px dashed #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    text-align: center;
+    background-color: #fff;
+}
+
+.file-input::before {
+    content: 'Drop files here or click to upload';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #666;
+    pointer-events: none;
+}
+
+.file-input:hover {
+    border-color: #4CAF50;
+    background-color: #f8f9fa;
+}
+
+/* Hide the default file input appearance */
+.file-input input[type="file"] {
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    cursor: pointer;
+}
+
+.selected-files {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.file-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #fff;
+    padding: 0.4rem;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    font-size: 0.85rem;
+}
+
+.remove-file {
+    background: none;
+    border: none;
+    color: #f44336;
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: 0 0.5rem;
+}
+
+.remove-file:hover {
+    color: #d32f2f;
+}
+
+.submit-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.85rem;
+}
+
+.submit-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.submit-button:not(:disabled):hover {
+    background-color: #45a049;
+}
+
+.v-expansion-panel--inactive .v-expansion-panel-text__wrapper {
+    max-height: 0 !important;
+    min-height: 0 !important;
+    padding: 0 !important;
 }
 </style>
 <template>
@@ -352,7 +506,35 @@ strong {
                                         </div>
                                     </v-expansion-panel-title>
                                     <v-expansion-panel-text>
-                                        {{ assignment.message }}
+                                        <div class="message-container">
+                                            <p>{{ assignment.message }}</p>
+                                            <div class="side-box">
+                                                <h3>Submit Assignment</h3>
+                                                <div class="file-upload">
+                                                    <div class="file-input">
+                                                        <input 
+                                                            type="file" 
+                                                            ref="fileInput" 
+                                                            @change="handleFileChange" 
+                                                            multiple
+                                                        >
+                                                    </div>
+                                                    <div class="selected-files" v-if="selectedFiles.length">
+                                                        <div v-for="(file, index) in selectedFiles" :key="index" class="file-item">
+                                                            <span>{{ file.name }}</span>
+                                                            <button @click="removeFile(index)" class="remove-file">×</button>
+                                                        </div>
+                                                    </div>
+                                                    <button 
+                                                        @click="() => submitFiles(assignment._id)" 
+                                                        class="submit-button"
+                                                        :disabled="!selectedFiles.length"
+                                                    >
+                                                        Submit Files
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </v-expansion-panel-text>
                                 </v-expansion-panel>
                             </v-expansion-panels>
@@ -398,7 +580,7 @@ export default {
     },
     data() {
         return {
-            currentUser: useStorage('currentUser', { name: '', access: '', class: '' }),
+            currentUser: useStorage('currentUser', { id: '', name: '', access: '', class: '' }),
             classroom: { name: 'Loading...', subject: '', class: '' },
             messages: [],
             newMessage: '',
@@ -408,7 +590,8 @@ export default {
                 message: '',
                 due_date: ''
             },
-            showModal: false
+            showModal: false,
+            selectedFiles: [],
         }
     },
     setup() {
@@ -488,6 +671,44 @@ export default {
         navigateToAssignment(assignmentId) {
             console.log(`Navigating to assignment: ${assignmentId}`);
             this.router.push(`/classroom/${this.$route.params.id}/assignment/${assignmentId}`);
+        },
+        handleFileChange(event) {
+            const newFiles = Array.from(event.target.files);
+            this.selectedFiles = [...this.selectedFiles, ...newFiles];
+        },
+        removeFile(index) {
+            this.selectedFiles.splice(index, 1);
+        },
+        async submitFiles(assignmentId) {
+            if (!this.selectedFiles.length) return;
+
+            const formData = new FormData();
+            this.selectedFiles.forEach(file => {
+                formData.append('files', file);
+            });
+
+            try {
+                console.log(this.currentUser)
+                const response = await axios.post(
+                    `http://localhost:1010/files/submit/${assignmentId}/${this.currentUser.id}`, 
+                    formData,
+                    {
+                        headers: {
+                            'Content-Type': 'multipart/form-data'
+                        }
+                    }
+                );
+                
+                // Clear files after successful upload
+                this.selectedFiles = [];
+                this.$refs.fileInput.value = '';
+                
+                // Show success message
+                alert('Files submitted successfully!');
+            } catch (error) {
+                console.error('Error submitting files:', error);
+                alert('Error submitting files. Please try again.');
+            }
         },
     },
     mounted() {

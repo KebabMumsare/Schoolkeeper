@@ -139,7 +139,27 @@ const AssignmentSchema = mongoose.Schema({
 
 });
 const AssignmentModel = mongoose.model("Assignment", AssignmentSchema);
-
+const SubmissionSchema = mongoose.Schema({
+  assignment_id: {
+    type: "string",
+  },
+  student_id: {
+    type: "string",
+  },
+  file_paths: [{
+    type: String
+  }],
+  file_names: [{
+    type: String
+  }],
+  grade: {
+    type: "string",
+  },
+  submitted_at: {
+    type: "string",
+  },
+});
+const SubmissionModel = mongoose.model("Submission", SubmissionSchema);
 
 // Login API
 app.post("/api/login", async (req, res) => {
@@ -385,9 +405,14 @@ app.post("/api/assignments", async (req, res) => {
   }
 });
 // Submit API
-app.post("/files/upload", upload.array("files", 12), function (req, res, next) {
-  // req.files is array of `photos` files
-  // req.body will contain the text fields, if there were any
+app.post("/files/submit/:assignmentId/:studentId", upload.array("files", 12), async function (req, res, next) {
+  const newSubmission = new SubmissionModel( {
+    assignment_id: req.params.assignmentId,
+    student_id: req.params.studentId,
+    file_paths: req.files.map(file => file.path),
+    file_names: req.files.map(file => file.originalname),
+  });
+  await newSubmission.save();
   return res.sendStatus(204);
 });
 

@@ -19,7 +19,9 @@ export default {
       
       .then(response => {
         this.setCurrentUser(response.data)
+        console.log(response.data)
         this.message = response.data.message;
+
         window.location.href = '/start';
       })
       .catch(error => {
@@ -28,6 +30,7 @@ export default {
     },
     setCurrentUser(user) {
       currentUser.value = {
+        id: user._id,
         name: user.name,
         access: user.access,
         class: user.class,
