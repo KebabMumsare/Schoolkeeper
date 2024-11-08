@@ -5,7 +5,7 @@
         <table>
           <tbody>
             <tr v-if="user.age">
-              <td>Age:</td>
+              <td>Ålder:</td>
               <td>{{ user.age }}</td>
             </tr>
             <tr v-if="user.email">
@@ -13,11 +13,11 @@
               <td>{{ user.email }}</td>
             </tr>
             <tr v-if="user.phoneNumber">
-              <td>Number:</td>
+              <td>Telefonnummer:</td>
               <td>{{ user.phoneNumber }}</td>
             </tr>
             <tr v-if="user.class">
-              <td>Class:</td>
+              <td>Klass:</td>
               <td>{{ user.class }}</td>
             </tr>
           </tbody>
@@ -28,7 +28,7 @@
         </div>
         
         <div v-if="showDetails" class="details-dropdown">
-          <h3>Additional Details</h3>
+          <h3>Ytterligare Information</h3>
           <table>
             <tbody>
               <tr v-if="user.studentdokument">
@@ -36,14 +36,13 @@
                 <td>{{ user.studentdokument }}</td>
               </tr>
               <tr v-if="user.birthday">
-                <td>Birthday:</td>
+                <td>Födelsedag:</td>
                 <td>{{ user.birthday }}</td>
               </tr>
               <tr v-if="user.emergencyContact">
-                <td>Emergency Contact:</td>
+                <td>Nödkontakt:</td>
                 <td>{{ user.emergencyContact }}</td>
               </tr>
-              <!-- Lägg till mer om de behövs-->
             </tbody>
           </table>
         </div>

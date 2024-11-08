@@ -157,64 +157,63 @@ export default {
   <NavBar site="files" :currentUser="currentUser" />
   <main class="content">
     <div id="classrooms" :class="{ 'full-width': currentUser.access === 'Elev' }">
-      <h2>Classrooms</h2>
+      <h2>Klassrum</h2>
       <div class="classroom-grid">
         <div v-for="classroom in filteredClassrooms" :key="classroom.id" 
              class="classroom-item" 
              @click="enterClassroom(classroom)">
           <h3>{{ classroom.name }}</h3>
-          <p>Class: {{ classroom.class }}</p>
-          <p>Subject: {{ classroom.subject }}</p>
+          <p>Klass: {{ classroom.class }}</p>
+          <p>Ämne: {{ classroom.subject }}</p>
           <div v-if="currentUser.access === 'Admin' || currentUser.access === 'Lärare'" class="admin-buttons">
-            <button @click.stop="openEditModal(classroom)" class="edit-button">Edit</button>
-            <button @click.stop="deleteClassroom(classroom._id)" class="delete-button">Delete</button>
+            <button @click.stop="openEditModal(classroom)" class="edit-button">Ändra</button>
+            <button @click.stop="deleteClassroom(classroom._id)" class="delete-button">Ta bort</button>
           </div>
         </div>
       </div>
     </div>
     <div id="create-classroom" v-if="currentUser.access === 'Admin' || currentUser.access === 'Lärare'">
-      <h2>Create Classroom</h2>
+      <h2>Skapa Klassrum</h2>
       <form @submit.prevent="createClassroom">
         <input v-model="currentClassroom.name" placeholder="Classroom Name" required>
         <select v-model="currentClassroom.class" required>
-          <option value="" disabled>Select Class</option>
+          <option value="" disabled>Välj Klass</option>
           <option v-for="classOption in availableClasses" :key="classOption" :value="classOption">
             {{ classOption }}
           </option>
         </select>
         <select v-model="currentClassroom.subject" required>
-          <option value="" disabled>Select Subject</option>
-          <option value="Math">Math</option>
-          <option value="Science">Science</option>
-          <option value="History">History</option>
-          <option value="Literature">Literature</option>
+          <option value="" disabled>Välj Klass</option>
+          <option value="Math">Matte</option>
+          <option value="Science">Vetenskap</option>
+          <option value="History">Historia</option>
+          <option value="Literature">Litteratur</option>
         </select>
-        <button type="submit" class="create-button">Create Classroom</button>
+        <button type="submit" class="create-button">Skapa Klassrum</button>
       </form>
     </div>
   </main>
 
-  <!-- Modal for editing classrooms -->
   <div v-if="showModal" class="modal">
     <div class="modal-content">
-      <h2>Edit Classroom</h2>
-      <input v-model="currentClassroom.name" placeholder="Classroom Name">
+      <h2>Ändra Klassrum</h2>
+      <input v-model="currentClassroom.name" placeholder="Klass Namn">
       <select v-model="currentClassroom.class">
-        <option value="" disabled>Select Class</option>
+        <option value="" disabled>Välj Klass</option>
         <option v-for="classOption in availableClasses" :key="classOption" :value="classOption">
           {{ classOption }}
         </option>
       </select>
       <select v-model="currentClassroom.subject">
-        <option value="" disabled>Select Subject</option>
-        <option value="Math">Math</option>
-        <option value="Science">Science</option>
-        <option value="History">History</option>
-        <option value="Literature">Literature</option>
+        <option value="" disabled>Välj Klassrum</option>
+        <option value="Math">Matte</option>
+        <option value="Science">Vetenskap</option>
+        <option value="History">Historia</option>
+        <option value="Literature">Litteratur</option>
       </select>
       <div class="modal-buttons">
-        <button @click="saveClassroom" class="save-button">Save</button>
-        <button @click="closeModal" class="cancel-button">Cancel</button>
+        <button @click="saveClassroom" class="save-button">Spara</button>
+        <button @click="closeModal" class="cancel-button">Avbryt</button>
       </div>
     </div>
   </div>
