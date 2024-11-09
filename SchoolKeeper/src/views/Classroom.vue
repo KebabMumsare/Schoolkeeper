@@ -24,7 +24,7 @@ main {
 .box {
     background-color: #f8f9fa;
     border-radius: 8px;
-    padding: 1.5rem;
+    padding: 1rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     overflow-y: auto;
 }
@@ -466,6 +466,100 @@ strong {
     min-height: 0 !important;
     padding: 0 !important;
 }
+
+/* Add these custom scrollbar styles for the chat messages */
+.chat-messages::-webkit-scrollbar {
+    width: 8px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+    background: #ffffff00;
+    border-radius: 4px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb:hover {
+    background: #666;
+}
+
+/* For Firefox */
+.chat-messages {
+    scrollbar-width: thin;
+    scrollbar-color: #888 #ffffff00;
+}
+
+.submitted-files {
+    margin-top: 1rem;
+}
+
+.submitted-files h4 {
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.file-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.download-file {
+    background: none;
+    border: none;
+    color: #4CAF50;
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: 0 0.5rem;
+}
+
+.download-file:hover {
+    color: #45a049;
+}
+
+/* Add these styles */
+.file-display {
+    margin: 1rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.selected-files, .submitted-files {
+    background-color: #fff;
+    border-radius: 4px;
+    padding: 0.5rem;
+}
+
+.selected-files h4, .submitted-files h4 {
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: #666;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.3rem;
+}
+
+.file-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.3rem 0.5rem;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    margin-bottom: 0.3rem;
+}
+
+.file-item:last-child {
+    margin-bottom: 0;
+}
+
+.file-item span {
+    font-size: 0.85rem;
+    color: #333;
+}
 </style>
 <template>
     <div class="classroom-view">
@@ -519,10 +613,26 @@ strong {
                                                             multiple
                                                         >
                                                     </div>
-                                                    <div class="selected-files" v-if="selectedFiles.length">
-                                                        <div v-for="(file, index) in selectedFiles" :key="index" class="file-item">
-                                                            <span>{{ file.name }}</span>
-                                                            <button @click="removeFile(index)" class="remove-file">×</button>
+                                                    <div class="file-display">
+                                                        <!-- Show selected files waiting to be submitted -->
+                                                        <div class="selected-files" v-if="selectedFiles.length">
+                                                            <h4>Selected Files:</h4>
+                                                            <div v-for="(file, index) in selectedFiles" :key="'selected-' + index" class="file-item">
+                                                                <span>{{ file.name }}</span>
+                                                                <button @click="removeFile(index)" class="remove-file">×</button>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Show previously submitted files -->
+                                                        <div class="submitted-files">
+                                                            <h4>Submitted Files:</h4>
+                                                            <div v-for="submission in submittedFiles[assignment._id]" :key="submission._id">
+                                                                
+                                                                <div v-for="(fileName, index) in submission.file_names" :key="index" class="file-item">
+                                                                    Hejsan
+                                                                    <span>{{ fileName }}</span>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <button 
@@ -592,11 +702,24 @@ export default {
             },
             showModal: false,
             selectedFiles: [],
+            submittedFiles: {},
         }
     },
     setup() {
         const router = useRouter();
         return { router };
+    },
+    watch: {
+        assignments: {
+            immediate: true,
+            handler(newAssignments) {
+                if (newAssignments.length > 0) {
+                    newAssignments.forEach(assignment => {
+                        this.fetchSubmittedFiles(assignment._id);
+                    });
+                }
+            }
+        }
     },
     methods: {
         async fetchClassroom() {
@@ -679,6 +802,27 @@ export default {
         removeFile(index) {
             this.selectedFiles.splice(index, 1);
         },
+        async fetchSubmittedFiles(assignmentId) {
+            try {
+                const response = await axios.get(
+                    `http://localhost:1010/api/submissions/${assignmentId}/${this.currentUser.id}`
+                );
+                this.$set(this.submittedFiles, assignmentId, response.data);
+            } catch (error) {
+                console.error('Error fetching submitted files:', error);
+            }
+        },
+        async deleteSubmission(assignmentId, fileId) {
+            if (!confirm('Are you sure you want to delete this submission?')) return;
+            
+            try {
+                await axios.delete(`http://localhost:1010/files/submission/${fileId}`);
+                await this.fetchSubmittedFiles(assignmentId);
+            } catch (error) {
+                console.error('Error deleting submission:', error);
+                alert('Error deleting submission');
+            }
+        },
         async submitFiles(assignmentId) {
             if (!this.selectedFiles.length) return;
 
@@ -688,8 +832,7 @@ export default {
             });
 
             try {
-                console.log(this.currentUser)
-                const response = await axios.post(
+                await axios.post(
                     `http://localhost:1010/files/submit/${assignmentId}/${this.currentUser.id}`, 
                     formData,
                     {
@@ -699,11 +842,13 @@ export default {
                     }
                 );
                 
-                // Clear files after successful upload
+                // Clear selected files
                 this.selectedFiles = [];
                 this.$refs.fileInput.value = '';
                 
-                // Show success message
+                // Fetch updated submitted files
+                await this.fetchSubmittedFiles(assignmentId);
+                
                 alert('Files submitted successfully!');
             } catch (error) {
                 console.error('Error submitting files:', error);
@@ -711,9 +856,9 @@ export default {
             }
         },
     },
-    mounted() {
-        this.fetchClassroom();
-        this.fetchAssignments();
+    async mounted() {
+        await this.fetchClassroom();
+        await this.fetchAssignments();
     },
 }
 </script>

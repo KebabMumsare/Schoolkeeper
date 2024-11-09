@@ -415,6 +415,10 @@ app.post("/files/submit/:assignmentId/:studentId", upload.array("files", 12), as
   await newSubmission.save();
   return res.sendStatus(204);
 });
+app.get("/api/submissions/:assignmentId/:studentId", async (req, res) => {
+  const submissions = await SubmissionModel.find({ assignment_id: req.params.assignmentId, student_id: req.params.studentId });
+  res.json(submissions);
+});
 
 const PORT = process.env.PORT || 1010;
 app.listen(PORT, () => {
