@@ -569,8 +569,8 @@ strong {
                 <div class="left-column">
                     <div class="box info-box">
                         <h2>{{ classroom.name }}</h2>
-                        <p><strong>Subject:</strong> {{ classroom.subject }}</p>
-                        <p><strong>Class:</strong> {{ classroom.class }}</p>
+                        <p><strong>Uppgift:</strong> {{ classroom.subject }}</p>
+                        <p><strong>Klass:</strong> {{ classroom.class }}</p>
                     </div>
                     <div class="box chat-box">
                         <h2>Chat</h2>
@@ -581,14 +581,14 @@ strong {
                             </p>
                         </div>
                         <div class="chat-input">
-                            <input v-model="newMessage" @keyup.enter="sendMessage" placeholder="Type a message..." />
-                            <button @click="sendMessage">Send</button>
+                            <input v-model="newMessage" @keyup.enter="sendMessage" placeholder="Skriv ett meddelande..." />
+                            <button @click="sendMessage">Skicka</button>
                         </div>
                     </div>
                 </div>
                 <div class="right-column">
                     <div class="box assignments-box">
-                        <h2>Assignments</h2>
+                        <h2>Uppgifter</h2>
                         <div class="assignments-list">
                             <!-- class="assignment-item" -->
                             <v-expansion-panels v-for="assignment in assignments" :key="assignment._id" >
@@ -603,7 +603,7 @@ strong {
                                         <div class="message-container">
                                             <p>{{ assignment.message }}</p>
                                             <div class="side-box">
-                                                <h3>Submit Assignment</h3>
+                                                <h3>Lämmna in Uppgift</h3>
                                                 <div class="file-upload">
                                                     <div class="file-input">
                                                         <input 
@@ -640,7 +640,7 @@ strong {
                                                         class="submit-button"
                                                         :disabled="!selectedFiles.length"
                                                     >
-                                                        Submit Files
+                                                        Lämmna in
                                                     </button>
                                                 </div>
                                             </div>
@@ -651,7 +651,7 @@ strong {
                         </div>
                         <button v-if="currentUser.access === 'Admin' || currentUser.access === 'Lärare'"
                             @click="openModal" class="create-button">
-                            Create New Assignment
+                            Skappa ny Uppgift
                         </button>
                     </div>
                 </div>
@@ -662,14 +662,14 @@ strong {
         <!-- Modal for creating assignments -->
         <div v-if="showModal" class="modal">
             <div class="modal-content create-assignment">
-                <h3>Create New Assignment</h3>
+                <h3>Skappa ny Uppgift</h3>
                 <form @submit.prevent="createAssignment">
                     <input v-model="newAssignment.title" placeholder="Assignment Title" required>
                     <textarea v-model="newAssignment.message" placeholder="Assignment Description" required></textarea>
                     <input v-model="newAssignment.due_date" type="date" required>
                     <div class="modal-buttons">
-                        <button type="submit" class="create-button">Create Assignment</button>
-                        <button @click="showModal = false" class="cancel-button">Cancel</button>
+                        <button type="submit" class="create-button">Skappa ny Uppgift</button>
+                        <button @click="showModal = false" class="cancel-button">Avbryt</button>
                     </div>
                 </form>
             </div>
