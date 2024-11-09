@@ -560,6 +560,53 @@ strong {
     font-size: 0.85rem;
     color: #333;
 }
+
+.file-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.file-name {
+    font-weight: 500;
+}
+
+.submission-date {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.file-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.download-file {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.2rem 0.5rem;
+    font-size: 1.1rem;
+    color: #4CAF50;
+}
+
+.download-file:hover {
+    color: #45a049;
+}
+
+.remove-file {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.2rem 0.5rem;
+    font-size: 1.1rem;
+    color: #f44336;
+}
+
+.remove-file:hover {
+    color: #d32f2f;
+}
 </style>
 <template>
     <div class="classroom-view">
@@ -625,13 +672,16 @@ strong {
 
                                                         <!-- Show previously submitted files -->
                                                         <div class="submitted-files">
-                                                            <h4>Submitted Files:</h4>
-                                                            <div v-for="submission in submittedFiles[assignment._id]" :key="submission._id">
-                                                                
-                                                                <div v-for="(fileName, index) in submission.file_names" :key="index" class="file-item">
-                                                                    Hejsan
-                                                                    <span>{{ fileName }}</span>
+                                                            <h4>Inlämnade Filer:</h4>
+                                                            <div v-if="Object.keys(submittedFiles).length > 0">
+                                                                <div v-for="submission in submittedFiles[assignment._id] || []" :key="submission._id" class="file-item">
+                                                                    <div class="file-info">
+                                                                        <span class="file-name">{{ submission.file_names[0] }}</span>
+                                                                    </div>
                                                                 </div>
+                                                            </div>
+                                                            <div v-else>
+                                                                Inga inlämnade filer i denna uppgift
                                                             </div>
                                                         </div>
                                                     </div>
@@ -651,7 +701,7 @@ strong {
                         </div>
                         <button v-if="currentUser.access === 'Admin' || currentUser.access === 'Lärare'"
                             @click="openModal" class="create-button">
-                            Skappa ny Uppgift
+                            Skapa ny Uppgift
                         </button>
                     </div>
                 </div>
@@ -709,18 +759,6 @@ export default {
         const router = useRouter();
         return { router };
     },
-    watch: {
-        assignments: {
-            immediate: true,
-            handler(newAssignments) {
-                if (newAssignments.length > 0) {
-                    newAssignments.forEach(assignment => {
-                        this.fetchSubmittedFiles(assignment._id);
-                    });
-                }
-            }
-        }
-    },
     methods: {
         async fetchClassroom() {
             try {
@@ -767,6 +805,31 @@ export default {
                 console.error('Error fetching assignments:', error);
             }
         },
+        async fetchSubmissions() {
+            try {
+                const response = await axios.get(`http://localhost:1010/api/submissions/${this.$route.params.id}/${this.currentUser.id}`);
+                console.log('Raw submissions response:', response.data);
+                
+                // Transform the data if needed
+                const submissions = response.data;
+                if (Array.isArray(submissions)) {
+                    // Group submissions by assignment ID
+                    this.submittedFiles = submissions.reduce((acc, submission) => {
+                        if (!acc[submission.assignment_id]) {
+                            acc[submission.assignment_id] = [];
+                        }
+                        acc[submission.assignment_id].push(submission);
+                        return acc;
+                    }, {});
+                } else {
+                    this.submittedFiles = submissions; // If data is already in the correct format
+                }
+                
+                console.log('Submitted files after assignment:', this.submittedFiles);
+            } catch (error) {
+                console.error('Error fetching submissions:', error);
+            }
+        },
         async createAssignment() {
             if (this.newAssignment.title && this.newAssignment.message && this.newAssignment.due_date) {
                 try {
@@ -791,10 +854,6 @@ export default {
             this.showModal = true;
             console.log('Modal should be open:', this.showModal);
         },
-        navigateToAssignment(assignmentId) {
-            console.log(`Navigating to assignment: ${assignmentId}`);
-            this.router.push(`/classroom/${this.$route.params.id}/assignment/${assignmentId}`);
-        },
         handleFileChange(event) {
             const newFiles = Array.from(event.target.files);
             this.selectedFiles = [...this.selectedFiles, ...newFiles];
@@ -802,22 +861,12 @@ export default {
         removeFile(index) {
             this.selectedFiles.splice(index, 1);
         },
-        async fetchSubmittedFiles(assignmentId) {
-            try {
-                const response = await axios.get(
-                    `http://localhost:1010/api/submissions/${assignmentId}/${this.currentUser.id}`
-                );
-                this.$set(this.submittedFiles, assignmentId, response.data);
-            } catch (error) {
-                console.error('Error fetching submitted files:', error);
-            }
-        },
         async deleteSubmission(assignmentId, fileId) {
             if (!confirm('Are you sure you want to delete this submission?')) return;
             
             try {
                 await axios.delete(`http://localhost:1010/files/submission/${fileId}`);
-                await this.fetchSubmittedFiles(assignmentId);
+                await this.fetchSubmissions();
             } catch (error) {
                 console.error('Error deleting submission:', error);
                 alert('Error deleting submission');
@@ -833,7 +882,7 @@ export default {
 
             try {
                 await axios.post(
-                    `http://localhost:1010/files/submit/${assignmentId}/${this.currentUser.id}`, 
+                    `http://localhost:1010/files/submit/${this.$route.params.id}/${assignmentId}/${this.currentUser.id}`, 
                     formData,
                     {
                         headers: {
@@ -847,18 +896,57 @@ export default {
                 this.$refs.fileInput.value = '';
                 
                 // Fetch updated submitted files
-                await this.fetchSubmittedFiles(assignmentId);
-                
-                alert('Files submitted successfully!');
+                await this.fetchSubmissions();
             } catch (error) {
                 console.error('Error submitting files:', error);
                 alert('Error submitting files. Please try again.');
             }
         },
+        async downloadFile(filePath, fileName) {
+            try {
+                const response = await axios.get(
+                    `http://localhost:1010/files/download/${filePath}`,
+                    { responseType: 'blob' }
+                );
+                
+                // Create blob link to download
+                const url = window.URL.createObjectURL(new Blob([response.data]));
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', fileName);
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                window.URL.revokeObjectURL(url);
+            } catch (error) {
+                console.error('Error downloading file:', error);
+                alert('Error downloading file. Please try again.');
+            }
+        },
+        async deleteSubmission(assignmentId, submissionId) {
+            if (!confirm('Are you sure you want to delete this submission?')) return;
+            
+            try {
+                await axios.delete(`http://localhost:1010/api/submissions/${submissionId}`);
+                // Update the local state after successful deletion
+                if (this.submittedFiles[assignmentId]) {
+                    this.submittedFiles[assignmentId] = this.submittedFiles[assignmentId]
+                        .filter(submission => submission._id !== submissionId);
+                }
+            } catch (error) {
+                console.error('Error deleting submission:', error);
+                alert('Error deleting submission. Please try again.');
+            }
+        }
     },
     async mounted() {
-        await this.fetchClassroom();
-        await this.fetchAssignments();
+        try {
+            await this.fetchClassroom();
+            await this.fetchAssignments();
+            await this.fetchSubmissions(); // Single fetch call
+        } catch (error) {
+            console.error('Error initializing classroom data:', error);
+        }
     },
 }
 </script>

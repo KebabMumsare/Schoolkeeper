@@ -140,6 +140,9 @@ const AssignmentSchema = mongoose.Schema({
 });
 const AssignmentModel = mongoose.model("Assignment", AssignmentSchema);
 const SubmissionSchema = mongoose.Schema({
+  classroom_id: {
+    type: "string",
+  },
   assignment_id: {
     type: "string",
   },
@@ -405,8 +408,9 @@ app.post("/api/assignments", async (req, res) => {
   }
 });
 // Submit API
-app.post("/files/submit/:assignmentId/:studentId", upload.array("files", 12), async function (req, res, next) {
+app.post("/files/submit/:classroomId/:assignmentId/:studentId", upload.array("files", 12), async function (req, res, next) {
   const newSubmission = new SubmissionModel( {
+    classroom_id: req.params.classroomId,
     assignment_id: req.params.assignmentId,
     student_id: req.params.studentId,
     file_paths: req.files.map(file => file.path),
@@ -415,9 +419,18 @@ app.post("/files/submit/:assignmentId/:studentId", upload.array("files", 12), as
   await newSubmission.save();
   return res.sendStatus(204);
 });
-app.get("/api/submissions/:assignmentId/:studentId", async (req, res) => {
-  const submissions = await SubmissionModel.find({ assignment_id: req.params.assignmentId, student_id: req.params.studentId });
-  res.json(submissions);
+app.get("/api/submissions/:classroomId/:studentId", async (req, res) => {
+  try {
+    const submissions = await SubmissionModel.find({ classroom_id: req.params.classroomId, student_id: req.params.studentId });
+    if (!submissions || submissions.length === 0) {
+      return res.status(404).json({ message: "No submissions found for this classroom and student" });
+    }
+    console.log(submissions);
+    res.json(submissions);
+  } catch (error) {
+    console.error('Error fetching submissions:', error);
+    res.status(500).json({ message: "Error fetching submissions", error: error.message });
+  }
 });
 
 const PORT = process.env.PORT || 1010;
