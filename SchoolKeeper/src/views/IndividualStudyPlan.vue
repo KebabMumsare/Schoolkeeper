@@ -3,18 +3,17 @@
     <NavBar site="individual-study-plan" :currentUser="currentUser" />
     <main class="content">
       <h1>Individual Study Plan</h1>
-      
       <div class="grades-grid">
         <div class="grid-header">
-          <div><h4 class="classtitle">Subject</h4></div>
-          <div><h4 class="classtitle">Grade</h4></div>
-          <div><h4 class="classtitle">Points</h4></div> 
+          <div><h4 class="classtitle">Ämne</h4></div>
+          <div><h4 class="classtitle">Betyg</h4></div>
+          <div><h4 class="classtitle">Poäng</h4></div> 
         </div>
         
-        <div class="grid-item" v-for="(lecture, index) in todaySchedule" :key="index">
-          <div class="lecture-name">{{ lecture.lecture }}</div>
-          <div class="lecture-grade">{{ lecture.grade }}</div> 
-          <div class="lecture-points">{{ lecture.points }}</div>
+        <div class="grid-item" v-for="(courses, index) in userCourses.courses" :key="index">
+          <div class="lecture-name">{{ courses.course.course_code }}</div>
+          <div class="lecture-grade">{{ courses.grade }}</div> 
+          <div class="lecture-points">{{ courses.course.points }}</div>
         </div>
       </div>
 
@@ -29,6 +28,7 @@
 <script>
 import NavBar from "@/components/Nav-Bar.vue";
 import Footer from "@/components/Footer.vue";
+import axios from "axios";
 import { useStorage } from "@vueuse/core";
 import { useRouter } from 'vue-router';
 
@@ -45,22 +45,25 @@ export default {
   data() {
     return {
       currentUser: useStorage('currentUser', { name: '', access: '', class: '' }),
-      todaySchedule: [] // Ensure this is populated with lesson data
+      courses: [], 
+      userCourses: [],
     };
   },
   methods: {
     goBack() {
       this.router.push('/personal');
+    },
+    async fetchCourses() {
+      const response = await axios.get(`http://localhost:1010/api/courses`);
+      this.courses = response.data;
+    },
+    async fetchUserCourses() {
+      const response = await axios.get(`http://localhost:1010/api/courses/${this.currentUser.id}`);
+      this.userCourses = response.data;
     }
   },
   mounted() {
-    // Example data, ändras om till riktita när Jesper gör dom i databassen
-    this.todaySchedule = [
-      { lecture: 'Math', grade: 'A', points: 100 },
-      { lecture: 'Science', grade: 'B+', points: 50 },
-      { lecture: 'History', grade: 'A-', points: 150 },
-      { lecture: 'Literature', grade: 'B', points: 75 },
-    ]; 
+    this.fetchUserCourses();
   }
 }
 </script>
@@ -127,6 +130,6 @@ h1 {
 }
 
 .classtitle {
-  color: white; /* Title color for subjects and grades */
+  color: rgb(0, 0, 0); /* Title color for subjects and grades */
 }
 </style>

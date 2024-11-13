@@ -38,6 +38,15 @@ const userSchema = mongoose.Schema({
   class: {
     type: "string",
   },
+  courses: [{
+    course: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Course',
+    },
+    grade: {
+      type: "string",
+    }
+  }]
 });
 const UserModel = mongoose.model("User", userSchema);
 // Schedual Schema
@@ -139,6 +148,7 @@ const AssignmentSchema = mongoose.Schema({
 
 });
 const AssignmentModel = mongoose.model("Assignment", AssignmentSchema);
+// Submission Schema
 const SubmissionSchema = mongoose.Schema({
   classroom_id: {
     type: "string",
@@ -163,6 +173,19 @@ const SubmissionSchema = mongoose.Schema({
   },
 });
 const SubmissionModel = mongoose.model("Submission", SubmissionSchema);
+// Course Schema
+const CourseSchema = mongoose.Schema({
+  name: {
+    type: "string",
+  },
+  course_code: {
+    type: "string",
+  },
+  points: {
+    type: "number",
+  },
+});
+const CourseModel = mongoose.model("Course", CourseSchema);
 
 // Login API
 app.post("/api/login", async (req, res) => {
@@ -430,6 +453,26 @@ app.get("/api/submissions/:classroomId/:studentId", async (req, res) => {
   } catch (error) {
     console.error('Error fetching submissions:', error);
     res.status(500).json({ message: "Error fetching submissions", error: error.message });
+  }
+});
+
+// Course API
+app.get("/api/courses", async (req, res) => {
+  try {
+    const courses = await CourseModel.find({});
+    res.json(courses);
+  } catch (error) {
+    console.error('Error fetching courses:', error);
+    res.status(500).json({ message: "Error fetching courses", error: error.message });
+  }
+});
+app.get("/api/courses/:userId", async (req, res) => {
+  try {
+    const course = await UserModel.findById(req.params.userId).populate("courses.course").select("courses");
+    res.json(course);
+  } catch (error) {
+    console.error('Error fetching course:', error);
+    res.status(500).json({ message: "Error fetching course", error: error.message });
   }
 });
 

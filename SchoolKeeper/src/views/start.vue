@@ -337,6 +337,7 @@ export default {
             todaySchedule: [],
             currentTimePosition: 0,
             testSchedule: [], // Corrected spelling and initialized as an empty array
+            courses: [],
         };
     },
     methods: {
@@ -445,6 +446,10 @@ export default {
                 test.subject.toLowerCase() === subject.toLowerCase()
             );
         },
+        async fetchCourses() {
+            const response = await axios.get(`http://localhost:1010/api/courses`);
+            this.courses = response.data;
+        },
     },
     mounted() {
         for (let i = 0; i < 5; i++) {
@@ -453,6 +458,7 @@ export default {
         
         // Update date and time immediately and then every second
         this.updateDateTime();
+        this.fetchCourses();
         setInterval(this.updateDateTime, 1000);
         this.fetchTodaySchedule();
         this.fetchTestSchedule();
@@ -461,6 +467,7 @@ export default {
             // Force re-render of the component to update current lecture
             this.$forceUpdate();
         }, 60000); // Update every minute
+        
     },
     watch: {
         testDay() {
