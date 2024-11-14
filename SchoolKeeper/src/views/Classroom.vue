@@ -148,14 +148,75 @@ strong {
     flex: 1;
     display: flex;
     gap: 1rem;
+    position: relative;
 }
 
 .assignments-box {
-    flex: 3;
+    flex: 2;
     background-color: #fff0f5;
+    transition: flex 0.3s ease-out;
 }
-.assignments-box::-webkit-scrollbar {
-  display: none;
+
+.assignments-box.with-submissions {
+    flex: 1.5;
+}
+
+.details-box {
+    flex: 1;
+    background-color: #f5f5f5;
+    min-width: 300px;
+    max-width: 400px;
+    animation: slideIn 0.3s ease-out;
+    transform-origin: right;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.assignment-details {
+    padding: 1rem 0;
+}
+
+.assignment-details .description {
+    margin: 1rem 0;
+    line-height: 1.5;
+}
+
+.submissions-list {
+    margin-top: 1rem;
+}
+
+.submission-item {
+    background-color: white;
+    padding: 0.75rem;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.student-name {
+    font-weight: 500;
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.submission-date {
+    font-size: 0.85rem;
+    color: #666;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.file-list {
+    margin-top: 0.5rem;
 }
 
 .create-assignment {
@@ -607,6 +668,50 @@ strong {
 .remove-file:hover {
     color: #d32f2f;
 }
+
+/* Add these new styles */
+.details-box {
+    flex: 1;
+    background-color: #f5f5f5;
+    min-width: 300px;
+    max-width: 400px;
+    animation: slideIn 0.3s ease-out;
+    transform-origin: right;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Optional: Add transition for when the box disappears */
+.right-column {
+    flex: 1;
+    display: flex;
+    gap: 1rem;
+    position: relative;
+}
+
+/* Alternative using Vue transition */
+.slide-fade-enter-active {
+    transition: all 0.3s ease-out;
+}
+
+.slide-fade-leave-active {
+    transition: all 0.3s cubic-bezier(1, 0.5, 0.8, 1);
+}
+
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+    transform: translateX(30px);
+    opacity: 0;
+}
 </style>
 <template>
     <div class="classroom-view">
@@ -634,12 +739,11 @@ strong {
                     </div>
                 </div>
                 <div class="right-column">
-                    <div class="box assignments-box">
+                    <div class="box assignments-box" :class="{ 'with-submissions': selectedAssignment }">
                         <h2>Uppgifter</h2>
                         <div class="assignments-list">
-                            <!-- class="assignment-item" -->
-                            <v-expansion-panels v-for="assignment in assignments" :key="assignment._id" >
-                                <v-expansion-panel>
+                            <v-expansion-panels v-for="assignment in assignments" :key="assignment._id">
+                                <v-expansion-panel @click="toggleAssignment(assignment)">
                                     <v-expansion-panel-title :class="{ 'v-expansion-panel-title--active': $attrs.modelValue }">
                                         <div class="assignment-title-container">
                                             <span>{{ assignment.title }}</span>
@@ -649,7 +753,7 @@ strong {
                                     <v-expansion-panel-text>
                                         <div class="message-container">
                                             <p>{{ assignment.message }}</p>
-                                            <div class="side-box">
+                                            <div v-if="currentUser.access === 'Elev'" class="side-box">
                                                 <h3>Lämmna in Uppgift</h3>
                                                 <div class="file-upload">
                                                     <div class="file-input">
@@ -661,7 +765,6 @@ strong {
                                                         >
                                                     </div>
                                                     <div class="file-display">
-                                                        <!-- Show selected files waiting to be submitted -->
                                                         <div class="selected-files" v-if="selectedFiles.length">
                                                             <h4>Selected Files:</h4>
                                                             <div v-for="(file, index) in selectedFiles" :key="'selected-' + index" class="file-item">
@@ -670,7 +773,6 @@ strong {
                                                             </div>
                                                         </div>
 
-                                                        <!-- Show previously submitted files -->
                                                         <div class="submitted-files">
                                                             <h4>Inlämnade Filer:</h4>
                                                             <div v-if="Object.keys(submittedFiles).length > 0">
@@ -704,6 +806,31 @@ strong {
                             Skapa ny Uppgift
                         </button>
                     </div>
+                    
+                    <Transition name="slide-fade">
+                        <div v-if="selectedAssignment && (currentUser.access === 'Lärare' || currentUser.access === 'Admin')" class="box details-box">
+                            <h2>Inlämningar</h2>
+                            <div class="submissions-list">
+                                <div v-if="getSubmissionsForAssignment(selectedAssignment._id).length > 0">
+                                    <div v-for="submission in getSubmissionsForAssignment(selectedAssignment._id)" 
+                                         :key="submission._id" 
+                                         class="submission-item">
+                                        <span class="student-name">{{ submission.student_name }}</span>
+                                        <span class="submission-date">{{ new Date(submission.created_at).toLocaleDateString() }}</span>
+                                        <div class="file-list">
+                                            <div v-for="file in submission.file_names" :key="file" class="file-item">
+                                                <span>{{ file }}</span>
+                                                <button @click="downloadFile(submission.file_path, file)" class="download-file">
+                                                    ⬇️
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p v-else>Inga inlämningar än</p>
+                            </div>
+                        </div>
+                    </Transition>
                 </div>
             </div>
         </main>
@@ -753,6 +880,7 @@ export default {
             showModal: false,
             selectedFiles: [],
             submittedFiles: {},
+            selectedAssignment: null,
         }
     },
     setup() {
@@ -937,6 +1065,12 @@ export default {
                 console.error('Error deleting submission:', error);
                 alert('Error deleting submission. Please try again.');
             }
+        },
+        getSubmissionsForAssignment(assignmentId) {
+            return this.submittedFiles[assignmentId] || [];
+        },
+        toggleAssignment(assignment) {
+            this.selectedAssignment = this.selectedAssignment?._id === assignment._id ? null : assignment;
         }
     },
     async mounted() {
