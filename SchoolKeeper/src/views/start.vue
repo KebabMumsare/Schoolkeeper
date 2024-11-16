@@ -72,7 +72,9 @@
                 </option>
             </select>
         </div>
-        <button v-if="currentUser.access === 'Admin'" type="submit" ><a href="/ScheduleCreator">Ändra</a></button>
+        <router-link to="/start">
+            <button v-if="currentUser.access === 'Admin'" type="button">Ändra</button>
+        </router-link>
     </main>
     <Footer />
 </template>
