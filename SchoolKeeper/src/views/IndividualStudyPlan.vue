@@ -1,6 +1,6 @@
 <template>
   <div class="individual-study-plan">
-    <NavBar site="individual-study-plan" :currentUser="currentUser" />
+    <NavBar site="personal" :currentUser="currentUser" />
     <main class="content">
       <h1>Individual Study Plan</h1>
       <div class="grades-grid">
