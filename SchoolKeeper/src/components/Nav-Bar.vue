@@ -50,7 +50,7 @@
       <!-- Add user info -->
       <div v-if="currentUser" class="user-info">
         <p>{{ currentUser.name }} | {{ currentUser.class }}</p>
-        <a id="logout-button" href="/">Logga out</a>
+        <a id="logout-button" href="/">Logga ut</a>
       </div>
     </div>
   </div>
