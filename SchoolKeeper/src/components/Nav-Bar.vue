@@ -168,10 +168,8 @@ export default {
   },
   methods: {
     logout() {
-      localStorage.removeItem('authToken'); 
-      this.$emit('logout'); 
-      this.currentUser = null;
-      this.$router.replace('/HomeView.vue');
+      localStorage.removeItem('currentUser'); 
+      this.$router.replace('/');
     }
   }
 };
