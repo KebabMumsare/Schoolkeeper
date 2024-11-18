@@ -24,7 +24,7 @@ main {
 .box {
     background-color: #f8f9fa;
     border-radius: 8px;
-    padding: 1.5rem;
+    padding: 1rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     overflow-y: auto;
 }
@@ -32,7 +32,7 @@ main {
 .left-column {
     display: flex;
     flex-direction: column;
-    width: 25%;
+    width: 20%;
     gap: 1rem;
 }
 
@@ -74,28 +74,40 @@ strong {
     flex-grow: 1;
     overflow-y: auto;
     margin-bottom: 10px;
+    font-size: 0.85rem;
+}
+
+.chat-messages p {
+    margin: 0.3rem 0;
+    color: #666;
+    font-size: 0.85rem;
 }
 
 .chat-input {
     display: flex;
     margin-top: 10px;
+    gap: 6px;
 }
 
 .chat-input input {
     flex-grow: 1;
-    padding: 8px;
+    padding: 4px 6px;
     border: 1px solid #ccc;
     border-radius: 4px;
-    margin-right: 8px;
+    font-size: 0.85rem;
+    height: 28px;
+    width: 80%;
 }
 
 .chat-input button {
-    padding: 8px 16px;
+    padding: 4px 10px;
     background-color: #4CAF50;
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    font-size: 0.85rem;
+    height: 28px;
 }
 
 .chat-input button:hover {
@@ -117,6 +129,100 @@ strong {
 
 .assignment-item:hover {
     background-color: #f0f0f0;
+}
+
+.create-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.create-button:hover {
+    background-color: #45a049;
+}
+
+.right-column {
+    flex: 1;
+    display: flex;
+    gap: 1rem;
+    position: relative;
+}
+
+.assignments-box {
+    flex: 2;
+    background-color: #fff0f5;
+    transition: flex 0.3s ease-out;
+}
+
+.assignments-box.with-submissions {
+    flex: 1.5;
+}
+
+.details-box {
+    flex: 1;
+    background-color: #f5f5f5;
+    min-width: 300px;
+    max-width: 400px;
+    animation: slideIn 0.3s ease-out;
+    transform-origin: right;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.assignment-details {
+    padding: 1rem 0;
+}
+
+.assignment-details .description {
+    margin: 1rem 0;
+    line-height: 1.5;
+}
+
+.submissions-list {
+    margin-top: 1rem;
+}
+
+.submission-item {
+    background-color: white;
+    padding: 0.75rem;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.student-name {
+    font-weight: 500;
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.submission-date {
+    font-size: 0.85rem;
+    color: #666;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.file-list {
+    margin-top: 0.5rem;
+}
+
+.create-assignment {
+    flex: 2;
+    background-color: #f0f0f0;
+    align-self: flex-start;
 }
 
 .create-assignment {
@@ -146,37 +252,6 @@ strong {
     height: 100px;
     resize: vertical;
 }
-
-.create-button {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    padding: 0.5rem;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.create-button:hover {
-    background-color: #45a049;
-}
-
-.right-column {
-    flex: 1;
-    display: flex;
-    gap: 1rem;
-}
-
-.assignments-box {
-    flex: 3;
-    background-color: #fff0f5;
-}
-
-.create-assignment {
-    flex: 2;
-    background-color: #f0f0f0;
-    align-self: flex-start;
-}
-
 .modal {
     position: fixed !important;
     z-index: 1000 !important;
@@ -282,8 +357,9 @@ strong {
 }
 
 .v-expansion-panel-text {
-    padding: 8px 16px 16px !important;  /* Adjust padding for the content */
-}   
+    padding: 8px 16px 16px !important;
+    font-size: 0.9rem !important;
+}
 
 /* Optional: If you want to adjust the icon position */
 .v-expansion-panel-title__icon {
@@ -298,6 +374,19 @@ strong {
 .v-expansion-panel {
     box-shadow: none !important;
     border: 1px solid #ddd !important;
+    margin-bottom: 0.5rem !important;
+    overflow: hidden !important;
+    transition: none !important;
+}
+
+.v-expansion-panel-text__wrapper {
+    padding: 0 !important;
+    transition: none !important;
+}
+
+.v-expansion-panel-text {
+    padding: 8px 16px 16px !important;
+    font-size: 0.9rem !important;
 }
 
 .assignment-title-container {
@@ -312,6 +401,317 @@ strong {
     color: #666;
     margin-right: 24px; /* Add space for the expansion icon */
 }
+
+.message-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 0.5rem 0 !important;
+    margin: 0 !important;
+}
+
+.message-container p {
+    flex: 1;
+}
+
+.side-box {
+    width: 25%;
+    max-height: 100%;
+    background-color: #f5f5f5;
+    padding: 0.75rem;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-size: 0.85rem;
+}
+
+.side-box h3 {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.file-upload {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.file-input {
+    position: relative;
+    padding: 2rem;
+    border: 2px dashed #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    text-align: center;
+    background-color: #fff;
+}
+
+.file-input::before {
+    content: 'Drop files here or click to upload';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #666;
+    pointer-events: none;
+}
+
+.file-input:hover {
+    border-color: #4CAF50;
+    background-color: #f8f9fa;
+}
+
+/* Hide the default file input appearance */
+.file-input input[type="file"] {
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    cursor: pointer;
+}
+
+.selected-files {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.file-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #fff;
+    padding: 0.4rem;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    font-size: 0.85rem;
+}
+
+.remove-file {
+    background: none;
+    border: none;
+    color: #f44336;
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: 0 0.5rem;
+}
+
+.remove-file:hover {
+    color: #d32f2f;
+}
+
+.submit-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.85rem;
+}
+
+.submit-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.submit-button:not(:disabled):hover {
+    background-color: #45a049;
+}
+
+.v-expansion-panel--inactive .v-expansion-panel-text__wrapper {
+    max-height: 0 !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+}
+
+/* Add these custom scrollbar styles for the chat messages */
+.chat-messages::-webkit-scrollbar {
+    width: 8px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+    background: #ffffff00;
+    border-radius: 4px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb:hover {
+    background: #666;
+}
+
+/* For Firefox */
+.chat-messages {
+    scrollbar-width: thin;
+    scrollbar-color: #888 #ffffff00;
+}
+
+.submitted-files {
+    margin-top: 1rem;
+}
+
+.submitted-files h4 {
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.file-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.download-file {
+    background: none;
+    border: none;
+    color: #4CAF50;
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: 0 0.5rem;
+}
+
+.download-file:hover {
+    color: #45a049;
+}
+
+/* Add these styles */
+.file-display {
+    margin: 1rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.selected-files, .submitted-files {
+    background-color: #fff;
+    border-radius: 4px;
+    padding: 0.5rem;
+}
+
+.selected-files h4, .submitted-files h4 {
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: #666;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.3rem;
+}
+
+.file-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.3rem 0.5rem;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    margin-bottom: 0.3rem;
+}
+
+.file-item:last-child {
+    margin-bottom: 0;
+}
+
+.file-item span {
+    font-size: 0.85rem;
+    color: #333;
+}
+
+.file-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.file-name {
+    font-weight: 500;
+}
+
+.submission-date {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.file-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.download-file {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.2rem 0.5rem;
+    font-size: 1.1rem;
+    color: #4CAF50;
+}
+
+.download-file:hover {
+    color: #45a049;
+}
+
+.remove-file {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.2rem 0.5rem;
+    font-size: 1.1rem;
+    color: #f44336;
+}
+
+.remove-file:hover {
+    color: #d32f2f;
+}
+
+/* Add these new styles */
+.details-box {
+    flex: 1;
+    background-color: #f5f5f5;
+    min-width: 300px;
+    max-width: 400px;
+    animation: slideIn 0.3s ease-out;
+    transform-origin: right;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Optional: Add transition for when the box disappears */
+.right-column {
+    flex: 1;
+    display: flex;
+    gap: 1rem;
+    position: relative;
+}
+
+/* Alternative using Vue transition */
+.slide-fade-enter-active {
+    transition: all 0.3s ease-out;
+}
+
+.slide-fade-leave-active {
+    transition: all 0.3s cubic-bezier(1, 0.5, 0.8, 1);
+}
+
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+    transform: translateX(30px);
+    opacity: 0;
+}
 </style>
 <template>
     <div class="classroom-view">
@@ -321,8 +721,8 @@ strong {
                 <div class="left-column">
                     <div class="box info-box">
                         <h2>{{ classroom.name }}</h2>
-                        <p><strong>Subject:</strong> {{ classroom.subject }}</p>
-                        <p><strong>Class:</strong> {{ classroom.class }}</p>
+                        <p><strong>Uppgift:</strong> {{ classroom.subject }}</p>
+                        <p><strong>Klass:</strong> {{ classroom.class }}</p>
                     </div>
                     <div class="box chat-box">
                         <h2>Chat</h2>
@@ -333,18 +733,17 @@ strong {
                             </p>
                         </div>
                         <div class="chat-input">
-                            <input v-model="newMessage" @keyup.enter="sendMessage" placeholder="Type a message..." />
-                            <button @click="sendMessage">Send</button>
+                            <input v-model="newMessage" @keyup.enter="sendMessage" placeholder="Skriv ett meddelande..." />
+                            <button @click="sendMessage">Skicka</button>
                         </div>
                     </div>
                 </div>
                 <div class="right-column">
-                    <div class="box assignments-box">
-                        <h2>Assignments</h2>
+                    <div class="box assignments-box" :class="{ 'with-submissions': selectedAssignment }">
+                        <h2>Uppgifter</h2>
                         <div class="assignments-list">
-                            <!-- class="assignment-item" -->
-                            <v-expansion-panels v-for="assignment in assignments" :key="assignment._id" >
-                                <v-expansion-panel>
+                            <v-expansion-panels v-for="assignment in assignments" :key="assignment._id">
+                                <v-expansion-panel @click="toggleAssignment(assignment)">
                                     <v-expansion-panel-title :class="{ 'v-expansion-panel-title--active': $attrs.modelValue }">
                                         <div class="assignment-title-container">
                                             <span>{{ assignment.title }}</span>
@@ -352,16 +751,86 @@ strong {
                                         </div>
                                     </v-expansion-panel-title>
                                     <v-expansion-panel-text>
-                                        {{ assignment.message }}
+                                        <div class="message-container">
+                                            <p>{{ assignment.message }}</p>
+                                            <div v-if="currentUser.access === 'Elev'" class="side-box">
+                                                <h3>Lämmna in Uppgift</h3>
+                                                <div class="file-upload">
+                                                    <div class="file-input">
+                                                        <input 
+                                                            type="file" 
+                                                            ref="fileInput" 
+                                                            @change="handleFileChange" 
+                                                            multiple
+                                                        >
+                                                    </div>
+                                                    <div class="file-display">
+                                                        <div class="selected-files" v-if="selectedFiles.length">
+                                                            <h4>Selected Files:</h4>
+                                                            <div v-for="(file, index) in selectedFiles" :key="'selected-' + index" class="file-item">
+                                                                <span>{{ file.name }}</span>
+                                                                <button @click="removeFile(index)" class="remove-file">×</button>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="submitted-files">
+                                                            <h4>Inlämnade Filer:</h4>
+                                                            <div v-if="Object.keys(submittedFiles).length > 0">
+                                                                <div v-for="submission in submittedFiles[assignment._id] || []" :key="submission._id" class="file-item">
+                                                                    <div class="file-info">
+                                                                        <span class="file-name">{{ submission.file_names[0] }}</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div v-else>
+                                                                Inga inlämnade filer i denna uppgift
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <button 
+                                                        @click="() => submitFiles(assignment._id)" 
+                                                        class="submit-button"
+                                                        :disabled="!selectedFiles.length"
+                                                    >
+                                                        Lämmna in
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </v-expansion-panel-text>
                                 </v-expansion-panel>
                             </v-expansion-panels>
                         </div>
                         <button v-if="currentUser.access === 'Admin' || currentUser.access === 'Lärare'"
                             @click="openModal" class="create-button">
-                            Create New Assignment
+                            Skapa ny Uppgift
                         </button>
                     </div>
+                    
+                    <Transition name="slide-fade">
+                        <div v-if="selectedAssignment && (currentUser.access === 'Lärare' || currentUser.access === 'Admin')" class="box details-box">
+                            <h2>Inlämningar</h2>
+                            <div class="submissions-list">
+                                <div v-if="getSubmissionsForAssignment(selectedAssignment._id).length > 0">
+                                    <div v-for="submission in getSubmissionsForAssignment(selectedAssignment._id)" 
+                                         :key="submission._id" 
+                                         class="submission-item">
+                                        <span class="student-name">{{ submission.student_name }}</span>
+                                        <span class="submission-date">{{ new Date(submission.created_at).toLocaleDateString() }}</span>
+                                        <div class="file-list">
+                                            <div v-for="file in submission.file_names" :key="file" class="file-item">
+                                                <span>{{ file }}</span>
+                                                <button @click="downloadFile(submission.file_path, file)" class="download-file">
+                                                    ⬇️
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p v-else>Inga inlämningar än</p>
+                            </div>
+                        </div>
+                    </Transition>
                 </div>
             </div>
         </main>
@@ -370,14 +839,14 @@ strong {
         <!-- Modal for creating assignments -->
         <div v-if="showModal" class="modal">
             <div class="modal-content create-assignment">
-                <h3>Create New Assignment</h3>
+                <h3>Skappa ny Uppgift</h3>
                 <form @submit.prevent="createAssignment">
                     <input v-model="newAssignment.title" placeholder="Assignment Title" required>
                     <textarea v-model="newAssignment.message" placeholder="Assignment Description" required></textarea>
                     <input v-model="newAssignment.due_date" type="date" required>
                     <div class="modal-buttons">
-                        <button type="submit" class="create-button">Create Assignment</button>
-                        <button @click="showModal = false" class="cancel-button">Cancel</button>
+                        <button type="submit" class="create-button">Skappa ny Uppgift</button>
+                        <button @click="showModal = false" class="cancel-button">Avbryt</button>
                     </div>
                 </form>
             </div>
@@ -398,7 +867,7 @@ export default {
     },
     data() {
         return {
-            currentUser: useStorage('currentUser', { name: '', access: '', class: '' }),
+            currentUser: useStorage('currentUser', { id: '', name: '', access: '', class: '' }),
             classroom: { name: 'Loading...', subject: '', class: '' },
             messages: [],
             newMessage: '',
@@ -408,7 +877,10 @@ export default {
                 message: '',
                 due_date: ''
             },
-            showModal: false
+            showModal: false,
+            selectedFiles: [],
+            submittedFiles: {},
+            selectedAssignment: null,
         }
     },
     setup() {
@@ -461,6 +933,31 @@ export default {
                 console.error('Error fetching assignments:', error);
             }
         },
+        async fetchSubmissions() {
+            try {
+                const response = await axios.get(`http://localhost:1010/api/submissions/${this.$route.params.id}/${this.currentUser.id}`);
+                console.log('Raw submissions response:', response.data);
+                
+                // Transform the data if needed
+                const submissions = response.data;
+                if (Array.isArray(submissions)) {
+                    // Group submissions by assignment ID
+                    this.submittedFiles = submissions.reduce((acc, submission) => {
+                        if (!acc[submission.assignment_id]) {
+                            acc[submission.assignment_id] = [];
+                        }
+                        acc[submission.assignment_id].push(submission);
+                        return acc;
+                    }, {});
+                } else {
+                    this.submittedFiles = submissions; // If data is already in the correct format
+                }
+                
+                console.log('Submitted files after assignment:', this.submittedFiles);
+            } catch (error) {
+                console.error('Error fetching submissions:', error);
+            }
+        },
         async createAssignment() {
             if (this.newAssignment.title && this.newAssignment.message && this.newAssignment.due_date) {
                 try {
@@ -485,14 +982,105 @@ export default {
             this.showModal = true;
             console.log('Modal should be open:', this.showModal);
         },
-        navigateToAssignment(assignmentId) {
-            console.log(`Navigating to assignment: ${assignmentId}`);
-            this.router.push(`/classroom/${this.$route.params.id}/assignment/${assignmentId}`);
+        handleFileChange(event) {
+            const newFiles = Array.from(event.target.files);
+            this.selectedFiles = [...this.selectedFiles, ...newFiles];
         },
+        removeFile(index) {
+            this.selectedFiles.splice(index, 1);
+        },
+        async deleteSubmission(assignmentId, fileId) {
+            if (!confirm('Are you sure you want to delete this submission?')) return;
+            
+            try {
+                await axios.delete(`http://localhost:1010/files/submission/${fileId}`);
+                await this.fetchSubmissions();
+            } catch (error) {
+                console.error('Error deleting submission:', error);
+                alert('Error deleting submission');
+            }
+        },
+        async submitFiles(assignmentId) {
+            if (!this.selectedFiles.length) return;
+
+            const formData = new FormData();
+            this.selectedFiles.forEach(file => {
+                formData.append('files', file);
+            });
+
+            try {
+                await axios.post(
+                    `http://localhost:1010/files/submit/${this.$route.params.id}/${assignmentId}/${this.currentUser.id}`, 
+                    formData,
+                    {
+                        headers: {
+                            'Content-Type': 'multipart/form-data'
+                        }
+                    }
+                );
+                
+                // Clear selected files
+                this.selectedFiles = [];
+                this.$refs.fileInput.value = '';
+                
+                // Fetch updated submitted files
+                await this.fetchSubmissions();
+            } catch (error) {
+                console.error('Error submitting files:', error);
+                alert('Error submitting files. Please try again.');
+            }
+        },
+        async downloadFile(filePath, fileName) {
+            try {
+                const response = await axios.get(
+                    `http://localhost:1010/files/download/${filePath}`,
+                    { responseType: 'blob' }
+                );
+                
+                // Create blob link to download
+                const url = window.URL.createObjectURL(new Blob([response.data]));
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', fileName);
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                window.URL.revokeObjectURL(url);
+            } catch (error) {
+                console.error('Error downloading file:', error);
+                alert('Error downloading file. Please try again.');
+            }
+        },
+        async deleteSubmission(assignmentId, submissionId) {
+            if (!confirm('Are you sure you want to delete this submission?')) return;
+            
+            try {
+                await axios.delete(`http://localhost:1010/api/submissions/${submissionId}`);
+                // Update the local state after successful deletion
+                if (this.submittedFiles[assignmentId]) {
+                    this.submittedFiles[assignmentId] = this.submittedFiles[assignmentId]
+                        .filter(submission => submission._id !== submissionId);
+                }
+            } catch (error) {
+                console.error('Error deleting submission:', error);
+                alert('Error deleting submission. Please try again.');
+            }
+        },
+        getSubmissionsForAssignment(assignmentId) {
+            return this.submittedFiles[assignmentId] || [];
+        },
+        toggleAssignment(assignment) {
+            this.selectedAssignment = this.selectedAssignment?._id === assignment._id ? null : assignment;
+        }
     },
-    mounted() {
-        this.fetchClassroom();
-        this.fetchAssignments();
+    async mounted() {
+        try {
+            await this.fetchClassroom();
+            await this.fetchAssignments();
+            await this.fetchSubmissions(); // Single fetch call
+        } catch (error) {
+            console.error('Error initializing classroom data:', error);
+        }
     },
 }
 </script>

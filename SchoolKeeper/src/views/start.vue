@@ -2,11 +2,11 @@
     <NavBar site="start" :currentUser="currentUser" />
     <main class="Schedule">
         <div class="Container">
-            <h3>Schedule</h3>
+            <h3>Schema</h3>
         </div>
         <div class="schedule-layout">
             <div class="today-schedule">
-                <h4>Today's Schedule ({{ resolveDay(currentDayIndex) }})</h4>
+                <h4>Dagens schema ({{ resolveDay(currentDayIndex) }})</h4>
                 <div class="schedule-timeline">
                     <div v-for="(lecture, index) in todaySchedule" :key="index" class="lecture-item">
                         <div class="lecture-time">{{ lecture.time }}</div>
@@ -42,11 +42,11 @@
             <div class="additional-info">
                 <!-- Lägg till inkommande prov här skulel vara en banger ide (Feedback av Gymasie arebte grupp) -->
                 <!-- Man kan också ha så att lektionerna blir andra färg om man har prov i de ämnet-->
-                <h4>Additional Information</h4>
+                <h4>Ytterligare information</h4>
                 
                 <div class="test-list">
                     <h5 class="upcoming-tests">
-                        Upcoming tests
+                        Kommande prov
                         <span class="bullet-point"></span>
                     </h5>
                     <ul v-if="testSchedule.length > 0">
@@ -57,22 +57,24 @@
                         </li>
                     </ul>
                     
-                    <p v-else>No upcoming tests</p>
+                    <p v-else>Inga kommande prov</p>
                 </div>
             
             
             </div>
         </div>
         <div class="test-controls">
-            <label for="test-day">Test Day:</label>
+            <label for="test-day">Dag:</label>
             <select id="test-day" v-model="testDay" @change="updateSchedules">
-                <option value="">Use actual day</option>
-                <option v-for="(day, index) in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']" :key="index" :value="index">
+                <option value="">Idag</option>
+                <option v-for="(day, index) in ['Måndag', 'Tisdag', 'Onsdag', 'Torsdag', 'Fredag']" :key="index" :value="index">
                     {{ day }}
                 </option>
             </select>
         </div>
-        <button v-if="currentUser.access === 'Admin'" type="submit" ><a href="/ScheduleCreator">Edit</a></button>
+        <router-link to="/start">
+            <button v-if="currentUser.access === 'Admin'" type="button">Ändra</button>
+        </router-link>
     </main>
     <Footer />
 </template>
@@ -337,6 +339,7 @@ export default {
             todaySchedule: [],
             currentTimePosition: 0,
             testSchedule: [], // Corrected spelling and initialized as an empty array
+            courses: [],
         };
     },
     methods: {
@@ -445,6 +448,10 @@ export default {
                 test.subject.toLowerCase() === subject.toLowerCase()
             );
         },
+        async fetchCourses() {
+            const response = await axios.get(`http://localhost:1010/api/courses`);
+            this.courses = response.data;
+        },
     },
     mounted() {
         for (let i = 0; i < 5; i++) {
@@ -453,6 +460,7 @@ export default {
         
         // Update date and time immediately and then every second
         this.updateDateTime();
+        this.fetchCourses();
         setInterval(this.updateDateTime, 1000);
         this.fetchTodaySchedule();
         this.fetchTestSchedule();
@@ -461,6 +469,7 @@ export default {
             // Force re-render of the component to update current lecture
             this.$forceUpdate();
         }, 60000); // Update every minute
+        
     },
     watch: {
         testDay() {

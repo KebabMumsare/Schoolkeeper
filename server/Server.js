@@ -38,6 +38,15 @@ const userSchema = mongoose.Schema({
   class: {
     type: "string",
   },
+  courses: [{
+    course: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Course',
+    },
+    grade: {
+      type: "string",
+    }
+  }]
 });
 const UserModel = mongoose.model("User", userSchema);
 // Schedual Schema
@@ -139,7 +148,44 @@ const AssignmentSchema = mongoose.Schema({
 
 });
 const AssignmentModel = mongoose.model("Assignment", AssignmentSchema);
-
+// Submission Schema
+const SubmissionSchema = mongoose.Schema({
+  classroom_id: {
+    type: "string",
+  },
+  assignment_id: {
+    type: "string",
+  },
+  student_id: {
+    type: "string",
+  },
+  file_paths: [{
+    type: String
+  }],
+  file_names: [{
+    type: String
+  }],
+  grade: {
+    type: "string",
+  },
+  submitted_at: {
+    type: "string",
+  },
+});
+const SubmissionModel = mongoose.model("Submission", SubmissionSchema);
+// Course Schema
+const CourseSchema = mongoose.Schema({
+  name: {
+    type: "string",
+  },
+  course_code: {
+    type: "string",
+  },
+  points: {
+    type: "number",
+  },
+});
+const CourseModel = mongoose.model("Course", CourseSchema);
 
 // Login API
 app.post("/api/login", async (req, res) => {
@@ -385,10 +431,49 @@ app.post("/api/assignments", async (req, res) => {
   }
 });
 // Submit API
-app.post("/files/upload", upload.array("files", 12), function (req, res, next) {
-  // req.files is array of `photos` files
-  // req.body will contain the text fields, if there were any
+app.post("/files/submit/:classroomId/:assignmentId/:studentId", upload.array("files", 12), async function (req, res, next) {
+  const newSubmission = new SubmissionModel( {
+    classroom_id: req.params.classroomId,
+    assignment_id: req.params.assignmentId,
+    student_id: req.params.studentId,
+    file_paths: req.files.map(file => file.path),
+    file_names: req.files.map(file => file.originalname),
+  });
+  await newSubmission.save();
   return res.sendStatus(204);
+});
+app.get("/api/submissions/:classroomId/:studentId", async (req, res) => {
+  try {
+    const submissions = await SubmissionModel.find({ classroom_id: req.params.classroomId, student_id: req.params.studentId });
+    if (!submissions || submissions.length === 0) {
+      return res.status(404).json({ message: "No submissions found for this classroom and student" });
+    }
+    console.log(submissions);
+    res.json(submissions);
+  } catch (error) {
+    console.error('Error fetching submissions:', error);
+    res.status(500).json({ message: "Error fetching submissions", error: error.message });
+  }
+});
+
+// Course API
+app.get("/api/courses", async (req, res) => {
+  try {
+    const courses = await CourseModel.find({});
+    res.json(courses);
+  } catch (error) {
+    console.error('Error fetching courses:', error);
+    res.status(500).json({ message: "Error fetching courses", error: error.message });
+  }
+});
+app.get("/api/courses/:userId", async (req, res) => {
+  try {
+    const course = await UserModel.findById(req.params.userId).populate("courses.course").select("courses");
+    res.json(course);
+  } catch (error) {
+    console.error('Error fetching course:', error);
+    res.status(500).json({ message: "Error fetching course", error: error.message });
+  }
 });
 
 const PORT = process.env.PORT || 1010;

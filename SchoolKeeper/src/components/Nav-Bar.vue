@@ -6,8 +6,6 @@
         <img src="/public/pictures/placeholder.png" alt="Logo" class="logo-image">
       </div>
 
-      <!--Search bar would be nice-->
-      
       <nav class="nav-center">
         <ul class="nav-list">
           <li class="nav-item">
@@ -35,13 +33,11 @@
             </a>
           </li>
           <li class="nav-item">
-            <a v-if="site !== 'files'" href="/filer" class="nav-link">
+            <a v-if="site !== 'files'" href="/classrooms" class="nav-link">
               <img src="https://banner2.cleanpng.com/20180411/zxq/avf25i5q7.webp" alt="" class="nav-icon">
             </a>
-            <a v-if="site === 'files'" href="/filer" class="nav-link nav-link-active">
+            <a v-if="site === 'files'" href="/classrooms" class="nav-link nav-link-active">
               <img src="https://banner2.cleanpng.com/20180411/zxq/avf25i5q7.webp" alt="" class="nav-icon-selected">
-              <!-- Kanske kan använda denna bild någon annan gång -->
-              <!-- https://cdn-icons-png.flaticon.com/512/686/686112.png -->
             </a>
           </li>
         </ul>
@@ -50,7 +46,7 @@
       <!-- Add user info -->
       <div v-if="currentUser" class="user-info">
         <p>{{ currentUser.name }} | {{ currentUser.class }}</p>
-        <a id="logout-button" href="/">Log out</a>
+        <a id="logout-button" href="/" @click.prevent="logout">Logga ut</a>
       </div>
     </div>
   </div>
@@ -169,6 +165,12 @@ export default {
   props: {
     site: String,
     currentUser: Object,
+  },
+  methods: {
+    logout() {
+      localStorage.removeItem('currentUser'); 
+      this.$router.replace('/');
+    }
   }
-}
+};
 </script>

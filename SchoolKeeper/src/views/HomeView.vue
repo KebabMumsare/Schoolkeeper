@@ -19,7 +19,9 @@ export default {
       
       .then(response => {
         this.setCurrentUser(response.data)
+        console.log(response.data)
         this.message = response.data.message;
+
         window.location.href = '/start';
       })
       .catch(error => {
@@ -28,6 +30,7 @@ export default {
     },
     setCurrentUser(user) {
       currentUser.value = {
+        id: user._id,
         name: user.name,
         access: user.access,
         class: user.class,
@@ -44,21 +47,21 @@ export default {
 <template>
   <main>
     <div class="login-container">
-      <h2>Login</h2>
+      <h2>Logga in</h2>
       <form @submit.prevent="submitLogin">
         
         <div class="form-group">
-          <label for="email">Email:</label>
+          <label for="email">Epost:</label>
           <input type="texts" v-model="email" required />
         </div>
 
         <div class="form-group">
-          <label for="password">Password:</label>
+          <label for="password">Lösenord:</label>
           <input type="password" v-model="password" required />
         </div>
         
         <div class="form-group">
-          <button type="submit">Login</button>
+          <button type="submit">Logga in</button>
         </div>
       </form>
       
