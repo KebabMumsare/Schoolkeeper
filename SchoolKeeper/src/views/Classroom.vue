@@ -811,11 +811,11 @@ strong {
                         <div v-if="selectedAssignment && (currentUser.access === 'Lärare' || currentUser.access === 'Admin')" class="box details-box">
                             <h2>Inlämningar</h2>
                             <div class="submissions-list">
-                                <div v-if="getSubmissionsForAssignment(selectedAssignment._id).length > 0">
-                                    <div v-for="submission in getSubmissionsForAssignment(selectedAssignment._id)" 
+                                <div v-if="allSubmissions.length > 0">
+                                    <div v-for="submission in allSubmissions[selectedAssignment._id]" 
                                          :key="submission._id" 
                                          class="submission-item">
-                                        <span class="student-name">{{ submission.student_name }}</span>
+                                        <span class="student-name">{{ getStudentName(submission.student_id) }}</span>
                                         <span class="submission-date">{{ new Date(submission.created_at).toLocaleDateString() }}</span>
                                         <div class="file-list">
                                             <div v-for="file in submission.file_names" :key="file" class="file-item">
@@ -880,7 +880,9 @@ export default {
             showModal: false,
             selectedFiles: [],
             submittedFiles: {},
+            allSubmissions: {},
             selectedAssignment: null,
+            
         }
     },
     setup() {
@@ -956,6 +958,14 @@ export default {
                 console.log('Submitted files after assignment:', this.submittedFiles);
             } catch (error) {
                 console.error('Error fetching submissions:', error);
+            }
+        },
+        async fetchAllSubmissions() {
+            try {
+                const response = await axios.get(`http://localhost:1010/api/submissions/${this.$route.params.id}`);
+                this.allSubmissions = response.data;
+            } catch (error) {
+                console.error('Error fetching all submissions:', error);
             }
         },
         async createAssignment() {
@@ -1067,17 +1077,25 @@ export default {
             }
         },
         getSubmissionsForAssignment(assignmentId) {
-            return this.submittedFiles[assignmentId] || [];
+            console.log('Submitted files:', this.allSubmissions[assignmentId]);
+            return this.allSubmissions[assignmentId] || [];
         },
         toggleAssignment(assignment) {
             this.selectedAssignment = this.selectedAssignment?._id === assignment._id ? null : assignment;
-        }
+        },
+        getStudentName(studentId) {
+            return this.allSubmissions[studentId];
+        }   
+        
     },
     async mounted() {
         try {
             await this.fetchClassroom();
             await this.fetchAssignments();
-            await this.fetchSubmissions(); // Single fetch call
+            await this.fetchSubmissions();
+            if (this.currentUser.access === 'Admin' || this.currentUser.access === 'Lärare') {
+                await this.fetchAllSubmissions();
+            }
         } catch (error) {
             console.error('Error initializing classroom data:', error);
         }

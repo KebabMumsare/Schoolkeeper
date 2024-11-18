@@ -455,7 +455,15 @@ app.get("/api/submissions/:classroomId/:studentId", async (req, res) => {
     res.status(500).json({ message: "Error fetching submissions", error: error.message });
   }
 });
-
+app.get("/api/submissions/:classroomId", async (req, res) => {
+  try {
+    const submissions = await SubmissionModel.find({ classroom_id: req.params.classroomId });
+    res.json(submissions);
+  } catch (error) {
+    console.error('Error fetching submissions:', error);
+    res.status(500).json({ message: "Error fetching submissions", error: error.message });
+  }
+});
 // Course API
 app.get("/api/courses", async (req, res) => {
   try {
