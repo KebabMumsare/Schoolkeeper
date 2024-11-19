@@ -40,6 +40,14 @@
               <img src="https://banner2.cleanpng.com/20180411/zxq/avf25i5q7.webp" alt="" class="nav-icon-selected">
             </a>
           </li>
+          <li class="nav-item" v-if="this.currentUser.access === 'Admin'">
+            <a v-if="site !== 'admintools'" href="/admintools" class="nav-link">
+              <img src="/public/pictures/placeholder.png" alt="" class="nav-icon">
+            </a>
+            <a v-if="site === 'admintools'" href="/admintools" class="nav-link nav-link-active">
+              <img src="/public/pictures/placeholder.png" alt="" class="nav-icon-selected">
+            </a>
+          </li>
         </ul>
       </nav>
       
@@ -160,6 +168,8 @@
 </style>
 
 <script>
+import { useStorage } from '@vueuse/core';
+
 export default {
   name: 'NavBar',
   props: {
