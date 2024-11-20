@@ -16,9 +16,9 @@
           :key="user.id"
         >
           <div class="user-info">
-            <strong>Name:</strong> {{ user.name }} <br />
+            <strong>Namn:</strong> {{ user.name }} <br />
             <strong>Email:</strong> {{ user.email }} <br />
-            <strong>Access Level:</strong> {{ user.access }} <br />
+            <strong>Behörighet:</strong> {{ user.access }} <br />
           </div>
         </div>
       </div>
@@ -26,19 +26,19 @@
 
     <div v-if="showModal" class="modal">
       <div class="modal-content create-user">
-        <h3>Create New User</h3>
+        <h3>Skappa Användare</h3>
         <form @submit.prevent="createUser">
-          <input v-model="newUser.name" placeholder="User Name" required />
-          <input v-model="newUser.email" placeholder="User Email" type="email" required />
+          <input v-model="newUser.name" placeholder="Användarnamn " required />
+          <input v-model="newUser.email" placeholder="Email" type="email" required />
           <select v-model="newUser.access" required>
-            <option value="" disabled>Select Access Level</option>
+            <option value="" disabled>Välj behörighet</option>
             <option value="Admin">Admin</option>
-            <option value="Teacher">Teacher</option>
-            <option value="Student">Student</option>
+            <option value="Teacher">Lärare</option>
+            <option value="Student">Elev</option>
           </select>
           <div class="modal-buttons">
-            <button type="submit" class="create-button">Create User</button>
-            <button @click="closeModal" class="cancel-button">Cancel</button>
+            <button type="submit" class="create-button">Skappa Användare</button>
+            <button @click="closeModal" class="cancel-button">Avbryt</button>
           </div>
         </form>
       </div>
@@ -172,6 +172,8 @@ import Footer from '@/components/Footer.vue';
 import axios from 'axios';
 import { useStorage } from "@vueuse/core";
 
+
+
 export default {
   name: 'user-creator',
   components: {
@@ -180,13 +182,9 @@ export default {
   },
   data() {
     return {
+      newUser: [],
       currentUser: useStorage('currentUser', { name: '', access: '', class: '' }),
       showModal: false,
-      newUser: {
-        name: '',
-        email: '',
-        access: ''
-      },
       users: [], // Array to hold all users
       searchQuery: '' // For the search input
     };
