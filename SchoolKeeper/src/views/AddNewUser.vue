@@ -1,9 +1,27 @@
 <template>
   <NavBar site="user-creator" :currentUser="currentUser" />
   <div class="user-creator-container">
-    <h2>Create New User</h2>
-    <div class="button-container">
-      <button @click="openModal" class="create-button">Create New User</button>
+
+    <div class="user-list-container">
+      <input 
+        type="text" 
+        v-model="searchQuery" 
+        placeholder="Search Users..." 
+        class="search-bar" 
+      />
+      <div class="user-list">
+        <div 
+          class="user-item" 
+          v-for="user in filteredUsers" 
+          :key="user.id"
+        >
+          <div class="user-info">
+            <strong>Name:</strong> {{ user.name }} <br />
+            <strong>Email:</strong> {{ user.email }} <br />
+            <strong>Access Level:</strong> {{ user.access }} <br />
+          </div>
+        </div>
+      </div>
     </div>
 
     <div v-if="showModal" class="modal">
@@ -25,22 +43,25 @@
         </form>
       </div>
     </div>
+    <div class="button-container">
+      <button @click="openModal" class="create-button">Create New User</button>
+    </div>
   </div>
   <Footer />
 </template>
 
 <style scoped>
 .user-creator-container {
+    padding-top: 5rem;
   width: 100vw;
   height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
 }
 
 .button-container {
-  margin-top: 1rem;
+  margin-top: 1rem; /* Add some space above the button */
 }
 
 .create-button {
@@ -56,6 +77,39 @@
 .create-button:hover {
   background-color: #0056b3;
   cursor: pointer;
+}
+
+.user-list-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 600px; /* Adjust as needed */
+  margin-top: 2rem;
+}
+
+.search-bar {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-bottom: 1rem;
+}
+
+.user-list {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  max-height: 300px; /* Limit height for scrolling */
+  overflow-y: auto;
+}
+
+.user-item {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.user-item:last-child {
+  border-bottom: none; /* Remove border for last item */
 }
 
 .modal {
@@ -132,8 +186,19 @@ export default {
         name: '',
         email: '',
         access: ''
-      }
+      },
+      users: [], // Array to hold all users
+      searchQuery: '' // For the search input
     };
+  },
+  computed: {
+    filteredUsers() {
+      // Filter users based on the search query
+      return this.users.filter(user => 
+        user.name.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+        user.email.toLowerCase().includes(this.searchQuery.toLowerCase())
+      );
+    }
   },
   methods: {
     openModal() {
@@ -152,13 +217,24 @@ export default {
             access: this.newUser.access,
           };
           const response = await axios.post('http://localhost:1010/api/users', payload);
-          console.log('User created:', response.data);
+          this.users.push(response.data); // Add the new user to the users array
           this.closeModal(); // Close the modal after creating the user
         } catch (error) {
           console.error('Error creating user:', error);
         }
       }
+    },
+    async fetchUsers() {
+      try {
+        const response = await axios.get('http://localhost:1010/api/users');
+        this.users = response.data; // Fetch all users
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
     }
+  },
+  mounted() {
+    this.fetchUsers(); // Fetch users when the component is mounted
   }
 };
 </script>
