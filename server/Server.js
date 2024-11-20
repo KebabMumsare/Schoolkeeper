@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const multer = require("multer");
+import { createZip } from "./FileHandling.js";
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -484,6 +485,9 @@ app.get("/api/courses/:userId", async (req, res) => {
     res.status(500).json({ message: "Error fetching course", error: error.message });
   }
 });
+
+// Download API
+
 
 const PORT = process.env.PORT || 1010;
 app.listen(PORT, () => {
