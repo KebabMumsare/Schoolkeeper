@@ -9,6 +9,7 @@ import IndividualStudyPlan from '@/views/IndividualStudyPlan.vue'
 import AssignmentView from '../views/Assignment.vue'
 import ScheduleCreator from '../views/ScheduleCreator.vue'
 import AdminTools from '../views/AdminTools.vue'
+import AddNewUser from '../views/AddNewUser.vue'
 
 const router = createRouter({
  history: createWebHistory(import.meta.env.BASE_URL),
@@ -57,6 +58,11 @@ const router = createRouter({
     path: '/admintools',
     name: 'AdminTools',
     component: AdminTools
+   },
+   {
+    path: '/addnewuser',
+    name: 'AddNewUser',
+    component: AddNewUser
    },
  ]
 })

@@ -2,20 +2,31 @@
 <NavBar site="admintools" :currentUser="currentUser" />
 <main>
   <h2>Funktioner</h2>
-  <div class="classroom-grid">
+  <div class="admintools-grid">
     <router-link 
       to="/schedulecreator" 
-      class="classroom-item"
-      :style="{ backgroundColor: getRandomColor(0) }"
+      class="admintools-item"
+      :style="{ backgroundColor: getRandomColor(-1) }"
     >
-      <h3>Go to Schedule Creator</h3>
-      <p>Click here to create a schedule.</p>
+      <h3>Gå till Schema Skapare</h3>
+      <p>Klicka här för att skappa Schema.</p>
     </router-link>
+
+    <router-link 
+      to="/addnewuser" 
+      class="admintools-item"
+      :style="{ backgroundColor: getRandomColor(-1) }"
+    >
+      <h3>Gå till Skapa Användare</h3>
+      <p>Klicka här för att skappa Användare.</p>
+    </router-link>
+
+
     <div 
-      class="classroom-item" 
+      class="admintools-item" 
       v-for="index in 2" 
       :key="index + 1" 
-      :style="{ backgroundColor: getRandomColor(index + 1) }"
+      :style="{ backgroundColor: getRandomColor(index) }"
     >
       <h3>Placeholder {{ index + 1 }}</h3>
       <p>Details for Placeholder {{ index + 1 }}</p>
@@ -25,14 +36,14 @@
 </template>
 
 <style scoped>
-.classroom-grid {
+.admintools-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
   margin-top: 1rem;
 }
 
-.classroom-item {
+.admintools-item {
   border: 1px solid #ccc;
   border-radius: 5px;
   padding: 1rem;
@@ -43,7 +54,7 @@
   color: inherit;
 }
 
-.classroom-item:hover {
+.admintools-item:hover {
   background-color: #f0f0f0;
 }
 
@@ -63,15 +74,17 @@ export default {
     data() {
         return {
             currentUser: useStorage('currentUser', {id: '', name: '', access: '', class: ''}),
+            colors: ['#baddff', '#f8fa98', '#92fca6'], 
         }
     },
     methods: {
         getRandomColor(index) {
-            // Get a random color from the colors array
             const randomIndex = Math.floor(Math.random() * this.colors.length);
-            // Ensure the color is not the same as the previous one
+            if (index === -1) {
+                return this.colors[randomIndex];
+            }
             if (index > 0 && this.colors[randomIndex] === this.colors[index - 1]) {
-                return this.colors[(randomIndex + 1) % this.colors.length]; // Get the next color
+                return this.colors[(randomIndex + 1) % this.colors.length]; 
             }
             return this.colors[randomIndex];
         }

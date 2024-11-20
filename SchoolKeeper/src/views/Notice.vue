@@ -52,7 +52,7 @@
 }
 
 .notice-container {
-    max-height: 40vh;
+    max-height: 60vh;
     width: 100vh;
     overflow-y: auto;
     border: 1px solid #ccc;
