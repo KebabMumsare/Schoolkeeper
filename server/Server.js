@@ -157,7 +157,8 @@ const SubmissionSchema = mongoose.Schema({
     type: "string",
   },
   student_id: {
-    type: "string",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
   },
   file_paths: [{
     type: String
@@ -457,7 +458,7 @@ app.get("/api/submissions/:classroomId/:studentId", async (req, res) => {
 });
 app.get("/api/submissions/:classroomId", async (req, res) => {
   try {
-    const submissions = await SubmissionModel.find({ classroom_id: req.params.classroomId });
+    const submissions = await SubmissionModel.find({ classroom_id: req.params.classroomId }).populate('student_id').lean();
     res.json(submissions);
   } catch (error) {
     console.error('Error fetching submissions:', error);
