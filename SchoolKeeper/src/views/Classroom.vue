@@ -812,7 +812,7 @@ strong {
                             <h2>Inlämningar</h2>
                             <div class="submissions-list">
                                 <div v-if="allSubmissions.length > 0">
-                                    <div v-for="submission in allSubmissions[selectedAssignment._id]" 
+                                    <div v-for="submission in allSubmissions.filter(submission => submission.assignment_id === selectedAssignment._id)" 
                                          :key="submission._id" 
                                          class="submission-item">
                                         <span class="student-name">{{ getStudentName(submission.student_id) }}</span>
@@ -820,9 +820,9 @@ strong {
                                         <div class="file-list">
                                             <div v-for="file in submission.file_names" :key="file" class="file-item">
                                                 <span>{{ file }}</span>
-                                                <button @click="downloadFile(submission.file_path, file)" class="download-file">
+                                                <!--<button @click="downloadFile(submission.file_path, file)" class="download-file">
                                                     ⬇️
-                                                </button>
+                                                </button>-->
                                             </div>
                                         </div>
                                     </div>
@@ -964,6 +964,7 @@ export default {
             try {
                 const response = await axios.get(`http://localhost:1010/api/submissions/${this.$route.params.id}`);
                 this.allSubmissions = response.data;
+                console.log('All submissions:', this.allSubmissions);
             } catch (error) {
                 console.error('Error fetching all submissions:', error);
             }
@@ -1084,7 +1085,9 @@ export default {
             this.selectedAssignment = this.selectedAssignment?._id === assignment._id ? null : assignment;
         },
         getStudentName(studentId) {
-            return this.allSubmissions[studentId];
+            const submission = this.allSubmissions.find(submission => submission.student_id === studentId);
+
+            return submission.student_id.name;
         }   
         
     },
