@@ -63,7 +63,6 @@ export default {
     data() {
         return {
             currentUser: useStorage('currentUser', {id: '', name: '', access: '', class: ''}),
-            colors: ['#f8f9fa', '#e6f2ff', '#fff0f5'], // Define your colors here
         }
     },
     methods: {
