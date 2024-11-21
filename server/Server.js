@@ -2,7 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const multer = require("multer");
-import { createZip } from "./FileHandling.js";
+//import { createZip } from "./FileHandling.js";
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
