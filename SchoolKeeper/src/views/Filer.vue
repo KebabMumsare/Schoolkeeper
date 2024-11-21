@@ -175,15 +175,15 @@ export default {
     <div id="create-classroom" v-if="currentUser.access === 'Admin' || currentUser.access === 'Lärare'">
       <h2>Skapa Klassrum</h2>
       <form @submit.prevent="createClassroom">
-        <input v-model="currentClassroom.name" placeholder="Classroom Name" required>
+        <input v-model="currentClassroom.name" placeholder="Klassrum namn" required>
         <select v-model="currentClassroom.class" required>
-          <option value="" disabled>Välj Klass</option>
+          <option value="" disabled>Välj klass</option>
           <option v-for="classOption in availableClasses" :key="classOption" :value="classOption">
             {{ classOption }}
           </option>
         </select>
         <select v-model="currentClassroom.subject" required>
-          <option value="" disabled>Välj Klass</option>
+          <option value="" disabled>Välj ämne</option>
           <option value="Math">Matte</option>
           <option value="Science">Vetenskap</option>
           <option value="History">Historia</option>
