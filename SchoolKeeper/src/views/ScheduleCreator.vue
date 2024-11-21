@@ -17,7 +17,7 @@
                 </div>
             </div>
             
-            <div class="button-wrapper"> 
+            <div class="button-wrapper">
                 <button @click="createSchedule" class="create-button">Create Schedule</button>
             </div>
         </div>
@@ -115,10 +115,11 @@
 
 .schedule-grid {
     position: absolute;
-    left: 50px; /* Width of time markers */
+    left: 50px;
     right: 0;
     top: 0;
     bottom: 0;
+    z-index: 2;
 }
 
 .button-wrapper {
@@ -194,7 +195,7 @@
 
 .grid-lines {
     position: absolute;
-    left: 50px; /* Align with schedule-grid */
+    left: 0;
     right: 0;
     top: 0;
     height: 100%;
@@ -214,18 +215,19 @@
     left: 0;
     top: 0;
     height: 100%;
-    width: 50px;
-    border-right: 1px solid rgba(255, 255, 255, 0.3);
-    background-color: #4fc0e5;
-    z-index: 2;
+    width: 100%;
+    pointer-events: none;
 }
 
 .time-marker {
     height: 60px;
     border-top: 1px solid rgba(255, 255, 255, 0.3);
-    padding: 2px;
+    padding: 2px 8px;
     font-size: 0.8rem;
     color: white;
+    width: 50px;
+    background-color: #4fc0e5;
+    z-index: 1;
 }
 </style>
 
@@ -239,10 +241,12 @@ export default {
                 { id: 3, name: 'English Class' },
             ],
             scheduledItems: [],
-            resizing: null,
-            startY: 0,
-            startHeight: 0,
-            startTop: 0,
+            resizing: false,
+            currentItem: null,
+            resizingDirection: null,
+            resizingStartY: 0,
+            resizingStartHeight: 0,
+            resizingStartTop: 0,
             dragStartY: 0,
             dragStartTop: 0,
         }
@@ -265,11 +269,17 @@ export default {
         startDragScheduledItem(evt, item) {
             evt.dataTransfer.dropEffect = 'move'
             evt.dataTransfer.effectAllowed = 'move'
-            evt.dataTransfer.setData('itemID', item.id)
+            evt.dataTransfer.setData('itemID', item.id.toString())
             evt.dataTransfer.setData('type', 'scheduled')
             
-            this.dragStartY = evt.clientY
-            this.dragStartTop = item.top
+            const dragImg = document.createElement('div')
+            dragImg.style.opacity = '0'
+            document.body.appendChild(dragImg)
+            evt.dataTransfer.setDragImage(dragImg, 0, 0)
+            setTimeout(() => document.body.removeChild(dragImg), 0)
+            
+            const rect = evt.target.getBoundingClientRect()
+            this.dragStartY = evt.clientY - rect.top
         },
         onDrop(evt) {
             const itemID = parseInt(evt.dataTransfer.getData('itemID'))
@@ -319,29 +329,65 @@ export default {
             }
         },
         startResize(evt, item, direction) {
-            this.resizing = { item, direction }
-            this.startY = evt.clientY
-            this.startHeight = item.minutes
-            this.startTop = item.top || 0
+            this.resizing = true
+            this.currentItem = item
+            this.resizingDirection = direction
+            this.resizingStartY = evt.clientY
+            this.resizingStartHeight = item.minutes
+            this.resizingStartTop = item.top
             evt.preventDefault()
         },
         handleResize(evt) {
-            if (!this.resizing) return
-            
-            const deltaY = evt.clientY - this.startY
-            
-            if (this.resizing.direction === 'bottom') {
-                const newHeight = Math.max(60, this.startHeight + deltaY)
-                this.resizing.item.minutes = Math.round(newHeight / 15) * 15
+            if (!this.resizing || !this.currentItem) return
+
+            const deltaY = evt.clientY - this.resizingStartY
+
+            if (this.resizingDirection === 'bottom') {
+                let newHeight = Math.round((this.resizingStartHeight + deltaY) / 15) * 15
+                newHeight = Math.max(60, newHeight)
+                
+                const itemBelow = this.scheduledItems.find(item => 
+                    item !== this.currentItem && 
+                    item.top > this.currentItem.top && 
+                    item.top < this.currentItem.top + newHeight
+                )
+
+                if (itemBelow) {
+                    newHeight = itemBelow.top - this.currentItem.top
+                }
+
+                if (this.currentItem.top + newHeight <= 1440) {
+                    this.currentItem.minutes = newHeight
+                }
             } else {
-                const newHeight = Math.max(60, this.startHeight - deltaY)
-                const newTop = this.startTop + (this.startHeight - newHeight)
-                this.resizing.item.minutes = Math.round(newHeight / 15) * 15
-                this.resizing.item.top = Math.round(newTop / 15) * 15
+                let newTop = Math.round((this.resizingStartTop + deltaY) / 15) * 15
+                let newHeight = this.resizingStartHeight + (this.resizingStartTop - newTop)
+                
+                const itemAbove = this.scheduledItems.find(item => 
+                    item !== this.currentItem && 
+                    item.top + item.minutes > newTop && 
+                    item.top < this.currentItem.top
+                )
+
+                if (itemAbove) {
+                    newTop = itemAbove.top + itemAbove.minutes
+                    newHeight = this.currentItem.top + this.currentItem.minutes - newTop
+                }
+
+                if (newHeight < 60) {
+                    newTop = this.currentItem.top + this.currentItem.minutes - 60
+                    newHeight = 60
+                }
+
+                if (newTop >= 0) {
+                    this.currentItem.top = newTop
+                    this.currentItem.minutes = newHeight
+                }
             }
         },
         stopResize() {
-            this.resizing = null
+            this.resizing = false
+            this.currentItem = null
         },
         formatDuration(minutes) {
             const hours = Math.floor(minutes / 60)
@@ -365,14 +411,13 @@ export default {
         handleDrag(evt, item) {
             if (!evt.clientY) return
             
-            const deltaY = evt.clientY - this.dragStartY
-            const newTop = Math.max(0, this.dragStartTop + deltaY)
-            const snappedTop = Math.round(newTop / 15) * 15
+            const scheduleRect = evt.currentTarget.parentElement.getBoundingClientRect()
+            const mouseY = evt.clientY - scheduleRect.top + evt.currentTarget.parentElement.scrollTop
+            
+            const newTop = Math.round((mouseY - this.dragStartY) / 15) * 15
             
             const maxTop = 1440 - item.minutes
-            const proposedTop = Math.min(snappedTop, maxTop)
-            
-            this.handleCollisions(item, proposedTop)
+            item.top = Math.min(Math.max(0, newTop), maxTop)
         },
         handleCollisions(movingItem, proposedTop) {
             if (!this.scheduledItems.includes(movingItem)) {
