@@ -343,7 +343,7 @@ export default {
             const deltaY = evt.clientY - this.resizingStartY
 
             if (this.resizingDirection === 'bottom') {
-                let newHeight = Math.round((this.resizingStartHeight + deltaY) / 15) * 15
+                let newHeight = Math.round((this.resizingStartHeight + deltaY) / 5) * 5
                 newHeight = Math.max(60, newHeight)
                 
                 const itemBelow = this.scheduledItems.find(item => 
