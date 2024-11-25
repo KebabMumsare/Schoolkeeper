@@ -712,6 +712,45 @@ strong {
     transform: translateX(30px);
     opacity: 0;
 }
+
+.file-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.download-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: background-color 0.2s ease;
+}
+
+.download-button:hover {
+    background-color: #45a049;
+}
+
+.download-button i {
+    font-size: 1rem;
+}
+
+.details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.details-header h2 {
+    margin: 0;  /* Remove default margin to ensure proper alignment */
+}
 </style>
 <template>
     <div class="classroom-view">
@@ -809,7 +848,14 @@ strong {
                     
                     <Transition name="slide-fade">
                         <div v-if="selectedAssignment && (currentUser.access === 'Lärare' || currentUser.access === 'Admin')" class="box details-box">
-                            <h2>Inlämningar</h2>
+                            <div class="details-header">
+                                <h2>Inlämningar</h2>
+                                <div class="file-actions">
+                                    <button class="download-button" @click="downloadAssignment">
+                                        Ladda ner alla
+                                    </button>
+                                </div>
+                            </div>
                             <div class="submissions-list">
                                 <div v-if="allSubmissions.length > 0">
                                     <div v-for="submission in allSubmissions.filter(submission => submission.assignment_id === selectedAssignment._id)" 
@@ -820,9 +866,11 @@ strong {
                                         <div class="file-list">
                                             <div v-for="file in submission.file_names" :key="file" class="file-item">
                                                 <span>{{ file }}</span>
-                                                <!--<button @click="downloadFile(submission.file_path, file)" class="download-file">
-                                                    ⬇️
-                                                </button>-->
+                                                <div class="file-actions">
+                                                    <button class="download-button">
+                                                        Ladda ner
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -989,17 +1037,6 @@ export default {
                 }
             }
         },
-        openModal() {
-            this.showModal = true;
-            console.log('Modal should be open:', this.showModal);
-        },
-        handleFileChange(event) {
-            const newFiles = Array.from(event.target.files);
-            this.selectedFiles = [...this.selectedFiles, ...newFiles];
-        },
-        removeFile(index) {
-            this.selectedFiles.splice(index, 1);
-        },
         async deleteSubmission(assignmentId, fileId) {
             if (!confirm('Are you sure you want to delete this submission?')) return;
             
@@ -1077,6 +1114,13 @@ export default {
                 alert('Error deleting submission. Please try again.');
             }
         },
+        async downloadAssignment() {
+            try {
+                await axios.get(`http://localhost:1010/api/download/${this.selectedAssignment._id}`);
+            } catch (error) {
+                console.error('Error downloading assignment:', error);
+            }
+        },
         getSubmissionsForAssignment(assignmentId) {
             console.log('Submitted files:', this.allSubmissions[assignmentId]);
             return this.allSubmissions[assignmentId] || [];
@@ -1088,8 +1132,18 @@ export default {
             const submission = this.allSubmissions.find(submission => submission.student_id === studentId);
 
             return submission.student_id.name;
-        }   
-        
+        },
+        openModal() {
+            this.showModal = true;
+            console.log('Modal should be open:', this.showModal);
+        },
+        handleFileChange(event) {
+            const newFiles = Array.from(event.target.files);
+            this.selectedFiles = [...this.selectedFiles, ...newFiles];
+        },
+        removeFile(index) {
+            this.selectedFiles.splice(index, 1);
+        },
     },
     async mounted() {
         try {

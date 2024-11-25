@@ -2,11 +2,10 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import StartView from '../views/start.vue'
 import NoticeView from '../views/Notice.vue'
-import FilerView from '../views/Filer.vue'
+import ClassroomsView from '../views/Classrooms.vue'
 import ClassroomView from '../views/Classroom.vue'
 import PersonalView from '../views/Personal.vue'
 import IndividualStudyPlan from '@/views/IndividualStudyPlan.vue'
-import AssignmentView from '../views/Assignment.vue'
 import ScheduleCreator from '../views/ScheduleCreator.vue'
 import AdminTools from '../views/AdminTools.vue'
 import AddNewUser from '../views/AddNewUser.vue'
@@ -37,7 +36,7 @@ const router = createRouter({
    {
      path: '/classrooms',
      name: 'classrooms',
-     component: FilerView
+     component: ClassroomsView
    },
    {
      path: '/classroom/:id',
