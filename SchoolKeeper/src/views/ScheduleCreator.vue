@@ -360,7 +360,7 @@ export default {
                     this.currentItem.minutes = newHeight
                 }
             } else {
-                let newTop = Math.round((this.resizingStartTop + deltaY) / 15) * 15
+                let newTop = Math.round((this.resizingStartTop + deltaY) / 5) * 5
                 let newHeight = this.resizingStartHeight + (this.resizingStartTop - newTop)
                 
                 const itemAbove = this.scheduledItems.find(item => 
