@@ -2,7 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const multer = require("multer");
-const { createZip } = require("./FileHandling.js");
+const { createZip, deleteZip } = require("./FileHandling.js");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -491,7 +491,9 @@ app.get("/api/download/:assignmentId", async (req, res) => {
   try {
     const submissions = await SubmissionModel.find({ assignment_id: req.params.assignmentId });
     console.log(submissions);
-    createZip(submissions);
+    await createZip(submissions);
+    res.download(__dirname + '/archive.zip');
+    deleteZip();
   } catch (error) {
     console.error('Error downloading submissions:', error);
     res.status(500).json({ message: "Error downloading submissions", error: error.message });

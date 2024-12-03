@@ -1116,7 +1116,18 @@ export default {
         },
         async downloadAssignment() {
             try {
-                await axios.get(`http://localhost:1010/api/download/${this.selectedAssignment._id}`);
+                const response = await axios.get(`http://localhost:1010/api/download/${this.selectedAssignment._id}`,{ responseType: 'blob' }
+                );
+                
+                // Create blob link to download
+                const url = window.URL.createObjectURL(new Blob([response.data]));
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', `${this.selectedAssignment.message}.zip`);
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                window.URL.revokeObjectURL(url);
             } catch (error) {
                 console.error('Error downloading assignment:', error);
             }
