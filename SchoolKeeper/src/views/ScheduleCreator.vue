@@ -21,53 +21,66 @@
                 <button @click="createSchedule" class="create-button">Create Schedule</button>
             </div>
         </div>
-        <div 
-            class="schedule"
-            @dragover.prevent
-            @drop="onDrop"
-        >
-            <div class="schedule-content">
-                <div class="grid-lines">
-                    <div v-for="hour in 24" :key="hour" class="grid-line" 
-                        :style="{ top: `${(hour - 1) * 60}px` }">
-                    </div>
+        <div class="schedule-container">
+            <div class="days-header">
+                <div 
+                    v-for="(day, index) in days" 
+                    :key="index" 
+                    class="day" 
+                    @click="selectDay(day)"
+                    :class="{ selected: selectedDay === day }"
+                >
+                    {{ day }}
                 </div>
-
-                <div class="time-markers">
-                    <div v-for="hour in 24" :key="hour" class="time-marker">
-                        {{ formatHour(hour - 1) }}
-                    </div>
-                </div>
-
-                <div class="schedule-grid">
-                    <div 
-                        v-for="scheduledItem in scheduledItems" 
-                        :key="scheduledItem.id" 
-                        class="scheduled-item"
-                        :style="{ 
-                            height: `${scheduledItem.minutes}px`,
-                            top: `${scheduledItem.top}px` 
-                        }"
-                        draggable="true"
-                        @dragstart="startDragScheduledItem($event, scheduledItem)"
-                        @drag="handleDrag($event, scheduledItem)"
-                    >
-                        <div 
-                            class="resize-handle top"
-                            @mousedown="startResize($event, scheduledItem, 'top')"
-                        ></div>
-                        
-                        <div class="scheduled-item-content">
-                            <div class="time-range">
-                                {{ getTimeRange(scheduledItem) }}
-                            </div>
-                            <div class="item-name">{{ scheduledItem.name }}</div>
+            </div>
+            <div 
+                class="schedule"
+                @dragover.prevent
+                @drop="onDrop"
+            >
+                <div class="schedule-content">
+                    <div class="grid-lines">
+                        <div v-for="hour in 24" :key="hour" class="grid-line" 
+                            :style="{ top: `${(hour - 1) * 60}px` }">
                         </div>
+                    </div>
 
+                    <div class="time-markers">
+                        <div v-for="hour in 24" :key="hour" class="time-marker">
+                            {{ formatHour(hour - 1) }}
+                        </div>
+                    </div>
+
+                    <div class="schedule-grid">
                         <div 
-                            class="resize-handle bottom"
-                            @mousedown="startResize($event, scheduledItem, 'bottom')"
-                        ></div>
+                            v-for="scheduledItem in schedules[selectedDay]" 
+                            :key="scheduledItem.id" 
+                            class="scheduled-item"
+                            :style="{ 
+                                height: `${scheduledItem.minutes}px`,
+                                top: `${scheduledItem.top}px` 
+                            }"
+                            draggable="true"
+                            @dragstart="startDragScheduledItem($event, scheduledItem)"
+                            @drag="handleDrag($event, scheduledItem)"
+                        >
+                            <div 
+                                class="resize-handle top"
+                                @mousedown="startResize($event, scheduledItem, 'top')"
+                            ></div>
+                            
+                            <div class="scheduled-item-content">
+                                <div class="time-range">
+                                    {{ getTimeRange(scheduledItem) }}
+                                </div>
+                                <div class="item-name">{{ scheduledItem.name }}</div>
+                            </div>
+
+                            <div 
+                                class="resize-handle bottom"
+                                @mousedown="startResize($event, scheduledItem, 'bottom')"
+                            ></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -76,10 +89,23 @@
 </template>
 
 <style scoped>
+/* Global scrollbar hiding */
+* {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+}
+
+*::-webkit-scrollbar {
+    width: 0 !important;
+    height: 0 !important;
+    display: none !important;
+}
+
 .wraper {
     display: flex;
     width: 100vw;
     height: 100vh;
+    overflow: hidden;
 }
 
 .components {
@@ -100,17 +126,47 @@
     width: 100%;
 }
 
+.schedule-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.days-header {
+    display: flex;
+    justify-content: space-around;
+    background-color: #4fc0e5;
+    padding: 10px 0;
+    flex-shrink: 0;
+}
+
+.day {
+    flex: 1;
+    text-align: center;
+    cursor: pointer;
+    color: white;
+    font-weight: bold;
+}
+
 .schedule {
     flex: 1;
     background-color: #4fc0e5;
     position: relative;
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
     min-width: 800px;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+    -webkit-overflow-scrolling: touch;
 }
 
 .schedule-content {
     position: relative;
-    min-height: 1440px; /* 24 hours * 60px */
+    min-height: 1440px;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+    -webkit-overflow-scrolling: touch;
 }
 
 .schedule-grid {
@@ -229,6 +285,10 @@
     background-color: #4fc0e5;
     z-index: 1;
 }
+
+.day.selected {
+    background-color: #3a9ecb;
+}
 </style>
 
 <script>
@@ -240,7 +300,14 @@ export default {
                 { id: 2, name: 'Science Class' },
                 { id: 3, name: 'English Class' },
             ],
-            scheduledItems: [],
+            schedules: {
+                Monday: [],
+                Tuesday: [],
+                Wednesday: [],
+                Thursday: [],
+                Friday: []
+            },
+            selectedDay: 'Monday',
             resizing: false,
             currentItem: null,
             resizingDirection: null,
@@ -249,6 +316,7 @@ export default {
             resizingStartTop: 0,
             dragStartY: 0,
             dragStartTop: 0,
+            days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
         }
     },
     mounted() {
@@ -290,7 +358,8 @@ export default {
                 if (item) {
                     const scheduleRect = evt.currentTarget.getBoundingClientRect()
                     const dropY = evt.clientY - scheduleRect.top + evt.currentTarget.scrollTop
-                    const snapY = Math.round(dropY / 15) * 15
+                    const adjustedDropY = dropY - this.dragStartY
+                    const snapY = Math.round(adjustedDropY / 5) * 5
                     const maxTop = 1440 - 60
                     const proposedTop = Math.min(Math.max(0, snapY), maxTop)
 
@@ -301,15 +370,16 @@ export default {
                         top: proposedTop
                     }
 
-                    this.scheduledItems.push(newItem)
+                    this.schedules[this.selectedDay].push(newItem)
                     this.handleCollisions(newItem, proposedTop)
                 }
             } else if (type === 'scheduled') {
-                const item = this.scheduledItems.find(item => item.id === itemID)
+                const item = this.schedules[this.selectedDay].find(item => item.id === itemID)
                 if (item) {
                     const scheduleRect = evt.currentTarget.getBoundingClientRect()
                     const dropY = evt.clientY - scheduleRect.top + evt.currentTarget.scrollTop
-                    const snapY = Math.round(dropY / 15) * 15
+                    const adjustedDropY = dropY - this.dragStartY
+                    const snapY = Math.round(adjustedDropY / 5) * 5
                     const maxTop = 1440 - item.minutes
                     const proposedTop = Math.min(Math.max(0, snapY), maxTop)
                     
@@ -322,9 +392,9 @@ export default {
             const type = evt.dataTransfer.getData('type')
             
             if (type === 'scheduled') {
-                const index = this.scheduledItems.findIndex(item => item.id === itemID)
+                const index = this.schedules[this.selectedDay].findIndex(item => item.id === itemID)
                 if (index !== -1) {
-                    this.scheduledItems.splice(index, 1)
+                    this.schedules[this.selectedDay].splice(index, 1)
                 }
             }
         },
@@ -346,7 +416,7 @@ export default {
                 let newHeight = Math.round((this.resizingStartHeight + deltaY) / 5) * 5
                 newHeight = Math.max(60, newHeight)
                 
-                const itemBelow = this.scheduledItems.find(item => 
+                const itemBelow = this.schedules[this.selectedDay].find(item => 
                     item !== this.currentItem && 
                     item.top > this.currentItem.top && 
                     item.top < this.currentItem.top + newHeight
@@ -363,7 +433,7 @@ export default {
                 let newTop = Math.round((this.resizingStartTop + deltaY) / 5) * 5
                 let newHeight = this.resizingStartHeight + (this.resizingStartTop - newTop)
                 
-                const itemAbove = this.scheduledItems.find(item => 
+                const itemAbove = this.schedules[this.selectedDay].find(item => 
                     item !== this.currentItem && 
                     item.top + item.minutes > newTop && 
                     item.top < this.currentItem.top
@@ -414,20 +484,20 @@ export default {
             const scheduleRect = evt.currentTarget.parentElement.getBoundingClientRect()
             const mouseY = evt.clientY - scheduleRect.top + evt.currentTarget.parentElement.scrollTop
             
-            const newTop = Math.round((mouseY - this.dragStartY) / 15) * 15
+            const newTop = Math.round((mouseY - this.dragStartY) / 5) * 5
             
             const maxTop = 1440 - item.minutes
             item.top = Math.min(Math.max(0, newTop), maxTop)
         },
         handleCollisions(movingItem, proposedTop) {
-            if (!this.scheduledItems.includes(movingItem)) {
+            if (!this.schedules[this.selectedDay].includes(movingItem)) {
                 movingItem.top = proposedTop
                 return
             }
 
             const itemBottom = proposedTop + movingItem.minutes
             
-            const overlappingItems = this.scheduledItems.filter(item => {
+            const overlappingItems = this.schedules[this.selectedDay].filter(item => {
                 if (item === movingItem) return false
                 
                 const otherTop = item.top
@@ -454,6 +524,9 @@ export default {
             }
 
             movingItem.top = proposedTop
+        },
+        selectDay(day) {
+            this.selectedDay = day
         }
     }
 }
