@@ -5,6 +5,13 @@
             @dragover.prevent
             @drop="onDropToRemove"
         >
+            <div class="components-header">
+                <button @click="goBack" class="back-button">
+                    Back
+                </button>
+                <h2>Schedule</h2>
+            </div>
+
             <div class="draggable-items">
                 <div 
                     v-for="item in items" 
@@ -82,6 +89,18 @@
                             ></div>
                         </div>
                     </div>
+                    
+                    <div class="schedule-controls">
+                        <select v-model="selectedClass" class="schedule-dropdown">
+                            <option value="">Select Class</option>
+                            <option v-for="classes in availableClasses" :key="classes" :value="classes">
+                                {{ classes }}
+                            </option>
+                        </select>
+                        <button @click="saveSchedule" class="schedule-save-btn">
+                            Save Schedule
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -89,18 +108,6 @@
 </template>
 
 <style scoped>
-/* Global scrollbar hiding */
-* {
-    scrollbar-width: none !important;
-    -ms-overflow-style: none !important;
-}
-
-*::-webkit-scrollbar {
-    width: 0 !important;
-    height: 0 !important;
-    display: none !important;
-}
-
 .wraper {
     display: flex;
     width: 100vw;
@@ -136,7 +143,7 @@
 .days-header {
     display: flex;
     justify-content: space-around;
-    background-color: #4fc0e5;
+    background-color: #216e87;
     padding: 10px 0;
     flex-shrink: 0;
 }
@@ -156,17 +163,18 @@
     overflow-y: auto;
     overflow-x: hidden;
     min-width: 800px;
-    scrollbar-width: none !important;
-    -ms-overflow-style: none !important;
-    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
 }
 
 .schedule-content {
     position: relative;
-    min-height: 1440px;
-    scrollbar-width: none !important;
-    -ms-overflow-style: none !important;
-    -webkit-overflow-scrolling: touch;
+    min-height: 1440px; /* 24 hours * 60px */
+    scrollbar-width: none;
+}
+
+.schedule-content::-webkit-scrollbar {
+    width: 0 !important;
+    display: none !important;
 }
 
 .schedule-grid {
@@ -287,11 +295,78 @@
 }
 
 .day.selected {
-    background-color: #3a9ecb;
+    background-color: #1d5d73;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+    border: 2px solid rgba(0, 0, 0, 0.3);
+}
+
+.schedule-controls {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+}
+
+.schedule-dropdown {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: white;
+}
+
+.schedule-save-btn {
+    padding: 8px 16px;
+    background-color: #216e87;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.schedule-save-btn:hover {
+    background-color: #1d5d73;
+}
+
+.components-header {
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border-bottom: 1px solid #ddd;
+}
+
+.components-header h2 {
+    margin: 0;
+    color: #216e87;
+}
+
+.back-button {
+    padding: 0.5rem 1rem;
+    background-color: #216e87;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+
+.back-button:hover {
+    background-color: #1d5d73;
 }
 </style>
 
 <script>
+import axios from 'axios';
 export default {
     data() {
         return {
@@ -316,10 +391,13 @@ export default {
             resizingStartTop: 0,
             dragStartY: 0,
             dragStartTop: 0,
-            days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+            days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+            selectedClass: '',
+            availableClasses: []
         }
     },
     mounted() {
+        this.fetchClasses();
         window.addEventListener('mousemove', this.handleResize)
         window.addEventListener('mouseup', this.stopResize)
     },
@@ -328,6 +406,16 @@ export default {
         window.removeEventListener('mouseup', this.stopResize)
     },
     methods: {
+        async fetchClasses() {
+            try {
+                const response = await axios.get('http://localhost:1010/api/classes');
+                this.availableClasses = response.data;
+                console.log('Fetched classes:', this.availableClasses);
+            } catch (error) {
+                console.error('Error fetching classes:', error);
+                this.availableClasses = []; // Set to empty array in case of error
+            }
+        },
         startDrag(evt, item) {
             evt.dataTransfer.dropEffect = 'move'
             evt.dataTransfer.effectAllowed = 'move'
@@ -527,6 +615,44 @@ export default {
         },
         selectDay(day) {
             this.selectedDay = day
+        },
+        async saveSchedule() {
+            if (!this.selectedClass) {
+                alert('Please select a class first');
+                return;
+            }
+
+            try {
+                // Format the schedule data
+                const formattedSchedules = {};
+                for (const [day, items] of Object.entries(this.schedules)) {
+                    formattedSchedules[day] = items.map(item => ({
+                        name: item.name,
+                        top: item.top,
+                        minutes: item.minutes
+                    }));
+                }
+
+                // Send the schedule to the server
+                const response = await axios.post('http://localhost:1010/api/schedule', {
+                    selectedClass: this.selectedClass,
+                    schedules: formattedSchedules
+                });
+
+                if (response.status === 201) {
+                    alert('Schedule saved successfully!');
+                    // Optionally redirect back to admin tools or clear the schedule
+                    this.$router.push('/admintools');
+                } else {
+                    throw new Error('Failed to save schedule');
+                }
+            } catch (error) {
+                console.error('Error saving schedule:', error);
+                alert('Error saving schedule. Please try again.');
+            }
+        },
+        goBack() {
+            this.$router.push('/admintools');
         }
     }
 }

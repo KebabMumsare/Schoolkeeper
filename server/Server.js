@@ -54,13 +54,28 @@ const UserModel = mongoose.model("User", userSchema);
 const schedualSchema = mongoose.Schema({
   day: {
     type: "string",
+    required: true
+  },
+  class: {
+    type: "string",
+    required: true
   },
   lecture: {
     type: "string",
+    required: true
   },
   time: {
     type: "string",
+    required: true
   },
+  startMinutes: {
+    type: "number",
+    required: true
+  },
+  duration: {
+    type: "number",
+    required: true
+  }
 });
 const SchedualModel = mongoose.model("Schema", schedualSchema);
 
@@ -261,20 +276,16 @@ app.get("/api/classes", async (req, res) => {
 });
 
 // Schedual API
-app.get("/api/schema/:day", async (req, res) => {
+app.get("/api/schema/:day/:class", async (req, res) => {
   try {
-    // Find user by ID (this can be adjusted to find by email or another field)
-    const user = await SchedualModel.find({ day: req.params.day });
-
-    if (!user) {
-      return res.sendStatus(404); // If user not found, return 404
-    }
-
-    // Respond with user data
-    res.json(user);
+    const schedule = await SchedualModel.find({ 
+      day: req.params.day.toLowerCase(),
+      class: req.params.class 
+    });
+    res.json(schedule);
   } catch (error) {
     console.error(error);
-    res.sendStatus(500); // Handle server error
+    res.status(500).json({ message: "Error fetching schedule", error: error.message });
   }
 });
 
@@ -499,6 +510,46 @@ app.get("/api/download/:assignmentId", async (req, res) => {
     res.status(500).json({ message: "Error downloading submissions", error: error.message });
   }
 });
+
+// Add new Schedule API endpoints
+app.post("/api/schedule", async (req, res) => {
+  try {
+    const { selectedClass, schedules } = req.body;
+    
+    // Delete existing schedules for this class
+    await SchedualModel.deleteMany({ class: selectedClass });
+    
+    // Create array of new schedule items
+    const scheduleItems = Object.entries(schedules).flatMap(([day, items]) =>
+      items.map(item => ({
+        day: day.toLowerCase(),
+        class: selectedClass,
+        lecture: item.name,
+        time: getTimeRange(item.top, item.minutes),
+        startMinutes: item.top,
+        duration: item.minutes
+      }))
+    );
+    
+    // Insert all new schedule items
+    await SchedualModel.insertMany(scheduleItems);
+    res.status(201).json({ message: "Schedule created successfully" });
+  } catch (error) {
+    console.error('Error creating schedule:', error);
+    res.status(500).json({ message: "Error creating schedule", error: error.message });
+  }
+});
+
+// Helper function to format time range
+function getTimeRange(startMinutes, duration) {
+  const startHour = Math.floor(startMinutes / 60);
+  const startMin = startMinutes % 60;
+  const endMinutes = startMinutes + duration;
+  const endHour = Math.floor(endMinutes / 60);
+  const endMin = endMinutes % 60;
+
+  return `${startHour.toString().padStart(2, '0')}:${startMin.toString().padStart(2, '0')} - ${endHour.toString().padStart(2, '0')}:${endMin.toString().padStart(2, '0')}`;
+}
 
 const PORT = process.env.PORT || 1010;
 app.listen(PORT, () => {

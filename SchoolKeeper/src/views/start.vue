@@ -358,35 +358,27 @@ export default {
             }
         },
         async fetchSchema(i) {
-            let day = ""; // We're only focusing on Monday for now
-
+            let day = "";
             switch (i) {
-                case 0:
-                    day = "monday";
-                    break;
-                case 1:
-                    day = "tuesday";
-                    break;
-                case 2:
-                    day = "wednesday";
-                    break;
-                case 3:
-                    day = "thursday";
-                    break;
-                case 4:
-                    day = "friday";
-                    break;
+                case 0: day = "monday"; break;
+                case 1: day = "tuesday"; break;
+                case 2: day = "wednesday"; break;
+                case 3: day = "thursday"; break;
+                case 4: day = "friday"; break;
             }
 
-            axios.get(`http://localhost:1010/api/schema/${day}`)
-                .then(response => {
-                    this.schema[i] = response.data; // Store Monday data in the first array element
-                    console.log('loaded Monday data:', response.data);
-                })
-                .catch(error => {
-                    console.error('Error fetching Monday data:', error);
-                    this.error = 'Failed to load Monday data';
-                });
+            try {
+                const response = await axios.get(
+                    `http://localhost:1010/api/schema/${day}/${this.currentUser.class}`
+                );
+                this.schema[i] = response.data.map(item => ({
+                    ...item,
+                    time: item.time.split(' - ')[0], // Take only the start time for compatibility
+                }));
+            } catch (error) {
+                console.error(`Error fetching ${day} data:`, error);
+                this.error = `Failed to load ${day} data`;
+            }
         },
         updateDateTime() {
             const now = new Date();
@@ -407,10 +399,12 @@ export default {
             const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
             const dayIndex = this.testDay !== '' ? parseInt(this.testDay) : new Date().getDay() - 1;
             this.currentDayIndex = dayIndex;
-            const dayName = days[dayIndex + 1]; // +1 because our days array starts with Sunday
+            const dayName = days[dayIndex + 1];
             
             try {
-                const response = await axios.get(`http://localhost:1010/api/schema/${dayName}`);
+                const response = await axios.get(
+                    `http://localhost:1010/api/schema/${dayName}/${this.currentUser.class}`
+                );
                 this.todaySchedule = response.data;
                 this.updateCurrentTimePosition();
             } catch (error) {
