@@ -405,6 +405,18 @@ export default {
         window.removeEventListener('mousemove', this.handleResize)
         window.removeEventListener('mouseup', this.stopResize)
     },
+    watch: {
+        selectedClass: {
+            immediate: true,
+            handler(newClass) {
+                if (newClass) {
+                    this.loadExistingSchedule(newClass);
+                } else {
+                    this.clearSchedules();
+                }
+            }
+        }
+    },
     methods: {
         async fetchClasses() {
             try {
@@ -641,8 +653,8 @@ export default {
 
                 if (response.status === 201) {
                     alert('Schedule saved successfully!');
-                    // Optionally redirect back to admin tools or clear the schedule
-                    this.$router.push('/admintools');
+                    // Remove or comment out the redirection line
+                    // this.$router.push('/admintools');
                 } else {
                     throw new Error('Failed to save schedule');
                 }
@@ -653,6 +665,51 @@ export default {
         },
         goBack() {
             this.$router.push('/admintools');
+        },
+        async loadExistingSchedule(className) {
+            try {
+                // Reset schedules first
+                this.clearSchedules();
+
+                // Fetch schedule for each day
+                const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+                
+                for (const day of days) {
+                    const response = await axios.get(
+                        `http://localhost:1010/api/schema/${day}/${className}`
+                    );
+                    
+                    // Convert server data to schedule format
+                    const formattedItems = response.data.map(item => ({
+                        id: Date.now() + Math.random(), // Generate unique ID
+                        name: item.lecture,
+                        minutes: item.duration,
+                        top: item.startMinutes
+                    }));
+
+                    // Capitalize first letter of day for schedules object
+                    const formattedDay = day.charAt(0).toUpperCase() + day.slice(1);
+                    this.schedules[formattedDay] = formattedItems;
+                }
+
+                console.log('Loaded schedules:', this.schedules);
+            } catch (error) {
+                console.error('Error loading schedule:', error);
+                alert('Error loading existing schedule. Please try again.');
+            }
+        },
+        clearSchedules() {
+            // Reset schedules to empty arrays
+            this.schedules = {
+                Monday: [],
+                Tuesday: [],
+                Wednesday: [],
+                Thursday: [],
+                Friday: []
+            };
+        },
+        createSchedule() {
+            this.clearSchedules();
         }
     }
 }
