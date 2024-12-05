@@ -635,7 +635,6 @@ export default {
             }
 
             try {
-                // Format the schedule data
                 const formattedSchedules = {};
                 for (const [day, items] of Object.entries(this.schedules)) {
                     formattedSchedules[day] = items.map(item => ({
@@ -645,7 +644,6 @@ export default {
                     }));
                 }
 
-                // Send the schedule to the server
                 const response = await axios.post('http://localhost:1010/api/schedule', {
                     selectedClass: this.selectedClass,
                     schedules: formattedSchedules
@@ -653,8 +651,6 @@ export default {
 
                 if (response.status === 201) {
                     alert('Schedule saved successfully!');
-                    // Remove or comment out the redirection line
-                    // this.$router.push('/admintools');
                 } else {
                     throw new Error('Failed to save schedule');
                 }

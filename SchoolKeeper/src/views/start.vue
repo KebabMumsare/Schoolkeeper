@@ -148,7 +148,7 @@
 }
 
 .day-header.current-day {
-    background-color: #6597c9; /* Gold color for the current day */
+    background-color: #6597c9;
     color: #000000;
     font-weight: bold;
 }
@@ -206,12 +206,14 @@ button {
 .schedule-timeline {
     position: relative;
     padding-left: 60px;
+    margin-top: 1rem;
 }
 
 .lecture-item {
     display: flex;
     margin-bottom: 1rem;
     position: relative;
+    min-height: 40px;
 }
 
 .lecture-time {
@@ -220,6 +222,7 @@ button {
     width: 50px;
     text-align: right;
     font-weight: bold;
+    padding-right: 10px;
 }
 
 .lecture-name {
@@ -227,6 +230,8 @@ button {
     padding: 0.5rem;
     background-color: #f0f0f0;
     border-radius: 4px;
+    word-break: break-word;
+    overflow: hidden;
 }
 
 .current-lecture {
@@ -371,10 +376,10 @@ export default {
                 const response = await axios.get(
                     `http://localhost:1010/api/schema/${day}/${this.currentUser.class}`
                 );
-                this.schema[i] = response.data.map(item => ({
+                this.schema[i] = this.sortScheduleByTime(response.data.map(item => ({
                     ...item,
-                    time: item.time.split(' - ')[0], // Take only the start time for compatibility
-                }));
+                    time: item.time.split(' - ')[0],
+                })));
             } catch (error) {
                 console.error(`Error fetching ${day} data:`, error);
                 this.error = `Failed to load ${day} data`;
@@ -405,7 +410,7 @@ export default {
                 const response = await axios.get(
                     `http://localhost:1010/api/schema/${dayName}/${this.currentUser.class}`
                 );
-                this.todaySchedule = response.data;
+                this.todaySchedule = this.sortScheduleByTime(response.data);
                 this.updateCurrentTimePosition();
             } catch (error) {
                 console.error('Error fetching today\'s schedule:', error);
@@ -446,13 +451,23 @@ export default {
             const response = await axios.get(`http://localhost:1010/api/courses`);
             this.courses = response.data;
         },
+        sortScheduleByTime(schedule) {
+            return [...schedule].sort((a, b) => {
+                const timeA = this.convertTimeToMinutes(a.time);
+                const timeB = this.convertTimeToMinutes(b.time);
+                return timeA - timeB;
+            });
+        },
+        convertTimeToMinutes(timeStr) {
+            const [hours, minutes] = timeStr.split(':').map(Number);
+            return hours * 60 + minutes;
+        },
     },
     mounted() {
         for (let i = 0; i < 5; i++) {
             this.fetchSchema(i);
         }
         
-        // Update date and time immediately and then every second
         this.updateDateTime();
         this.fetchCourses();
         setInterval(this.updateDateTime, 1000);
@@ -460,9 +475,8 @@ export default {
         this.fetchTestSchedule();
         setInterval(() => {
             this.updateCurrentTimePosition();
-            // Force re-render of the component to update current lecture
             this.$forceUpdate();
-        }, 60000); // Update every minute
+        }, 60000);
         
     },
     watch: {
