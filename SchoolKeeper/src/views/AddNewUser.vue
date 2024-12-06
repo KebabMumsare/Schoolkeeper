@@ -12,7 +12,7 @@
       <div class="user-list">
         <div 
           class="user-item" 
-          v-for="user in filteredUsers" 
+          v-for="user in filteredUsers"  
           :key="user.id"
         >
           <div class="user-info">

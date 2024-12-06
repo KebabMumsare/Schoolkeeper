@@ -205,33 +205,37 @@ button {
 
 .schedule-timeline {
     position: relative;
-    padding-left: 60px;
-    margin-top: 1rem;
+    margin-top: 1vh;
+    display: flex;
+    flex-direction: column;
 }
 
 .lecture-item {
     display: flex;
-    margin-bottom: 1rem;
+    align-items: center;
+    margin-bottom: 1vh;
     position: relative;
-    min-height: 40px;
+    min-height: 5vh;
+    padding: 1vh;
+    box-shadow: 0 0.5vh 1vh rgba(0, 0, 0, 0.1);
 }
 
 .lecture-time {
-    position: absolute;
-    left: -60px;
-    width: 50px;
-    text-align: right;
+    width: auto;
+    text-align: left;
     font-weight: bold;
-    padding-right: 10px;
+    padding-right: 1vh;
+    margin-right: auto;
 }
 
 .lecture-name {
     flex-grow: 1;
-    padding: 0.5rem;
+    padding: 0.5vh;
     background-color: #f0f0f0;
     border-radius: 4px;
     word-break: break-word;
     overflow: hidden;
+    text-align: center;
 }
 
 .current-lecture {
