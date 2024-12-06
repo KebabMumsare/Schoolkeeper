@@ -110,21 +110,21 @@
 .additional-info {
     flex: 1;
     background-color: #ffffff;
-    border-radius: 8px;
-    padding: 1rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 1vh;
+    padding: 1vh;
+    box-shadow: 0 2vh 4vh rgba(0, 0, 0, 0.1);
 }
 
 .schedule-container {
     display: flex;
     justify-content: space-between;
-    margin-top: 0.3rem;
-    border-radius: 8px;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    margin-top: 0.3vh;
+    border-radius: 1vh;
+    box-shadow: 0 3vh 6vh rgba(0, 0, 0, 0.1);
     background-color: #ffffff;
-    padding: 0.3rem;
-    gap: 8px;
-    min-height: 350px;
+    padding: 0.3vh;
+    gap: 1vh;
+    min-height: 43vh;
 }
 
 .column {
@@ -238,11 +238,6 @@ button {
     text-align: center;
 }
 
-.current-lecture {
-    background-color: #e6f7ff;
-    border: 2px solid #1890ff;
-}
-
 .current-time-indicator {
     position: absolute;
     left: 0;
@@ -250,18 +245,6 @@ button {
     height: 2px;
     background-color: #ff4d4f;
     pointer-events: none;
-}
-
-.current-lecture {
-    background-color: #e6f7ff !important;
-    border: 2px solid #1890ff !important;
-    font-weight: bold;
-}
-
-.time-slot.current-lecture {
-    background-color: #e6f7ff !important;
-    border: 2px solid #1890ff !important;
-    font-weight: bold;
 }
 
 .test-list {
