@@ -14,26 +14,24 @@ export default {
     };
   },
   methods: {
-    submitLogin() {
-      axios.post('http://localhost:1010/api/login', {name: this.email, password: this.password})
-      
-      .then(response => {
-        this.setCurrentUser(response.data)
-        console.log(response.data)
-        this.message = response.data.message;
+    async submitLogin() {
+      const response = await axios.post('http://localhost:1010/api/login', {name: this.email, password: this.password})
+      console.log(response.data)
+      this.setCurrentUser(response.data)
+      this.message = response.data.message;
 
-        window.location.href = '/start';
-      })
-      .catch(error => {
-        console.error('There was an error!', error);
-      });
+      window.location.href = '/start';
     },
     setCurrentUser(user) {
+      console.log('User:', JSON.stringify(user));
+      console.log('User groups:', user.group);
+      const classGroup = user.groups?.find(g => g.type === 'class');
+      console.log('Found class group:', classGroup);
       currentUser.value = {
         id: user._id,
         name: user.name,
         access: user.access,
-        class: user.class,
+        class: classGroup?.name,
       }
     }
   },
