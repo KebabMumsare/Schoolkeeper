@@ -39,6 +39,16 @@ const userSchema = mongoose.Schema({
   class: {
     type: "string",
   },
+  groups: [
+    {
+      type: {
+        type: "string",
+      },
+      name: {
+        type: "string",
+      }
+    }
+  ],
   courses: [{
     course: {
       type: mongoose.Schema.Types.ObjectId,
