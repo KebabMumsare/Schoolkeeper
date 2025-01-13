@@ -514,7 +514,7 @@ app.get("/api/download/:assignmentId", async (req, res) => {
     console.log(submissions);
     await createZip(submissions);
     res.download(__dirname + '/archive.zip');
-    deleteZip();
+    //deleteZip();
   } catch (error) {
     console.error('Error downloading submissions:', error);
     res.status(500).json({ message: "Error downloading submissions", error: error.message });
