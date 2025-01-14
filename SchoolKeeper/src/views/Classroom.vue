@@ -1081,7 +1081,7 @@ export default {
         async downloadFile(filePath, fileName) {
             try {
                 const response = await axios.get(
-                    `http://localhost:1010/files/download/${filePath}`,
+                    `http://localhost:1010/api/download/${filePath}`,
                     { responseType: 'blob' }
                 );
                 
@@ -1116,7 +1116,8 @@ export default {
         },
         async downloadAssignment() {
             try {
-                const response = await axios.get(`http://localhost:1010/api/download/${this.selectedAssignment._id}`,{ responseType: 'blob' }
+                const response = await axios.get(`http://localhost:1010/api/download/${this.selectedAssignment._id}`,
+                { responseType: 'blob' }
                 );
                 
                 // Create blob link to download
