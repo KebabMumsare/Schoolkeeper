@@ -1,0 +1,20 @@
+Administrativa:
+ - Underhåll
+   - undervisnings grupper
+     - Lättare att lägga till elever
+   - Skolverket
+   - Salar
+   - Skatteverket (Elever)
+   - 
+ - Tjänstevilkor
+ - Schema
+   - Spärtid
+   - Dubbel boka
+   - Undantag
+   - Avancerat filter
+ - Närvaro
+ - Program grund
+ - Kurs hantering
+   - Bytta kurs
+   - Ta bort kurs
+ - Backup
