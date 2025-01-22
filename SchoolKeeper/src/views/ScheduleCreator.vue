@@ -91,10 +91,10 @@
                     </div>
                     
                     <div class="schedule-controls">
-                        <select v-model="selectedClass" class="schedule-dropdown">
-                            <option value="">Select Class</option>
-                            <option v-for="classes in availableClasses" :key="classes" :value="classes">
-                                {{ classes }}
+                        <select v-model="selectedGroupId" required>
+                            <option value="" disabled>Välj grupp</option>
+                            <option v-for="group in availableGroups" :key="group._id" :value="group._id">
+                                {{ group.name }}
                             </option>
                         </select>
                         <button @click="saveSchedule" class="schedule-save-btn">
@@ -392,12 +392,12 @@ export default {
             dragStartY: 0,
             dragStartTop: 0,
             days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-            selectedClass: '',
-            availableClasses: []
+            selectedGroupId: '',
+            availableGroups: []
         }
     },
     mounted() {
-        this.fetchClasses();
+        this.fetchGroups();
         window.addEventListener('mousemove', this.handleResize)
         window.addEventListener('mouseup', this.stopResize)
     },
@@ -406,11 +406,11 @@ export default {
         window.removeEventListener('mouseup', this.stopResize)
     },
     watch: {
-        selectedClass: {
+        selectedGroupId: {
             immediate: true,
-            handler(newClass) {
-                if (newClass) {
-                    this.loadExistingSchedule(newClass);
+            handler(newGroupId) {
+                if (newGroupId) {
+                    this.loadExistingSchedule(newGroupId);
                 } else {
                     this.clearSchedules();
                 }
@@ -418,14 +418,13 @@ export default {
         }
     },
     methods: {
-        async fetchClasses() {
+        async fetchGroups() {
             try {
-                const response = await axios.get('http://localhost:1010/api/classes');
-                this.availableClasses = response.data;
-                console.log('Fetched classes:', this.availableClasses);
+                const response = await axios.get('http://localhost:1010/api/groups');
+                this.availableGroups = response.data;
             } catch (error) {
-                console.error('Error fetching classes:', error);
-                this.availableClasses = []; // Set to empty array in case of error
+                console.error('Error fetching groups:', error);
+                this.availableGroups = [];
             }
         },
         startDrag(evt, item) {
@@ -629,8 +628,8 @@ export default {
             this.selectedDay = day
         },
         async saveSchedule() {
-            if (!this.selectedClass) {
-                alert('Please select a class first');
+            if (!this.selectedGroupId) {
+                alert('Please select a group first');
                 return;
             }
 
@@ -645,7 +644,7 @@ export default {
                 }
 
                 const response = await axios.post('http://localhost:1010/api/schedule', {
-                    selectedClass: this.selectedClass,
+                    selectedGroupId: this.selectedGroupId,
                     schedules: formattedSchedules
                 });
 
@@ -662,7 +661,7 @@ export default {
         goBack() {
             this.$router.push('/admintools');
         },
-        async loadExistingSchedule(className) {
+        async loadExistingSchedule(groupId) {
             try {
                 // Reset schedules first
                 this.clearSchedules();
@@ -672,7 +671,7 @@ export default {
                 
                 for (const day of days) {
                     const response = await axios.get(
-                        `http://localhost:1010/api/schema/${day}/${className}`
+                        `http://localhost:1010/api/schema/${day}/${groupId}`
                     );
                     
                     // Convert server data to schedule format

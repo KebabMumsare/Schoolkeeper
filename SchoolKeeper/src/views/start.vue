@@ -17,13 +17,6 @@
                 </div>
             </div>
             <div class="weekly-schedule">
-                <!-- behövs inte men Jesper kan klaga om jag tar bort de så de chillar här
-                <div class="name">
-                    <p>Namn: {{ currentUser.name }}</p>
-                </div>
-                <div class="section">
-                    <p>Class: {{ currentUser.class }}</p>
-                </div>-->
                 <div class="schedule-container">
                     <div class="column" v-for="(day, i) in schema" :key="i">
                         <div class="day-header" :class="{ 'current-day': isCurrentDay(i) }">
@@ -357,16 +350,39 @@ export default {
             }
 
             try {
-                const response = await axios.get(
-                    `http://localhost:1010/api/schema/${day}/${this.currentUser.class}`
-                );
-                this.schema[i] = this.sortScheduleByTime(response.data.map(item => ({
-                    ...item,
-                    time: item.time.split(' - ')[0],
-                })));
+                // Check if user has groups
+                if (!this.currentUser.groups || !this.currentUser.groups.length) {
+                    console.log('No groups found for user:', this.currentUser);
+                    return;
+                }
+
+                const schedules = [];
+                console.log('Fetching schedules for groups:', this.currentUser.groups);
+
+                // Fetch schedules for each group the user belongs to
+                for (const group of this.currentUser.groups) {
+                    try {
+                        const response = await axios.get(
+                            `http://localhost:1010/api/schema/${day}/${group}`
+                        );
+                        if (response.data && response.data.length > 0) {
+                            schedules.push(...response.data);
+                        }
+                    } catch (groupError) {
+                        console.error(`Error fetching schedule for group ${group}:`, groupError);
+                    }
+                }
+
+                // Sort and update the schema
+                if (schedules.length > 0) {
+                    this.schema[i] = this.sortScheduleByTime(schedules.map(item => ({
+                        ...item,
+                        time: item.time.split(' - ')[0],
+                    })));
+                }
             } catch (error) {
-                console.error(`Error fetching ${day} data:`, error);
-                this.error = `Failed to load ${day} data`;
+                console.error(`Error fetching ${day} schedule:`, error);
+                this.error = `Failed to load ${day} schedule`;
             }
         },
         updateDateTime() {
@@ -391,10 +407,22 @@ export default {
             const dayName = days[dayIndex + 1];
             
             try {
-                const response = await axios.get(
-                    `http://localhost:1010/api/schema/${dayName}/${this.currentUser.class}`
-                );
-                this.todaySchedule = this.sortScheduleByTime(response.data);
+                if (!this.currentUser.groups || !this.currentUser.groups.length) {
+                    console.log('No groups found for today schedule');
+                    return;
+                }
+
+                const schedules = [];
+                for (const groupId of this.currentUser.groups) {
+                    const response = await axios.get(
+                        `http://localhost:1010/api/schema/${dayName}/${groupId}`
+                    );
+                    if (response.data && response.data.length > 0) {
+                        schedules.push(...response.data);
+                    }
+                }
+
+                this.todaySchedule = this.sortScheduleByTime(schedules);
                 this.updateCurrentTimePosition();
             } catch (error) {
                 console.error('Error fetching today\'s schedule:', error);

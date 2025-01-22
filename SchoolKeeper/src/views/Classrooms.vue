@@ -20,11 +20,11 @@ export default {
       currentClassroom: {
         id: null,
         name: '',
-        class: '',
+        groupId: '',
         subject: ''
       },
       isEditing: false,
-      availableClasses: []
+      availableGroups: []
     };
   },
   computed: {
@@ -66,7 +66,7 @@ export default {
     async createClassroom() {
       await axios.post('http://localhost:1010/api/classrooms/', {
         name: this.currentClassroom.name,
-        class: this.currentClassroom.class,
+        groupId: this.currentClassroom.groupId,
         subject: this.currentClassroom.subject
       });
       this.loadClasses();
@@ -77,7 +77,7 @@ export default {
     },
     openCreateModal() {
       this.isEditing = false;
-      this.currentClassroom = { id: null, name: '', class: '', subject: '' };
+      this.currentClassroom = { id: null, name: '', groupId: '', subject: '' };
       this.showModal = true;
     },
     openEditModal(classroom) {
@@ -99,7 +99,7 @@ export default {
         this.classrooms.push({
           id: newId,
           name: this.currentClassroom.name,
-          class: this.currentClassroom.class,
+          groupId: this.currentClassroom.groupId,
           subject: this.currentClassroom.subject
         });
       }
@@ -111,20 +111,19 @@ export default {
       this.currentClassroom = {
         id: null,
         name: '',
-        class: '',
+        groupId: '',
         subject: ''
       };
       this.isEditing = false;
     },
 
-    async fetchClasses() {
+    async fetchGroups() {
       try {
-        const response = await axios.get('http://localhost:1010/api/classes');
-        this.availableClasses = response.data;
-        console.log('Fetched classes:', this.availableClasses);
+        const response = await axios.get('http://localhost:1010/api/groups');
+        this.availableGroups = response.data;
       } catch (error) {
-        console.error('Error fetching classes:', error);
-        this.availableClasses = []; // Set to empty array in case of error
+        console.error('Error fetching groups:', error);
+        this.availableGroups = [];
       }
     },
     async loadClasses() {
@@ -147,7 +146,7 @@ export default {
     return { router }
   },
   mounted() {
-    this.fetchClasses();
+    this.fetchGroups();
     this.loadClasses();
   }
 };
@@ -176,10 +175,10 @@ export default {
       <h2>Skapa Klassrum</h2>
       <form @submit.prevent="createClassroom">
         <input v-model="currentClassroom.name" placeholder="Klassrum namn" required>
-        <select v-model="currentClassroom.class" required>
-          <option value="" disabled>Välj klass</option>
-          <option v-for="classOption in availableClasses" :key="classOption" :value="classOption">
-            {{ classOption }}
+        <select v-model="currentClassroom.groupId" required>
+          <option value="" disabled>Välj grupp</option>
+          <option v-for="group in availableGroups" :key="group._id" :value="group._id">
+            {{ group.name }}
           </option>
         </select>
         <select v-model="currentClassroom.subject" required>
@@ -198,10 +197,10 @@ export default {
     <div class="modal-content">
       <h2>Ändra Klassrum</h2>
       <input v-model="currentClassroom.name" placeholder="Klass Namn">
-      <select v-model="currentClassroom.class">
-        <option value="" disabled>Välj Klass</option>
-        <option v-for="classOption in availableClasses" :key="classOption" :value="classOption">
-          {{ classOption }}
+      <select v-model="currentClassroom.groupId">
+        <option value="" disabled>Välj grupp</option>
+        <option v-for="group in availableGroups" :key="group._id" :value="group._id">
+          {{ group.name }}
         </option>
       </select>
       <select v-model="currentClassroom.subject">

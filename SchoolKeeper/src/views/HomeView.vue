@@ -15,24 +15,39 @@ export default {
   },
   methods: {
     async submitLogin() {
-      const response = await axios.post('http://localhost:1010/api/login', {name: this.email, password: this.password})
-      console.log(response.data)
-      this.setCurrentUser(response.data)
-      this.message = response.data.message;
+      try {
+        const response = await axios.post('http://localhost:1010/api/login', {
+          name: this.email, 
+          password: this.password
+        });
+        
+        console.log('Login response:', response.data);
+        this.setCurrentUser(response.data);
+        this.message = response.data.message;
 
-      window.location.href = '/start';
+        window.location.href = '/start';
+      } catch (error) {
+        console.error('Login error:', error);
+        this.errorMessage = 'Failed to login. Please check your credentials.';
+      }
     },
     setCurrentUser(user) {
-      console.log('User:', JSON.stringify(user));
-      console.log('User groups:', user.group);
+      console.log('Setting user:', JSON.stringify(user));
+      console.log('User groups:', user.groups);
+      
+      // Find the class group (for backward compatibility)
       const classGroup = user.groups?.find(g => g.type === 'class');
       console.log('Found class group:', classGroup);
+
       currentUser.value = {
         id: user._id,
         name: user.name,
         access: user.access,
-        class: classGroup?.name,
+        class: classGroup?.name || '', // Keep class for backward compatibility
+        groups: user.groups?.map(g => g._id) || [], // Add all group IDs
       }
+
+      console.log('Updated currentUser:', currentUser.value);
     }
   },
   components: {

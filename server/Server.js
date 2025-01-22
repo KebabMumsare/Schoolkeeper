@@ -39,16 +39,10 @@ const userSchema = mongoose.Schema({
   class: {
     type: "string",
   },
-  groups: [
-    {
-      type: {
-        type: "string",
-      },
-      name: {
-        type: "string",
-      }
-    }
-  ],
+  groups: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Group',
+  }],
   courses: [{
     course: {
       type: mongoose.Schema.Types.ObjectId,
@@ -60,6 +54,18 @@ const userSchema = mongoose.Schema({
   }]
 });
 const UserModel = mongoose.model("User", userSchema);
+// Group Schema
+const GroupSchema = mongoose.Schema({
+  type: {
+    type: String,
+    required: true
+  },
+  name: {
+    type: String,
+    required: true
+  }
+});
+const GroupModel = mongoose.model("Group", GroupSchema);
 // Schedual Schema
 const schedualSchema = mongoose.Schema({
   day: {
@@ -260,42 +266,84 @@ app.get("/api/users/", async (req, res) => {
     res.sendStatus(500); // Handle server error
   }
 });
-// Class API
-app.get("/api/classes", async (req, res) => {
+// Group API
+app.get("/api/groups", async (req, res) => {
   try {
-    // Find all users and select only the 'class' field
-    const users = await UserModel.find({}, "class");
+    const groups = await GroupModel.find({});
 
-    if (!users || users.length === 0) {
-      return res.sendStatus(404); // If no users found, return 404
+    if (!groups || groups.length === 0) {
+      return res.sendStatus(404);
     }
 
-    // Extract unique classes
-    const uniqueClasses = [...new Set(users.map((user) => user.class))];
-
-    // Filter out any null or undefined classes, but keep empty strings
-    const validClasses = uniqueClasses.filter(
-      (className) => className !== null && className !== undefined
-    );
-
-    res.json(validClasses);
+    res.json(groups.map(group => group.name));
   } catch (error) {
-    console.error("Error fetching classes:", error);
-    res.sendStatus(500); // Handle server error
+    console.error("Error fetching groups:", error);
+    res.sendStatus(500);
+  }
+});
+
+// Add new group endpoint
+app.post("/api/groups", async (req, res) => {
+  try {
+    const newGroup = new GroupModel(req.body);
+    await newGroup.save();
+    res.status(201).json(newGroup);
+  } catch (error) {
+    console.error("Error creating group:", error);
+    res.status(500).json({ message: "Error creating group", error: error.message });
+  }
+});
+
+// Get specific group endpoint
+app.get("/api/groups/:id", async (req, res) => {
+  try {
+    const group = await GroupModel.findById(req.params.id);
+    if (!group) {
+      return res.sendStatus(404);
+    }
+    res.json(group);
+  } catch (error) {
+    console.error("Error fetching group:", error);
+    res.sendStatus(500);
+  }
+});
+
+// Delete group endpoint
+app.delete("/api/groups/:id", async (req, res) => {
+  try {
+    await GroupModel.findByIdAndDelete(req.params.id);
+    res.sendStatus(204);
+  } catch (error) {
+    console.error("Error deleting group:", error);
+    res.sendStatus(500);
   }
 });
 
 // Schedual API
-app.get("/api/schema/:day/:class", async (req, res) => {
+app.get("/api/schema/:day/:groupId", async (req, res) => {
   try {
+    const group = await GroupModel.findById(req.params.groupId);
+    if (!group) {
+      console.log('Group not found:', req.params.groupId);
+      return res.status(404).json({ message: "Group not found" });
+    }
+
+    console.log('Found group:', group.name);
     const schedule = await SchedualModel.find({ 
       day: req.params.day.toLowerCase(),
-      class: req.params.class 
+      class: group.name
     });
+
+    console.log('Found schedule:', schedule);
     res.json(schedule);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Error fetching schedule", error: error.message });
+    console.error('Error in /api/schema/:day/:groupId:', error);
+    res.status(500).json({ 
+      message: "Error fetching schedule", 
+      error: error.message,
+      groupId: req.params.groupId,
+      day: req.params.day 
+    });
   }
 });
 
@@ -324,12 +372,20 @@ app.get("/api/classrooms/:id", async (req, res) => {
 });
 app.post("/api/classrooms/", async (req, res) => {
   try {
-    const newClassroom = new ClassroomModel(req.body);
+    const group = await GroupModel.findById(req.body.groupId);
+    if (!group) {
+      return res.status(404).json({ message: "Group not found" });
+    }
+
+    const newClassroom = new ClassroomModel({
+      ...req.body,
+      class: group.name // Using group name
+    });
     await newClassroom.save();
     res.json(newClassroom);
   } catch (error) {
     console.error(error);
-    res.sendStatus(500); // Handle server error
+    res.status(500).json({ message: "Error creating classroom", error: error.message });
   }
 });
 app.delete("/api/classrooms/:id", async (req, res) => {
@@ -346,9 +402,7 @@ app.delete("/api/classrooms/:id", async (req, res) => {
 // Prov API
 app.get("/api/tests/", async (req, res) => {
   try {
-    console.log("Attempting to fetch tests...");
     const tests = await ProvModel.find({});
-    console.log("Retrieved tests:", tests);
 
     if (!tests || tests.length === 0) {
       console.log("No tests found");
@@ -528,16 +582,21 @@ app.get("/api/download/:assignmentId", async (req, res) => {
 // Add new Schedule API endpoints
 app.post("/api/schedule", async (req, res) => {
   try {
-    const { selectedClass, schedules } = req.body;
+    const { selectedGroupId, schedules } = req.body;
     
-    // Delete existing schedules for this class
-    await SchedualModel.deleteMany({ class: selectedClass });
+    const group = await GroupModel.findById(selectedGroupId);
+    if (!group) {
+      return res.status(404).json({ message: "Group not found" });
+    }
+
+    // Delete existing schedules for this group
+    await SchedualModel.deleteMany({ class: group.name });
     
     // Create array of new schedule items
     const scheduleItems = Object.entries(schedules).flatMap(([day, items]) =>
       items.map(item => ({
         day: day.toLowerCase(),
-        class: selectedClass,
+        class: group.name, // Using group name
         lecture: item.name,
         time: getTimeRange(item.top, item.minutes),
         startMinutes: item.top,
@@ -545,7 +604,6 @@ app.post("/api/schedule", async (req, res) => {
       }))
     );
     
-    // Insert all new schedule items
     await SchedualModel.insertMany(scheduleItems);
     res.status(201).json({ message: "Schedule created successfully" });
   } catch (error) {
@@ -564,6 +622,26 @@ function getTimeRange(startMinutes, duration) {
 
   return `${startHour.toString().padStart(2, '0')}:${startMin.toString().padStart(2, '0')} - ${endHour.toString().padStart(2, '0')}:${endMin.toString().padStart(2, '0')}`;
 }
+
+// Update Test/Prov endpoints to work with groups
+app.post("/api/tests", async (req, res) => {
+  try {
+    const group = await GroupModel.findById(req.body.groupId);
+    if (!group) {
+      return res.status(404).json({ message: "Group not found" });
+    }
+
+    const newTest = new ProvModel({
+      ...req.body,
+      class: group.name // Using group name
+    });
+    await newTest.save();
+    res.status(201).json(newTest);
+  } catch (error) {
+    console.error("Error creating test:", error);
+    res.status(500).json({ message: "Error creating test", error: error.message });
+  }
+});
 
 const PORT = process.env.PORT || 1010;
 app.listen(PORT, () => {
