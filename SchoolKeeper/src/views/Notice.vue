@@ -6,17 +6,18 @@
                 <div class="notice-title">{{ item.title }}</div>
                 <div class="notice-date">{{ new Date(item.created_at).toLocaleString() }}</div>
             </div>
-            <button v-if="currentUser.access === 'Admin' || currentUser.access === 'Lärare'" @click="openModal" class="create-button">Create New Notice</button>
         </div>
+        <button v-if="currentUser.access === 'Admin' || currentUser.access === 'Lärare'" @click="openModal" class="create-button">Skapa Ny Notis</button>
+
         <div v-if="showModal" class="modal">
             <div class="modal-content create-notice">
-                <h3>Create New Notice</h3>
+                <h3>Skapa Ny Notis</h3>
                 <form @submit.prevent="createNotice">
-                    <input v-model="newNotice.title" placeholder="Notice Title" required>
-                    <textarea v-model="newNotice.message" placeholder="Notice Message" required></textarea>
+                    <input v-model="newNotice.title" placeholder="Notis Titel" required>
+                    <textarea v-model="newNotice.message" placeholder="Notis Medelande" required></textarea>
                     <div class="modal-buttons">
-                        <button type="submit" class="create-button">Create Notice</button>
-                        <button @click="closeModal" class="cancel-button">Cancel</button>
+                        <button type="submit" class="create-button">Skapa Notis</button>
+                        <button @click="closeModal" class="cancel-button">Avbryt</button>
                     </div>
                 </form>
             </div>
