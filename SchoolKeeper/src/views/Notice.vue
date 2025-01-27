@@ -275,7 +275,17 @@ export default {
         async fetchNotice() {
             try {
                 const response = await axios.get('http://localhost:1010/api/notices');
-                this.notice = response.data; // Fetch all notices
+                this.notice = response.data.sort((a, b) => {
+                    const dateA = new Date(a.created_at);
+                    const dateB = new Date(b.created_at);
+
+                    // Check for invalid dates
+                    if (isNaN(dateA) && isNaN(dateB)) return 0; 
+                    if (isNaN(dateA)) return 1; 
+                    if (isNaN(dateB)) return -1; 
+
+                    return dateB - dateA;
+                });
             } catch (error) {
                 console.error("Error fetching notices:", error);
             }
