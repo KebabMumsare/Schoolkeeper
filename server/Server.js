@@ -36,9 +36,6 @@ const userSchema = mongoose.Schema({
   password: {
     type: "string",
   },
-  class: {
-    type: "string",
-  },
   groups: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Group',
@@ -222,16 +219,24 @@ const CourseModel = mongoose.model("Course", CourseSchema);
 
 // Login API
 app.post("/api/login", async (req, res) => {
-  const user = await UserModel.findOne({ name: req.body.name });
+  try {
+    const user = await UserModel.findOne({ name: req.body.name })
+      .populate("groups")
+      .exec();
 
-  if (!user) {
+    if (!user) {
+      return res.sendStatus(401);
+    }
+
+    if (user.password === req.body.password) {
+      console.log('User found:', user);
+      return res.json(user);
+    }
     return res.sendStatus(401);
+  } catch (error) {
+    console.error('Error during login:', error);
+    res.status(500).json({ message: "Error during login", error: error.message });
   }
-
-  if (user.password === req.body.password) {
-    return res.json(user);
-  }
-  return res.sendStatus(401);
 });
 // User API
 app.get("/api/user/:name", async (req, res) => {
@@ -299,6 +304,7 @@ app.get("/api/groups/:id", async (req, res) => {
   try {
     const group = await GroupModel.findById(req.params.id);
     if (!group) {
+      console.log('Group found:', group.name);
       return res.sendStatus(404);
     }
     res.json(group);

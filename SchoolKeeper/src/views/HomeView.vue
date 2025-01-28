@@ -31,10 +31,9 @@ export default {
         this.errorMessage = 'Failed to login. Please check your credentials.';
       }
     },
-    setCurrentUser(user) {
+    async setCurrentUser(user) {
       console.log('Setting user:', JSON.stringify(user));
       console.log('User groups:', user.groups);
-      
       // Find the class group (for backward compatibility)
       const classGroup = user.groups?.find(g => g.type === 'class');
       console.log('Found class group:', classGroup);
