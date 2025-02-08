@@ -18,20 +18,19 @@
       :style="{ backgroundColor: getRandomColor(-1) }"
     >
       <h3>Gå till Skapa Användare</h3>
-      <p>Klicka här för att skappa Användare.</p>
+      <p>Klicka här för att skapa Användare.</p>
     </router-link>
-
-
-    <div 
-      class="admintools-item" 
-      v-for="index in 2" 
-      :key="index + 1" 
-      :style="{ backgroundColor: getRandomColor(index) }"
+    <router-link 
+      to="/groupcreator" 
+      class="admintools-item"
+      :style="{ backgroundColor: getRandomColor(-1) }"
     >
-      <h3>Placeholder {{ index + 1 }}</h3>
-      <p>Details for Placeholder {{ index + 1 }}</p>
-    </div>
+      <h3>Gå till Skapa grupper</h3>
+
+      <p>Klicka här för att skapa grupper.</p>
+    </router-link>
   </div>
+
 </main>
 </template>
 

@@ -6,14 +6,16 @@ import ClassroomsView from '../views/Classrooms.vue'
 import ClassroomView from '../views/Classroom.vue'
 import PersonalView from '../views/Personal.vue'
 import IndividualStudyPlan from '@/views/IndividualStudyPlan.vue'
-import ScheduleCreator from '../views/ScheduleCreator.vue'
-import AdminTools from '../views/AdminTools.vue'
-import AddNewUser from '../views/AddNewUser.vue'
+import ScheduleCreator from '../views/AdminTools/ScheduleCreator.vue'
+import AdminTools from '../views/AdminTools/AdminTools.vue'
+import AddNewUser from '../views/AdminTools/AddNewUser.vue'
+import GroupCreator from '../views/AdminTools/GroupCreator.vue'
 const router = createRouter({
  history: createWebHistory(import.meta.env.BASE_URL),
  routes: [
    {
      path: '/',
+
      name: 'home',
      component: HomeView
    },
@@ -62,7 +64,13 @@ const router = createRouter({
     name: 'AddNewUser',
     component: AddNewUser
    },
+   {
+    path: '/groupcreator',
+    name: 'GroupCreator',
+    component: GroupCreator
+   },
  ]
 })
+
 
 export default router

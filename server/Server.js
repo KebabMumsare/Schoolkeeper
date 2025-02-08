@@ -271,7 +271,19 @@ app.get("/api/users/", async (req, res) => {
     res.sendStatus(500); // Handle server error
   }
 });
+app.get("/api/users/:groupId", async (req, res) => {
+  try {
+    const users = await UserModel.find({ groups: req.params.groupId });
+    res.json(users);
+  } catch (error) {
+
+    console.error("Error fetching group:", error);
+    res.sendStatus(500);
+  }
+
+});
 // Group API
+
 app.get("/api/groups", async (req, res) => {
   try {
     const groups = await GroupModel.find({});
@@ -286,8 +298,20 @@ app.get("/api/groups", async (req, res) => {
     res.sendStatus(500);
   }
 });
+app.get("/api/allGroups", async (req, res) => {
+  try {
+    const groups = await GroupModel.find({});
 
-// Add new group endpoint
+    if (!groups || groups.length === 0) {
+      return res.sendStatus(404);
+    }
+
+    res.json(groups);
+  } catch (error) {
+    console.error("Error fetching groups:", error);
+    res.sendStatus(500);
+  }
+});
 app.post("/api/groups", async (req, res) => {
   try {
     const newGroup = new GroupModel(req.body);
@@ -298,8 +322,6 @@ app.post("/api/groups", async (req, res) => {
     res.status(500).json({ message: "Error creating group", error: error.message });
   }
 });
-
-// Get specific group endpoint
 app.get("/api/groups/:id", async (req, res) => {
   try {
     const group = await GroupModel.findById(req.params.id);
@@ -313,8 +335,6 @@ app.get("/api/groups/:id", async (req, res) => {
     res.sendStatus(500);
   }
 });
-
-// Delete group endpoint
 app.delete("/api/groups/:id", async (req, res) => {
   try {
     await GroupModel.findByIdAndDelete(req.params.id);
