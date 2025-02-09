@@ -66,7 +66,7 @@ export default {
     async createClassroom() {
       await axios.post('http://localhost:1010/api/classrooms/', {
         name: this.currentClassroom.name,
-        groupId: this.currentClassroom.groupId,
+        groupId: this.currentClassroom.group,
         subject: this.currentClassroom.subject
       });
       this.loadClasses();
@@ -178,7 +178,7 @@ export default {
         <select v-model="currentClassroom.groupId" required>
           <option value="" disabled>Välj grupp</option>
           <option v-for="group in availableGroups" :key="group._id" :value="group._id">
-            {{ group.name }}
+            {{ group }}
           </option>
         </select>
         <select v-model="currentClassroom.subject" required>

@@ -280,7 +280,6 @@ app.get("/api/users/:groupId", async (req, res) => {
     console.error("Error fetching group:", error);
     res.sendStatus(500);
   }
-
 });
 // Group API
 
