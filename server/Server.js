@@ -281,6 +281,17 @@ app.get("/api/users/:groupId", async (req, res) => {
     res.sendStatus(500);
   }
 });
+app.post("/api/groups/:groupId/:userId", async (req, res) => {
+  try {
+    const user = await UserModel.findById(req.params.userId);
+    user.groups.push(req.params.groupId);
+    await user.save();
+    res.sendStatus(204);
+  } catch (error) {
+    console.error("Error adding user to group:", error);
+    res.sendStatus(500);
+  }
+});
 // Group API
 
 app.get("/api/groups", async (req, res) => {
