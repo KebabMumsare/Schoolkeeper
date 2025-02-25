@@ -86,16 +86,56 @@
                 <div class="attendance-modal-body">
                     <p><strong>Tid:</strong> {{ selectedLecture.time }}</p>
                     <div class="attendance-list">
-                        <div v-for="(student, index) in students" :key="index" class="student-attendance-item">
+                        <div v-for="(student, index) in students" :key="index" 
+                             class="student-attendance-item"
+                             :class="{
+                                 'status-present': student.attendanceStatus === 'present',
+                                 'status-absent': student.attendanceStatus === 'absent',
+                                 'status-late': student.attendanceStatus === 'late',
+                                 'status-registered-absence': student.attendanceStatus === 'registered-absence'
+                             }"
+                             @click="toggleAttendanceStatus(student)">
                             <span class="student-name">{{ student.name }}</span>
-                            <div class="attendance-options">
-                                <select v-model="student.attendanceStatus">
-                                    <option value="" disabled>Välj status</option>
-                                    <option value="present">Närvarande</option>
-                                    <option value="absent">Frånvarande</option>
-                                    <option value="registered-absence">Anmäld frånvaro</option>
-                                </select>
+                            <div class="attendance-actions">
+                                <div class="status-indicator">
+                                    <span v-if="student.attendanceStatus === 'present'" class="status-text">Närvarande</span>
+                                    <span v-else-if="student.attendanceStatus === 'absent'" class="status-text">Frånvarande</span>
+                                    <span v-else-if="student.attendanceStatus === 'late'" class="status-text">Sen ankomst</span>
+                                    <span v-else-if="student.attendanceStatus === 'registered-absence'" class="status-text">Anmäld frånvaro</span>
+                                </div>
                             </div>
+                            <!-- Late minutes input - always visible -->
+                            <div class="lateness-input-container">
+                                <input 
+                                    type="number" 
+                                    v-model="student.lateMinutes" 
+                                    placeholder="Min" 
+                                    min="0"
+                                    max="60"
+                                    @click.stop
+                                    @input="handleLatenessInput(student)"
+                                    :disabled="student.attendanceStatus === 'registered-absence'"
+                                    :class="{ 'input-disabled': student.attendanceStatus === 'registered-absence' }"
+                                >
+                            </div>
+                        </div>
+                    </div>
+                    <div class="attendance-legend">
+                        <div class="legend-item">
+                            <div class="legend-color status-present"></div>
+                            <span>Närvarande</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color status-late"></div>
+                            <span>Sen ankomst</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color status-absent"></div>
+                            <span>Frånvarande</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color status-registered-absence"></div>
+                            <span>Anmäld frånvaro</span>
                         </div>
                     </div>
                 </div>
@@ -411,14 +451,19 @@ button {
 
 .attendance-list {
     margin-top: 15px;
+    position: relative;
+    padding-right: 100px; /* Add space for the lateness input */
 }
 
 .student-attendance-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 20px;
+    padding: 15px 20px;
     border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative; /* Add this to position the lateness input */
 }
 
 .student-name {
@@ -576,6 +621,87 @@ body.modal-open {
     padding: 20px;
     text-align: center;
     color: #666;
+}
+
+.status-present {
+    background-color: rgba(76, 175, 80, 0.2);
+    border-left: 5px solid #4CAF50;
+}
+
+.status-absent {
+    background-color: rgba(244, 67, 54, 0.2);
+    border-left: 5px solid #F44336;
+}
+
+.status-registered-absence {
+    background-color: rgba(33, 150, 243, 0.2);
+    border-left: 5px solid #2196F3;
+}
+
+.status-late {
+    background-color: rgba(255, 193, 7, 0.2);
+    border-left: 5px solid #FFC107;
+}
+
+.attendance-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.status-indicator {
+    min-width: 120px;
+    text-align: right;
+}
+
+.status-text {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.lateness-input-container {
+    position: absolute;
+    right: -70px; /* Position it outside the row */
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 5;
+}
+
+.lateness-input-container input {
+    width: 60px;
+    padding: 5px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.input-disabled {
+    opacity: 0.5;
+    background-color: #f5f5f5;
+}
+
+.attendance-legend {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 25px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.legend-color {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
 }
 </style>
 
@@ -799,35 +925,34 @@ export default {
         async fetchStudentsForLecture(lecture) {
             try {
                 // Assuming you have an API endpoint to fetch students for a specific lecture
-                // If not, you might need to adjust this to fetch students based on class/group
                 const response = await axios.get(`http://localhost:1010/api/students/${lecture.group}`);
                 
                 // If you don't have a specific endpoint, you can use mock data for now
                 if (!response.data || response.data.length === 0) {
                     // Mock data if no students are returned
                     this.students = [
-                        { id: 1, name: 'Anna Andersson', attendanceStatus: '' },
-                        { id: 2, name: 'Erik Eriksson', attendanceStatus: '' },
-                        { id: 3, name: 'Maria Svensson', attendanceStatus: '' },
-                        { id: 4, name: 'Johan Johansson', attendanceStatus: '' },
-                        { id: 5, name: 'Lina Lindberg', attendanceStatus: '' },
+                        { id: 1, name: 'Anna Andersson', attendanceStatus: 'present' },
+                        { id: 2, name: 'Erik Eriksson', attendanceStatus: 'present' },
+                        { id: 3, name: 'Maria Svensson', attendanceStatus: 'present' },
+                        { id: 4, name: 'Johan Johansson', attendanceStatus: 'present' },
+                        { id: 5, name: 'Lina Lindberg', attendanceStatus: 'present' },
                     ];
                 } else {
-                    // Map the response data to include attendanceStatus
+                    // Map the response data to include attendanceStatus set to 'present' by default
                     this.students = response.data.map(student => ({
                         ...student,
-                        attendanceStatus: ''
+                        attendanceStatus: 'present'
                     }));
                 }
             } catch (error) {
                 console.error('Error fetching students:', error);
                 // Use mock data in case of error
                 this.students = [
-                    { id: 1, name: 'Anna Andersson', attendanceStatus: '' },
-                    { id: 2, name: 'Erik Eriksson', attendanceStatus: '' },
-                    { id: 3, name: 'Maria Svensson', attendanceStatus: '' },
-                    { id: 4, name: 'Johan Johansson', attendanceStatus: '' },
-                    { id: 5, name: 'Lina Lindberg', attendanceStatus: '' },
+                    { id: 1, name: 'Anna Andersson', attendanceStatus: 'present' },
+                    { id: 2, name: 'Erik Eriksson', attendanceStatus: 'present' },
+                    { id: 3, name: 'Maria Svensson', attendanceStatus: 'present' },
+                    { id: 4, name: 'Johan Johansson', attendanceStatus: 'present' },
+                    { id: 5, name: 'Lina Lindberg', attendanceStatus: 'present' },
                 ];
             }
         },
@@ -842,7 +967,8 @@ export default {
                     students: this.students.map(student => ({
                         studentId: student.id,
                         studentName: student.name,
-                        status: student.attendanceStatus
+                        status: student.attendanceStatus,
+                        lateMinutes: student.lateMinutes || 0
                     }))
                 };
                 
@@ -909,6 +1035,40 @@ export default {
                 const timeB = this.convertTimeToMinutes(b.time);
                 return timeA - timeB;
             });
+        },
+        toggleAttendanceStatus(student) {
+            // Cycle through attendance statuses (skipping 'late' status)
+            if (student.attendanceStatus === 'present') {
+                // Skip 'late' and go directly to 'absent'
+                student.attendanceStatus = 'absent';
+                // Remove late minutes when marked as absent
+                delete student.lateMinutes;
+            } else if (student.attendanceStatus === 'absent') {
+                student.attendanceStatus = 'registered-absence';
+                // Remove late minutes when marked as registered absence
+                delete student.lateMinutes;
+            } else if (student.attendanceStatus === 'registered-absence') {
+                student.attendanceStatus = 'present';
+                // Remove late minutes when marked as present
+                delete student.lateMinutes;
+            } else if (student.attendanceStatus === 'late') {
+                // If currently late, go to absent
+                student.attendanceStatus = 'absent';
+                // Remove late minutes when marked as absent
+                delete student.lateMinutes;
+            }
+        },
+        handleLatenessInput(student) {
+            // If the student has any value in lateMinutes
+            if (student.lateMinutes) {
+                // Set the status to late
+                student.attendanceStatus = 'late';
+            }
+            // If the lateMinutes field is cleared and the student is marked as late
+            else if (!student.lateMinutes && student.attendanceStatus === 'late') {
+                // Change back to present
+                student.attendanceStatus = 'present';
+            }
         }
     },
     mounted() {
