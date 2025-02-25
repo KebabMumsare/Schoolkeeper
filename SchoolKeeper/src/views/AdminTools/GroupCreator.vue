@@ -57,7 +57,12 @@
                         </div>
                     </div>
                     <div class="members-box">
-                        <h3>Group Members</h3>
+                        <div class="members-header">
+                            <h3>Group Members</h3>
+                            <button v-if="selectedGroup" @click="openAddMemberModal" class="add-member-button">
+                                Add Member
+                            </button>
+                        </div>
                         <div class="members-list">
                             <div v-if="selectedGroupMembers?.length" class="member-items">
                                 <div v-for="member in selectedGroupMembers" :key="member.id" class="member-item">
@@ -88,13 +93,40 @@
                     <option value="extra">Extra</option>
                 </select>
                 <div class="modal-buttons">
-
-
                     <button type="submit" class="create-button">Create Group</button>
                     <button @click="closeModal" class="cancel-button">Cancel</button>
-
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Add Member Modal -->
+    <div v-if="showAddMemberModal" class="modal">
+        <div class="modal-content">
+            <h3>Add Member to Group</h3>
+            <div class="search-container">
+                <input 
+                    v-model="memberSearchQuery" 
+                    placeholder="Search users..." 
+                    class="search-bar" 
+                />
+            </div>
+            <div class="available-users">
+                <div v-if="filteredAvailableUsers.length" class="user-list">
+                    <div 
+                        v-for="user in filteredAvailableUsers" 
+                        :key="user._id" 
+                        class="user-item"
+                        @click="addMemberToGroup(selectedGroup._id, user._id)"
+                    >
+                        {{ user.name }}
+                    </div>
+                </div>
+                <p v-else class="no-users">No users found</p>
+            </div>
+            <div class="modal-buttons">
+                <button @click="closeAddMemberModal" class="cancel-button">Close</button>
+            </div>
         </div>
     </div>
 </template>
@@ -313,8 +345,7 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.group-details-box h3,
-.members-box h3 {
+.group-details-box h3 {
     color: #216e87;
     margin-top: 0;
     margin-bottom: 1rem;
@@ -345,6 +376,70 @@
     text-align: center;
     margin-top: 2rem;
 }
+
+.members-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #4fc0e5;
+}
+
+.members-header h3 {
+    color: #216e87;
+    margin: 0;
+}
+
+.add-member-button {
+    background-color: #4fc0e5;
+    color: white;
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.add-member-button:hover {
+    background-color: #216e87;
+}
+
+.available-users {
+    max-height: 300px;
+    overflow-y: auto;
+    margin: 1rem 0;
+}
+
+.user-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.user-item {
+    background-color: white;
+    padding: 0.75rem;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.user-item:hover {
+    background-color: #f0f0f0;
+}
+
+.no-users {
+    color: #666;
+    text-align: center;
+    padding: 1rem;
+}
+
+.search-container {
+    margin-bottom: 1rem;
+}
 </style>
 
 <script>
@@ -357,22 +452,29 @@ export default {
         return {
             currentUser: useStorage('currentUser', { name: '', access: '', class: '' }),
             showModal: false,
+            showAddMemberModal: false,
             groups: [],
             searchQuery: '',
+            memberSearchQuery: '',
             newGroup: {
                 name: '',
                 type: ''
             },
             selectedGroup: null,
-            selectedGroupMembers: []
+            selectedGroupMembers: [],
+            availableUsers: []
         };
     },
-
 
     computed: {
         filteredGroups() {
             return this.groups.filter(group => 
                 group.name.toLowerCase().includes(this.searchQuery.toLowerCase())
+            );
+        },
+        filteredAvailableUsers() {
+            return this.availableUsers.filter(user => 
+                user.name.toLowerCase().includes(this.memberSearchQuery.toLowerCase())
             );
         }
     },
@@ -387,11 +489,32 @@ export default {
             this.showModal = false;
             this.newGroup = { name: '', type: '' };
         },
+        openAddMemberModal() {
+            this.showAddMemberModal = true;
+            this.fetchAvailableUsers();
+        },
+        closeAddMemberModal() {
+            this.showAddMemberModal = false;
+            this.memberSearchQuery = '';
+        },
         selectGroup(group) {
             this.selectedGroup = group;
             this.fetchGroupMembers(group._id);
         },
 
+        async fetchAvailableUsers() {
+            try {
+                const response = await axios.get('http://localhost:1010/api/users');
+                // Filter out users that are already in the group and only include students
+                const memberIds = this.selectedGroupMembers.map(member => member._id);
+                this.availableUsers = response.data.filter(user => 
+                    !memberIds.includes(user._id) && 
+                    user.access === 'Elev'  // Only include students
+                );
+            } catch (error) {
+                console.error('Error fetching available users:', error);
+            }
+        },
         async fetchGroupMembers(groupId) {
             try {
                 const response = await axios.get(`http://localhost:1010/api/users/${groupId}`);
@@ -402,10 +525,8 @@ export default {
             }
         },
         async createGroup() {
-
             if (this.newGroup.name) {
                 try {
-
                     const payload = {
                         name: this.newGroup.name,
                         type: this.newGroup.type
@@ -413,7 +534,6 @@ export default {
                     const response = await axios.post('http://localhost:1010/api/groups', payload);
                     this.groups.push(response.data);
                     this.closeModal();
-
                 } catch (error) {
                     console.error('Error creating group:', error);
                 }
@@ -427,8 +547,14 @@ export default {
             } catch (error) {
                 console.error("Error fetching groups:", error);
             }
-
-
+        },
+        async addMemberToGroup(groupId, memberId) {
+            try {
+                const response = await axios.post(`http://localhost:1010/api/groups/${groupId}/${memberId}`);
+                console.log(response.data);
+            } catch (error) {
+                console.error('Error adding member to group:', error);
+            }
         }
     },
     mounted() {
