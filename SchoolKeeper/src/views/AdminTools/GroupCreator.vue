@@ -53,6 +53,7 @@
                         <div class="details-content">
                             <p><strong>Name:</strong> {{ selectedGroup?.name || 'No group selected' }}</p>
                             <p><strong>Type:</strong> {{ selectedGroup?.type || 'N/A' }}</p>
+                            <p><strong>Teacher:</strong> {{ selectedGroup?.teacher || 'N/A' }}</p>
                             <p><strong>Created:</strong> {{ selectedGroup?.createdAt || 'N/A' }}</p>
                         </div>
                     </div>
@@ -497,8 +498,9 @@ export default {
             this.showAddMemberModal = false;
             this.memberSearchQuery = '';
         },
-        selectGroup(group) {
+        async selectGroup(group) {
             this.selectedGroup = group;
+            this.selectedGroup.teacher = (await axios.get(`http://localhost:1010/api/users/${group.teacher}`)).data.name;
             this.fetchGroupMembers(group._id);
         },
 

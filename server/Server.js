@@ -255,6 +255,15 @@ app.get("/api/user/:name", async (req, res) => {
     res.sendStatus(500); // Handle server error
   }
 });
+app.get("/api/users/:userId", async (req, res) => {
+  try {
+    const user = await UserModel.findById(req.params.userId);
+    res.json(user);
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(500); // Handle server error
+  }
+});
 app.get("/api/users/", async (req, res) => {
   try {
     // Find user by ID (this can be adjusted to find by email or another field)
