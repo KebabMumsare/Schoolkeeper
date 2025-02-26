@@ -216,6 +216,7 @@ const CourseSchema = mongoose.Schema({
   },
 });
 const CourseModel = mongoose.model("Course", CourseSchema);
+// Attendance Schema
 const AttendanceSchema = mongoose.Schema({
   student_id: {
     type: mongoose.Schema.Types.ObjectId,
@@ -233,6 +234,15 @@ const AttendanceSchema = mongoose.Schema({
   },
 });
 const AttendanceModel = mongoose.model("Attendance", AttendanceSchema);
+// rooms
+const RoomSchema = mongoose.Schema({
+  name: {
+    type: "string",
+  },
+  
+});
+const RoomModel = mongoose.model("Room", RoomSchema);
+
 // Login API
 app.post("/api/login", async (req, res) => {
   try {
@@ -296,7 +306,7 @@ app.get("/api/users/", async (req, res) => {
     res.sendStatus(500); // Handle server error
   }
 });
-app.get("/api/users/:groupId", async (req, res) => {
+app.get("/api/users/group/:groupId", async (req, res) => {
   try {
     const users = await UserModel.find({ groups: req.params.groupId });
     res.json(users);
