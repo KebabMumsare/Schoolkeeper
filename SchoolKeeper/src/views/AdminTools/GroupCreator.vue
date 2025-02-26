@@ -519,7 +519,7 @@ export default {
         },
         async fetchGroupMembers(groupId) {
             try {
-                const response = await axios.get(`http://localhost:1010/api/users/${groupId}`);
+                const response = await axios.get(`http://localhost:1010/api/users/group/${groupId}`);
                 this.selectedGroupMembers = response.data;
                 console.log(this.selectedGroupMembers);
             } catch (error) {
