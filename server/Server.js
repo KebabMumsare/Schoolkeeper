@@ -220,7 +220,7 @@ const CourseModel = mongoose.model("Course", CourseSchema);
 // Login API
 app.post("/api/login", async (req, res) => {
   try {
-    const user = await UserModel.findOne({ name: req.body.name })
+    const user = await UserModel.findOne({ email: req.body.email })
       .populate("groups")
       .exec();
 

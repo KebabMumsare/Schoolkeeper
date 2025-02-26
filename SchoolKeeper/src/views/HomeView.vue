@@ -17,7 +17,7 @@ export default {
     async submitLogin() {
       try {
         const response = await axios.post('http://localhost:1010/api/login', {
-          name: this.email, 
+          email: this.email, 
           password: this.password
         });
         
