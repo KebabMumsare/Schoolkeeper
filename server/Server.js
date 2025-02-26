@@ -216,7 +216,23 @@ const CourseSchema = mongoose.Schema({
   },
 });
 const CourseModel = mongoose.model("Course", CourseSchema);
-
+const AttendanceSchema = mongoose.Schema({
+  student_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+  },
+  lesson_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Lesson',
+  },
+  date: {
+    type: "string",
+  },
+  status: {
+    type: "string",
+  },
+});
+const AttendanceModel = mongoose.model("Attendance", AttendanceSchema);
 // Login API
 app.post("/api/login", async (req, res) => {
   try {
