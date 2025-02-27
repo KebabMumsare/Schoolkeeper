@@ -13,7 +13,7 @@
     </router-link>
 
     <router-link 
-      to="/addnewuser" 
+      to="/admintools/addnewuser" 
       class="admintools-item"
       :style="{ backgroundColor: getRandomColor(-1) }"
     >
@@ -21,13 +21,22 @@
       <p>Klicka här för att skapa Användare.</p>
     </router-link>
     <router-link 
-      to="/groupcreator" 
+      to="/admintools/groupcreator" 
       class="admintools-item"
       :style="{ backgroundColor: getRandomColor(-1) }"
     >
       <h3>Gå till Skapa grupper</h3>
 
       <p>Klicka här för att skapa grupper.</p>
+    </router-link>
+    <router-link 
+      to="/admintools/roomscreator" 
+      class="admintools-item"
+      :style="{ backgroundColor: getRandomColor(-1) }"
+    >
+      <h3>Gå till Skapa Salar</h3>
+
+      <p>Klicka här för att skapa salar.</p>
     </router-link>
   </div>
 

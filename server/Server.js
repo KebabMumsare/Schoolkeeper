@@ -239,7 +239,9 @@ const RoomSchema = mongoose.Schema({
   name: {
     type: "string",
   },
-  
+  capacity: {
+    type: "number",
+  },
 });
 const RoomModel = mongoose.model("Room", RoomSchema);
 
@@ -325,6 +327,16 @@ app.post("/api/groups/:groupId/:userId", async (req, res) => {
   } catch (error) {
     console.error("Error adding user to group:", error);
     res.sendStatus(500);
+  }
+});
+app.post("/api/users", async (req, res) => {
+  try {
+    const newUser = new UserModel(req.body);
+    await newUser.save();
+    res.status(201).json(newUser);
+  } catch (error) {
+    console.error("Error creating user:", error);
+    res.status(500).json({ message: "Error creating user", error: error.message });
   }
 });
 // Group API
@@ -680,6 +692,27 @@ app.post("/api/schedule", async (req, res) => {
   } catch (error) {
     console.error('Error creating schedule:', error);
     res.status(500).json({ message: "Error creating schedule", error: error.message });
+  }
+});
+
+// Room API
+app.get("/api/rooms", async (req, res) => {
+  try {
+    const rooms = await RoomModel.find({});
+    res.json(rooms);
+  } catch (error) {
+    console.error('Error fetching rooms:', error);
+    res.status(500).json({ message: "Error fetching rooms", error: error.message });
+  }
+});
+app.post("/api/rooms", async (req, res) => {
+  try {
+    const newRoom = new RoomModel(req.body);
+    await newRoom.save();
+    res.status(201).json(newRoom);
+  } catch (error) {
+    console.error('Error creating room:', error);
+    res.status(500).json({ message: "Error creating room", error: error.message });
   }
 });
 
