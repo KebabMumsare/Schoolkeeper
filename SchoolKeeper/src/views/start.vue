@@ -30,16 +30,19 @@
                                 <option value="canceled">Inställd</option>
                             </select>
                             
-                            <!-- Input field for "Ändra sal" option -->
-                            <input 
+                            <!--KOLLA HÄR JESPER-->
+                            <select 
                                 v-if="lecture.locationStatus === 'change'" 
                                 v-model="lecture.newRoom" 
-                                type="text" 
-                                placeholder="Ange sal" 
-                                class="custom-location-input"
+                                class="room-select"
                                 @click.stop
-                                @input="saveLocationChange(lecture)"
+                                @change="saveLocationChange(lecture)"
                             >
+                                <option value="" disabled selected>Välj sal</option>
+                                <option v-for="room in availableRooms" :key="room.id" :value="room.id">
+                                    {{ room.name }}
+                                </option>
+                            </select>
                         </div>
                         <div class="teacher-lecture-actions">
                             <span class="attendance-icon" @click.stop="openAttendanceModal(lecture)">📋</span>
@@ -642,13 +645,20 @@ body.modal-open {
     font-size: 0.9rem;
 }
 
-.custom-location-input {
+.room-select {
     width: 100%;
     padding: 8px;
     border: 1px solid #ddd;
     border-radius: 4px;
-    margin-top: 5px;
+    background-color: #fff;
     font-size: 0.9rem;
+    margin-top: 5px;
+}
+
+/* Style for the room select when a room is selected */
+.status-changed .room-select {
+    border-color: #FFEB3B;
+    background-color: rgba(255, 235, 59, 0.1);
 }
 
 .teacher-lecture-actions {
@@ -885,16 +895,7 @@ export default {
             selectedLecture: {},
             students: [],
             teacherLectures: [], // New property to store teacher's lectures
-            availableRooms: [
-                { id: 'A101', name: 'A101' },
-                { id: 'A102', name: 'A102' },
-                { id: 'B201', name: 'B201' },
-                { id: 'B202', name: 'B202' },
-                { id: 'C301', name: 'C301' },
-                { id: 'C302', name: 'C302' },
-                { id: 'D101', name: 'D101' },
-                { id: 'D102', name: 'D102' }
-            ],
+            availableRooms: [], // Initialize as empty array
         };
     },
     computed: {
@@ -1268,6 +1269,38 @@ export default {
             } catch (error) {
                 console.error('Error updating location:', error);
             }
+        },
+        async fetchClassrooms() {
+            try {
+                // Assuming you have an API endpoint for classrooms
+                const response = await axios.get('http://localhost:1010/api/classrooms');
+                
+                if (response.data && response.data.length > 0) {
+                    // Map the response to the format we need
+                    this.availableRooms = response.data.map(room => ({
+                        id: room.id || room.roomNumber,
+                        name: room.name || room.roomNumber
+                    }));
+                } else {
+                    // Fallback to some default rooms if API returns empty
+                    this.availableRooms = [
+                        { id: 'A101', name: 'A101' },
+                        { id: 'A102', name: 'A102' },
+                        { id: 'B201', name: 'B201' },
+                        { id: 'B202', name: 'B202' }
+                    ];
+                    console.log('No classrooms found in database, using defaults');
+                }
+            } catch (error) {
+                console.error('Error fetching classrooms:', error);
+                // Fallback to some default rooms in case of error
+                this.availableRooms = [
+                    { id: 'A101', name: 'A101' },
+                    { id: 'A102', name: 'A102' },
+                    { id: 'B201', name: 'B201' },
+                    { id: 'B202', name: 'B202' }
+                ];
+            }
         }
     },
     mounted() {
@@ -1287,6 +1320,9 @@ export default {
         
         // Add this to fetch teacher's lectures
         this.fetchTeacherLectures();
+        
+        // Add this line to fetch classrooms
+        this.fetchClassrooms();
     },
     watch: {
         testDay() {
