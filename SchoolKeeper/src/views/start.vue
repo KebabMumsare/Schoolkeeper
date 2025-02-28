@@ -1270,38 +1270,11 @@ export default {
                 console.error('Error updating location:', error);
             }
         },
-        async fetchClassrooms() {
-            try {
-                // Assuming you have an API endpoint for classrooms
-                const response = await axios.get('http://localhost:1010/api/classrooms');
-                
-                if (response.data && response.data.length > 0) {
-                    // Map the response to the format we need
-                    this.availableRooms = response.data.map(room => ({
-                        id: room.id || room.roomNumber,
-                        name: room.name || room.roomNumber
-                    }));
-                } else {
-                    // Fallback to some default rooms if API returns empty
-                    this.availableRooms = [
-                        { id: 'A101', name: 'A101' },
-                        { id: 'A102', name: 'A102' },
-                        { id: 'B201', name: 'B201' },
-                        { id: 'B202', name: 'B202' }
-                    ];
-                    console.log('No classrooms found in database, using defaults');
-                }
-            } catch (error) {
-                console.error('Error fetching classrooms:', error);
-                // Fallback to some default rooms in case of error
-                this.availableRooms = [
-                    { id: 'A101', name: 'A101' },
-                    { id: 'A102', name: 'A102' },
-                    { id: 'B201', name: 'B201' },
-                    { id: 'B202', name: 'B202' }
-                ];
-            }
-        }
+        async fetchRooms() {
+            const response = await axios.get('http://localhost:1010/api/rooms');
+            this.availableRooms = response.data;
+            console.log(this.availableRooms);
+        },
     },
     mounted() {
         for (let i = 0; i < 5; i++) {
@@ -1310,6 +1283,7 @@ export default {
         
         this.updateDateTime();
         this.fetchCourses();
+        this.fetchRooms();
         setInterval(this.updateDateTime, 1000);
         this.fetchTodaySchedule();
         this.fetchTestSchedule();
@@ -1320,9 +1294,6 @@ export default {
         
         // Add this to fetch teacher's lectures
         this.fetchTeacherLectures();
-        
-        // Add this line to fetch classrooms
-        this.fetchClassrooms();
     },
     watch: {
         testDay() {

@@ -348,7 +348,6 @@ export default {
         async fetchRooms() {
             const response = await axios.get('http://localhost:1010/api/rooms');
             this.rooms = response.data;
-            console.log(this.rooms);
         },
         async createRoom() {
             const response = await axios.post('http://localhost:1010/api/rooms', this.newRoom);
