@@ -183,8 +183,10 @@
     background-color: #f8f9fa;
     padding: 0.75rem;
     max-width: 2000px;
-    width: 100%;
-    margin: 50px auto 0 auto;
+    width: 95%;
+    margin: 100px auto 0 auto;
+    position: relative;
+    z-index: 1;
 }
 
 .schedule-layout {
@@ -415,36 +417,34 @@ button {
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
-    overflow: hidden;
+    z-index: 200;
+    padding-top: 60px;
+    box-sizing: border-box;
 }
 
 .attendance-modal-content {
     background-color: #fff;
     border-radius: 8px;
-    width: 95%;
+    width: 80%;
     max-width: 800px;
     max-height: 85vh;
-    display: flex;
-    flex-direction: column;
+    overflow-y: auto;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    margin: auto;
     position: relative;
-    overflow: hidden;
+    margin-top: 20px;
 }
 
 .attendance-modal-header {
+    position: sticky;
+    top: 0;
+    background-color: #fff;
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+    border-radius: 8px 8px 0 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 20px;
-    background-color: #6597c9;
-    color: white;
-    border-radius: 8px 8px 0 0;
-    position: sticky;
-    top: 0;
     z-index: 10;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .attendance-modal-header h3 {
@@ -509,11 +509,16 @@ button {
 }
 
 .attendance-modal-footer {
-    padding: 15px 20px;
+    position: sticky;
+    bottom: 0;
+    background-color: #fff;
+    padding: 15px;
+    border-top: 1px solid #ddd;
+    border-radius: 0 0 8px 8px;
     display: flex;
     justify-content: flex-end;
     gap: 10px;
-    border-top: 1px solid #eee;
+    z-index: 10;
 }
 
 .save-button {
@@ -596,11 +601,12 @@ body.modal-open {
     overflow-y: auto;
     border: 1px solid #eee;
     border-radius: 4px;
+    padding-bottom: 40px;
 }
 
 .teacher-lecture-item {
     display: grid;
-    grid-template-columns: 120px 100px 1fr 120px 180px 60px;
+    grid-template-columns: minmax(80px, 120px) minmax(70px, 100px) minmax(150px, 1fr) minmax(80px, 120px) minmax(150px, 180px) minmax(40px, 60px);
     align-items: center;
     padding: 15px 20px;
     border-bottom: 1px solid #eee;
@@ -634,6 +640,7 @@ body.modal-open {
 
 .teacher-lecture-location {
     position: relative;
+    z-index: 10;
 }
 
 .location-select {
@@ -862,6 +869,131 @@ body.modal-open {
 
 .status-canceled .location-select {
     border-color: #F44336;
+}
+
+/* Ensure the navbar has proper z-index */
+:deep(.navbar) {
+    z-index: 100;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+}
+
+/* Add more space to the Container element that holds the "Schema" heading */
+.Container {
+    margin-bottom: 15px;
+}
+
+/* Add media queries for smaller screens */
+@media (max-width: 1200px) {
+    .teacher-lecture-item {
+        grid-template-columns: minmax(80px, 100px) minmax(60px, 80px) minmax(120px, 1fr) minmax(70px, 100px) minmax(120px, 150px) minmax(40px, 50px);
+        padding: 12px 15px;
+        gap: 10px;
+    }
+}
+
+@media (max-width: 992px) {
+    .teacher-lecture-item {
+        grid-template-columns: minmax(70px, 90px) minmax(50px, 70px) minmax(100px, 1fr) minmax(60px, 80px) minmax(100px, 130px) minmax(30px, 40px);
+        padding: 10px 12px;
+        gap: 8px;
+        font-size: 0.9rem;
+    }
+    
+    .room-select {
+        font-size: 0.8rem;
+    }
+    
+    .location-select {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .teacher-lecture-item {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto;
+        gap: 5px;
+        padding: 15px;
+    }
+    
+    .teacher-lecture-day, 
+    .teacher-lecture-time {
+        grid-column: 1;
+        display: inline-block;
+        margin-right: 10px;
+    }
+    
+    .teacher-lecture-name,
+    .teacher-lecture-group {
+        grid-column: 1;
+    }
+    
+    .teacher-lecture-location {
+        grid-column: 1;
+        margin-top: 10px;
+    }
+    
+    .teacher-lecture-actions {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+    }
+    
+    /* Make the student schedule responsive */
+    .schedule-layout {
+        flex-direction: column;
+    }
+    
+    .weekly-schedule {
+        overflow-x: auto;
+    }
+    
+    .schedule-container {
+        min-width: 600px; /* Ensure minimum width for scrolling */
+    }
+}
+
+/* Improve the attendance modal for smaller screens */
+@media (max-width: 768px) {
+    .attendance-modal-content {
+        width: 95%;
+        max-height: 90vh;
+    }
+    
+    .student-attendance-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .attendance-actions {
+        margin-top: 5px;
+        width: 100%;
+    }
+    
+    .lateness-input-container {
+        position: static;
+        margin-top: 5px;
+        transform: none;
+    }
+}
+
+/* Ensure text doesn't overflow in grid cells */
+.teacher-lecture-day, 
+.teacher-lecture-time,
+.teacher-lecture-name,
+.teacher-lecture-group {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Make the room select dropdown responsive */
+.room-select {
+    width: 100%;
+    max-width: 200px;
 }
 </style>
 
