@@ -2,9 +2,12 @@
     <NavBar site="notice" :currentUser="currentUser" />
     <div class="notice-container-wrapper">
         <div class="notice-container">
-            <div v-for="(item, index) in notice" :key="index" class="notice-item" @click="openNotice(item)">
-                <div class="notice-title">{{ item.title }}</div>
-                <div class="notice-date">{{ new Date(item.created_at).toLocaleString() }}</div>
+            <div v-for="(item, index) in notice" :key="index" class="notice-card" @click="openNotice(item)">
+                <div class="notice-card-header">
+                    <h3 class="notice-title">{{ item.title }}</h3>
+                    <span class="notice-date">{{ new Date(item.created_at).toLocaleString() }}</span>
+                </div>
+                <p class="notice-preview">{{ item.message.substring(0, 100) }}...</p>
             </div>
         </div>
         <button v-if="currentUser.access === 'Admin' || currentUser.access === 'Lärare'" @click="openModal" class="create-button">Skapa Ny Notis</button>
@@ -14,7 +17,7 @@
                 <h3>Skapa Ny Notis</h3>
                 <form @submit.prevent="createNotice">
                     <input v-model="newNotice.title" placeholder="Notis Titel" required>
-                    <textarea v-model="newNotice.message" placeholder="Notis Medelande" required></textarea>
+                    <textarea v-model="newNotice.message" placeholder="Notis Meddelande" required></textarea>
                     <div class="modal-buttons">
                         <button type="submit" class="create-button">Skapa Notis</button>
                         <button @click="closeModal" class="cancel-button">Avbryt</button>
@@ -23,8 +26,8 @@
             </div>
         </div>
     </div>
-    <div class="notice-details-wrapper">
-        <div v-if="selectedNotice" class="notice-details" @click="closeNotice">
+    <div class="notice-details-wrapper" v-if="selectedNotice">
+        <div class="notice-details" @click="closeNotice">
             <div class="notice-details-content" @click.stop>
                 <div class="notice-details-header">
                     <h2>{{ selectedNotice.title }}</h2>
@@ -32,7 +35,7 @@
                 </div>
                 <div class="notice-details-body">
                     <p>{{ selectedNotice.message }}</p>
-                    <p>Sent on: {{ new Date(selectedNotice.created_at).toLocaleString() }}</p>
+                    <p>Skickad: {{ new Date(selectedNotice.created_at).toLocaleString() }}</p>
                 </div>
             </div>
         </div>
@@ -44,150 +47,111 @@
 .notice-container-wrapper {
     width: 100vw;
     height: 100vh;
-    padding-left: 1rem;
-    padding-top: 1.5rem;
+    padding: 2rem;
+    padding-top: 100px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    align-items: flex-start;
+    background-color: #f0f2f5;
+    box-sizing: border-box;
 }
 
 .notice-container {
-    max-height: 60vh;
-    width: 100vh;
+    width: 350px;
     overflow-y: auto;
-    border: 1px solid #ccc;
-    padding: 1rem;
-    border-radius: 10px;
-    margin-bottom: 1rem;
-    background-color: #f8f9fa;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    max-height: 75vh;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    margin-left: 2rem;
+    margin-bottom: 2rem;
+    position: relative;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+    scroll-behavior: smooth;
 }
 
-.notice-item {
-    height: 10vh;
+.notice-container::after {
+    content: none;
+}
+
+.notice-card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 1rem;
     width: 100%;
-    margin-bottom: 10px;
-    padding: 10px;
-    background-color: #b6c9f2;
-    border-radius: 5px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     cursor: pointer;
-    font-size: 1rem;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.5s forwards;
+    animation-delay: calc(var(--index, 0) * 0.1s);
+}
+
+.notice-card:hover {
+    transform: translateY(-3px) scale(1.01);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    background-color: #f9f9f9;
+}
+
+.notice-card:active {
+    transform: translateY(-1px) scale(0.99);
+    transition: all 0.1s;
+}
+
+.notice-card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    transition: all 0.3s ease;
-}
-
-.notice-item:hover {
-    background-color: #95b3e6;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    transform: translateY(-2px);
+    margin-bottom: 0.5rem;
 }
 
 .notice-title {
-    flex: 1;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 4px;
+    line-height: 1.3;
 }
 
 .notice-date {
-    margin-left: 10px;
-    font-size: 0.9rem;
-    color: #333;
+    font-size: 0.8rem;
+    color: #666;
 }
 
-.notice-details {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.notice-details-content {
-    background-color: #fff;
-    border-radius: 5px;
+.notice-preview {
+    font-size: 0.95rem;
+    color: #555;
+    line-height: 1.5;
+    margin-top: 8px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
     overflow: hidden;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    width: 80%;
-    max-width: 600px;
-}
-
-.notice-details-header {
-    background-color: #007bff;
-    color: white;
-    padding: 15px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.notice-details-header h2 {
-    margin: 0;
-}
-
-.close-button {
-    background-color: transparent;
-    color: white;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    padding: 0;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 50%;
-    transition: background-color 0.3s ease;
-}
-
-.close-button:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-}
-
-.notice-details-body {
-    padding: 20px;
-}
-
-.details-button {
-    background-color: #ffffff;
-    color: #007bff;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 5px;
-    font-size: 0.9rem;
-    transition: all 0.3s ease;
-}
-
-.details-button:hover {
-    background-color: #f0f0f0;
+    text-overflow: ellipsis;
 }
 
 .create-button {
+    margin-left: 3rem;
+    margin-top: 0.5rem;
     background-color: #007bff;
     color: white;
     border: none;
-    padding: 8px 15px;
+    padding: 10px 20px;
     border-radius: 5px;
-    font-size: 0.9rem;
-    transition: all 0.3s ease;
-    margin-top: 1rem;
+    font-size: 1rem;
+    transition: background-color 0.3s;
+    position: relative;
+    z-index: 6;
 }
 
 .create-button:hover {
-    background-color: #007bff;
-    cursor: pointer;
+    background-color: #0056b3;
 }
 
-.modal {
+.modal, .notice-details {
     position: fixed;
     top: 0;
     left: 0;
@@ -198,16 +162,28 @@
     justify-content: center;
     align-items: center;
     z-index: 1000;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.modal-content, .notice-details-content {
+    max-height: 80vh;
+    overflow-y: auto;
 }
 
 .modal-content {
     background-color: #fff;
-    border-radius: 5px;
-    overflow: hidden;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    width: 80%;
-    max-width: 600px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 500px;
     padding: 2rem;
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
 }
 
 .modal-content input,
@@ -245,6 +221,93 @@
     background-color: #e0e0e0;
 }
 
+.notice-details {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.notice-details-content {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 80%;
+    max-width: 600px;
+    padding: 2rem;
+}
+
+.notice-details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.notice-details-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #333;
+}
+
+.close-button {
+    background-color: transparent;
+    color: #333;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.close-button:hover {
+    color: #007bff;
+}
+
+.notice-details-body {
+    font-size: 1rem;
+    color: #555;
+}
+
+:deep(footer) {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 10;
+}
+
+:deep(.navbar) {
+    z-index: 100;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+}
+
+/* Customize scrollbar for WebKit browsers */
+.notice-container::-webkit-scrollbar {
+    width: 6px;
+}
+.notice-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+.notice-container::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+}
+
+/* Staggered animation for cards */
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 </style>
 
 <script>
@@ -321,7 +384,15 @@ export default {
         }
     },
     mounted() {
-        this.fetchNotice();
+        this.fetchNotice().then(() => {
+            // Set staggered animation delays after notices are loaded
+            setTimeout(() => {
+                const cards = document.querySelectorAll('.notice-card');
+                cards.forEach((card, index) => {
+                    card.style.setProperty('--index', index);
+                });
+            }, 100);
+        });
     }
 };
 </script>
