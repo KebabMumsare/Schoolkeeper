@@ -107,7 +107,7 @@
     transition: background-color 0.2s;
 }
 .back-button {
-    width: 20%;
+    width: 30%;
 }
 .create-button:hover, .back-button:hover, .add-equipment-button:hover {
     background-color: #216e87;
