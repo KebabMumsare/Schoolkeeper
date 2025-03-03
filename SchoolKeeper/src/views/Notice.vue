@@ -1,27 +1,26 @@
 <template>
     <NavBar site="notice" :currentUser="currentUser" />
     <div class="notice-container-wrapper">
-        <div class="notice-container">
-            <div v-for="(item, index) in notice" :key="index" class="notice-card" @click="openNotice(item)">
-                <div class="notice-card-header">
-                    <h3 class="notice-title">{{ item.title }}</h3>
-                    <span class="notice-date">{{ new Date(item.created_at).toLocaleString() }}</span>
+        <div class="notice-section">
+            <div class="notice-container">
+                <div v-for="(item, index) in notice" :key="index" class="notice-card" @click="openNotice(item)">
+                    <div class="notice-card-header">
+                        <h3 class="notice-title">{{ item.title }}</h3>
+                        <span class="notice-date">{{ new Date(item.created_at).toLocaleString() }}</span>
+                    </div>
+                    <p class="notice-preview">{{ item.message.substring(0, 100) }}...</p>
                 </div>
-                <p class="notice-preview">{{ item.message.substring(0, 100) }}...</p>
             </div>
         </div>
-        <button v-if="currentUser.access === 'Admin' || currentUser.access === 'Lärare'" @click="openModal" class="create-button">Skapa Ny Notis</button>
-
-        <div v-if="showModal" class="modal">
-            <div class="modal-content create-notice">
-                <h3>Skapa Ny Notis</h3>
+        
+        <!-- Permanent Create Notice Form -->
+        <div v-if="currentUser.access === 'Admin' || currentUser.access === 'Lärare'" class="create-notice-section">
+            <div class="create-notice-container">
+                <h3 class="create-notice-title">Skapa Ny Notis</h3>
                 <form @submit.prevent="createNotice">
                     <input v-model="newNotice.title" placeholder="Notis Titel" required>
                     <textarea v-model="newNotice.message" placeholder="Notis Meddelande" required></textarea>
-                    <div class="modal-buttons">
-                        <button type="submit" class="create-button">Skapa Notis</button>
-                        <button @click="closeModal" class="cancel-button">Avbryt</button>
-                    </div>
+                    <button type="submit" class="create-button">Skapa Notis</button>
                 </form>
             </div>
         </div>
@@ -50,10 +49,18 @@
     padding: 2rem;
     padding-top: 100px;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: flex-start;
+    justify-content: flex-start;
     background-color: #f0f2f5;
     box-sizing: border-box;
+}
+
+.notice-section {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    max-width: 400px;
 }
 
 .notice-container {
@@ -72,8 +79,108 @@
     scroll-behavior: smooth;
 }
 
-.notice-container::after {
-    content: none;
+/* New styles for the permanent create notice form */
+.create-notice-section {
+    margin-left: 3rem;
+    flex: 2;
+    max-width: 700px;
+    padding-top: 0; /* Remove top padding to align with notifications */
+}
+
+.create-notice-container {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 2.5rem;
+    padding-top: 1.5rem; /* Reduce top padding */
+    animation: fadeIn 0.5s ease-out;
+    height: 75vh;
+    display: flex;
+    flex-direction: column;
+    user-drag: none;
+    -webkit-user-drag: none;
+    margin-top: 1rem; /* Match the first notification's position */
+}
+
+.create-notice-title {
+    margin-top: 0;
+    margin-bottom: 1rem; /* Reduced from 1.5rem */
+    color: #333;
+    font-size: 1.4rem;
+    text-align: center;
+}
+
+.create-notice-container input,
+.create-notice-container textarea,
+.create-notice-container button {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 1.2rem;
+    box-sizing: border-box;
+    font-size: 1rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    user-drag: none;
+    -webkit-user-drag: none;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
+
+.create-notice-container input:focus,
+.create-notice-container textarea:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+    outline: none;
+}
+
+.create-notice-container form {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    justify-content: space-between;
+    height: 100%;
+    padding-bottom: 20px;
+}
+
+.create-notice-container form > :last-child {
+    margin-top: auto;
+}
+
+.create-notice-container textarea {
+    height: 250px;
+    flex-grow: 1;
+    resize: none;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+}
+
+.create-button {
+    width: 100%;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: background-color 0.3s;
+    cursor: pointer;
+    font-weight: 500;
+    margin-top: 1rem;
+    margin-bottom: 0;
+    position: relative;
+    bottom: 0;
+}
+
+.create-button:hover {
+    background-color: #0056b3;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .notice-card {
@@ -131,94 +238,6 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
-}
-
-.create-button {
-    margin-left: 3rem;
-    margin-top: 0.5rem;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    font-size: 1rem;
-    transition: background-color 0.3s;
-    position: relative;
-    z-index: 6;
-}
-
-.create-button:hover {
-    background-color: #0056b3;
-}
-
-.modal, .notice-details {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    padding: 20px;
-    box-sizing: border-box;
-}
-
-.modal-content, .notice-details-content {
-    max-height: 80vh;
-    overflow-y: auto;
-}
-
-.modal-content {
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    width: 90%;
-    max-width: 500px;
-    padding: 2rem;
-    animation: fadeIn 0.3s ease-out;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.9); }
-    to { opacity: 1; transform: scale(1); }
-}
-
-.modal-content input,
-.modal-content textarea {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    margin-bottom: 1rem;
-    box-sizing: border-box;
-}
-
-.modal-content textarea {
-    height: 100px;
-    resize: vertical;
-}
-
-.modal-buttons {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 1rem;
-}
-
-.cancel-button {
-    background-color: #f0f0f0;
-    color: #007bff;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 5px;
-    font-size: 0.9rem;
-    transition: all 0.3s ease;
-}
-
-.cancel-button:hover {
-    background-color: #e0e0e0;
 }
 
 .notice-details {
@@ -327,7 +346,6 @@ export default {
             currentUser: useStorage('currentUser', { name: '', access: '', class: '' }),
             notice: [],
             selectedNotice: null,
-            showModal: false,
             newNotice: {
                 title: '',
                 message: ''
@@ -359,12 +377,6 @@ export default {
         closeNotice() {
             this.selectedNotice = null;
         },
-        openModal() {
-            this.showModal = true;
-        },
-        closeModal() {
-            this.showModal = false;
-        },
         async createNotice() {
             if (this.newNotice.title && this.newNotice.message) {
                 try {
@@ -374,9 +386,15 @@ export default {
                         created_at: new Date().toISOString(), // Include created_at timestamp
                     };
                     const response = await axios.post('http://localhost:1010/api/notice', payload);
-                    this.notice.push(response.data); // Add the new notice to the notices array
-                    this.newNotice = { title: '', message: '' }; // Clear the input fields
-                    this.closeModal(); // Close the modal
+                    
+                    // Add the new notice to the beginning of the notices array
+                    this.notice.unshift(response.data);
+                    
+                    // Clear the input fields
+                    this.newNotice = { title: '', message: '' };
+                    
+                    // Show success message or feedback
+                    alert('Notis skapad!');
                 } catch (error) {
                     console.error('Error creating notice:', error);
                 }
