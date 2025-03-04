@@ -69,8 +69,9 @@ const schedualSchema = mongoose.Schema({
     type: "string",
     required: true
   },
-  class: {
-    type: "string",
+  group: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Group',
     required: true
   },
   lecture: {
@@ -405,18 +406,17 @@ app.delete("/api/groups/:id", async (req, res) => {
 // Schedual API
 app.get("/api/schema/:day/:groupId", async (req, res) => {
   try {
-    const group = await GroupModel.findById(req.params.groupId);
-    if (!group) {
-      console.log('Group not found:', req.params.groupId);
-      return res.status(404).json({ message: "Group not found" });
-    }
-
-    console.log('Found group:', group.name);
-    const schedule = await SchedualModel.find({ 
-      day: req.params.day.toLowerCase(),
-      class: group.name
+    // Add logging to debug the incoming request
+    console.log('Fetching schedule with params:', {
+      day: req.params.day,
+      groupId: req.params.groupId
     });
 
+    const schedule = await SchedualModel.find({ 
+      day: req.params.day.toLowerCase(),
+      group: req.params.groupId
+    }).populate('group');  // Add this to populate group details
+    
     console.log('Found schedule:', schedule);
     res.json(schedule);
   } catch (error) {

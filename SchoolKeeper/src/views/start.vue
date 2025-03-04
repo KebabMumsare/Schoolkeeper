@@ -1068,6 +1068,10 @@ export default {
             }
 
             try {
+                // Add debug logging
+                console.log('Current user:', this.currentUser);
+                console.log('User groups:', this.currentUser.groups);
+
                 // Check if user has groups
                 if (!this.currentUser.groups || !this.currentUser.groups.length) {
                     console.log('No groups found for user:', this.currentUser);
@@ -1075,14 +1079,16 @@ export default {
                 }
 
                 const schedules = [];
-                console.log('Fetching schedules for groups:', this.currentUser.groups);
-
+                
                 // Fetch schedules for each group the user belongs to
                 for (const group of this.currentUser.groups) {
                     try {
+                        console.log(`Fetching schedule for group ${group} on ${day}`);
                         const response = await axios.get(
                             `http://localhost:1010/api/schema/${day}/${group}`
                         );
+                        console.log('Response data:', response.data);
+                        
                         if (response.data && response.data.length > 0) {
                             schedules.push(...response.data);
                         }
@@ -1093,10 +1099,8 @@ export default {
 
                 // Sort and update the schema
                 if (schedules.length > 0) {
-                    this.schema[i] = this.sortScheduleByTime(schedules.map(item => ({
-                        ...item,
-                        time: item.time.split(' - ')[0],
-                    })));
+                    this.schema[i] = this.sortScheduleByTime(schedules);
+                    console.log(`Updated schema for day ${day}:`, this.schema[i]);
                 }
             } catch (error) {
                 console.error(`Error fetching ${day} schedule:`, error);
