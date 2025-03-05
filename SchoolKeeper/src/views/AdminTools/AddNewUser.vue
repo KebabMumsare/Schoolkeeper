@@ -132,6 +132,12 @@
 </template>
 
 <style scoped>
+/* Global Transition Variables */
+:root {
+  --transition-smooth: all 0.3s ease-out;
+  --shadow-hover: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
 .wraper {
   display: flex;
   width: 100vw;
@@ -190,11 +196,14 @@
   border-radius: 4px;
   border: 1px solid #ddd;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: var(--transition-smooth);
 }
 
 .user-item:hover {
   background-color: #f0f0f0;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+  border-color: #4fc0e5;
 }
 
 /* Main Content Area Styles */
@@ -264,11 +273,21 @@
   font-weight: bold;
   color: #fff;
   width: 100%;
-  transition: background-color 0.2s;
+  transition: var(--transition-smooth);
+  position: relative;
+  overflow: hidden;
 }
 
 .create-button:hover {
   background-color: #216e87;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+}
+
+.create-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.1s ease;
 }
 
 .back-button {
@@ -279,11 +298,19 @@
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
-  transition: background-color 0.2s;
+  transition: var(--transition-smooth);
 }
 
 .back-button:hover {
   background-color: #1d5d73;
+  transform: translateX(-2px);
+  box-shadow: var(--shadow-hover);
+}
+
+.back-button:active {
+  transform: translateX(0);
+  box-shadow: none;
+  transition: all 0.1s ease;
 }
 
 /* Modal Styles */
@@ -334,6 +361,14 @@
   border: 1px solid #ddd;
   border-radius: 5px;
   font-size: 1rem;
+  transition: var(--transition-smooth);
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: #4fc0e5;
+  box-shadow: 0 0 0 2px rgba(79, 192, 229, 0.2);
+  outline: none;
 }
 
 .form-group small {
@@ -349,6 +384,12 @@
   padding: 1rem;
   margin-bottom: 1rem;
   background-color: #f9f9f9;
+  transition: var(--transition-smooth);
+}
+
+.emergency-contact:hover {
+  border-color: #4fc0e5;
+  box-shadow: 0 0 0 1px rgba(79, 192, 229, 0.2);
 }
 
 .emergency-contact h4 {
@@ -371,11 +412,19 @@
   border-radius: 0.5rem;
   font-size: 1rem;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: var(--transition-smooth);
 }
 
 .cancel-button:hover {
   background-color: #e0e0e0;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+}
+
+.cancel-button:active {
+  transform: translateY(0);
+  box-shadow: none;
+  transition: all 0.1s ease;
 }
 </style>
 
@@ -488,6 +537,5 @@ export default {
   }
 };
 </script>
-
 
 
