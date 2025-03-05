@@ -4,9 +4,9 @@
         <div class="components">
             <div class="components-header">
                 <button @click="goBack" class="back-button">
-                    Back
+                    Tillbaka
                 </button>
-                <h2>Groups</h2>
+                <h2>Grupper</h2>
             </div>
 
             <!-- Search and List in Sidebar -->
@@ -14,7 +14,7 @@
                 <input 
                     type="text" 
                     v-model="searchQuery" 
-                    placeholder="Search Groups..." 
+                    placeholder="Sök grupper..." 
                     class="search-bar" 
                 />
                 <div class="group-list">
@@ -25,43 +25,39 @@
                         @click="selectGroup(group)"
                     >
                         <div class="group-info">
-                            <strong>Name:</strong> {{ group.name }} <br />
-
-                            <strong>Type:</strong> {{ group.type }}
+                            <strong>Namn:</strong> {{ group.name }} <br />
+                            <strong>Typ:</strong> {{ group.type }}
                         </div>
                     </div>
                 </div>
-
-
-
             </div>
 
             <div class="button-wrapper">
-                <button @click="openModal" class="create-button">Create New Group</button>
+                <button @click="openModal" class="create-button">Skapa ny grupp</button>
             </div>
         </div>
 
         <!-- Main Content Area -->
         <div class="main-container">
             <div class="main-header">
-                <h2>Group Details</h2>
+                <h2>Gruppdetaljer</h2>
             </div>
             <div class="main-content">
                 <div class="info-container">
                     <div class="group-details-box">
-                        <h3>Group Information</h3>
+                        <h3>Gruppinformation</h3>
                         <div class="details-content">
-                            <p><strong>Name:</strong> {{ selectedGroup?.name || 'No group selected' }}</p>
-                            <p><strong>Type:</strong> {{ selectedGroup?.type || 'N/A' }}</p>
-                            <p><strong>Teacher:</strong> {{ selectedGroup?.teacher || 'N/A' }}</p>
-                            <p><strong>Created:</strong> {{ selectedGroup?.createdAt || 'N/A' }}</p>
+                            <p><strong>Namn:</strong> {{ selectedGroup?.name || 'Ingen grupp vald' }}</p>
+                            <p><strong>Typ:</strong> {{ selectedGroup?.type || 'Ej tillgänglig' }}</p>
+                            <p><strong>Lärare:</strong> {{ selectedGroup?.teacher || 'Ej tillgänglig' }}</p>
+                            <p><strong>Skapad:</strong> {{ selectedGroup?.createdAt || 'Ej tillgänglig' }}</p>
                         </div>
                     </div>
                     <div class="members-box">
                         <div class="members-header">
-                            <h3>Group Members</h3>
+                            <h3>Gruppmedlemmar</h3>
                             <button v-if="selectedGroup" @click="openAddMemberModal" class="add-member-button">
-                                Add Member
+                                Lägg till medlem
                             </button>
                         </div>
                         <div class="members-list">
@@ -70,9 +66,7 @@
                                     {{ member.name }}
                                 </div>
                             </div>
-
-                            <p v-else class="no-members">No members in this group</p>
-
+                            <p v-else class="no-members">Inga medlemmar i denna grupp</p>
                         </div>
                     </div>
                 </div>
@@ -83,19 +77,19 @@
     <!-- Modal -->
     <div v-if="showModal" class="modal">
         <div class="modal-content">
-            <h3>Create Group</h3>
+            <h3>Skapa grupp</h3>
             <form @submit.prevent="createGroup">
-                <input v-model="newGroup.name" placeholder="Group Name" required />
+                <input v-model="newGroup.name" placeholder="Gruppnamn" required />
                 <select v-model="newGroup.type" required>
-                    <option value="">Group Type</option>
-                    <option value="class">Class</option>
-                    <option value="specialization">Specialization</option>
-                    <option value="individual">Individual</option>
+                    <option value="">Välj grupptyp</option>
+                    <option value="class">Klass</option>
+                    <option value="specialization">Specialisering</option>
+                    <option value="individual">Individuell</option>
                     <option value="extra">Extra</option>
                 </select>
                 <div class="modal-buttons">
-                    <button type="submit" class="create-button">Create Group</button>
-                    <button @click="closeModal" class="cancel-button">Cancel</button>
+                    <button type="submit" class="create-button">Skapa grupp</button>
+                    <button @click="closeModal" class="cancel-button">Avbryt</button>
                 </div>
             </form>
         </div>
@@ -104,11 +98,11 @@
     <!-- Add Member Modal -->
     <div v-if="showAddMemberModal" class="modal">
         <div class="modal-content">
-            <h3>Add Member to Group</h3>
+            <h3>Lägg till medlem i grupp</h3>
             <div class="search-container">
                 <input 
                     v-model="memberSearchQuery" 
-                    placeholder="Search users..." 
+                    placeholder="Sök användare..." 
                     class="search-bar" 
                 />
             </div>
@@ -123,10 +117,10 @@
                         {{ user.name }}
                     </div>
                 </div>
-                <p v-else class="no-users">No users found</p>
+                <p v-else class="no-users">Inga användare hittades</p>
             </div>
             <div class="modal-buttons">
-                <button @click="closeAddMemberModal" class="cancel-button">Close</button>
+                <button @click="closeAddMemberModal" class="cancel-button">Stäng</button>
             </div>
         </div>
     </div>
@@ -519,7 +513,7 @@ export default {
         },
         async fetchGroupMembers(groupId) {
             try {
-                const response = await axios.get(`http://localhost:1010/api/users/${groupId}`);
+                const response = await axios.get(`http://localhost:1010/api/users/group/${groupId}`);
                 this.selectedGroupMembers = response.data;
                 console.log(this.selectedGroupMembers);
             } catch (error) {

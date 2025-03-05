@@ -10,14 +10,42 @@
             <h4>Mina Lektioner</h4>
             <div class="teacher-lectures-container">
                 <div v-if="teacherLectures.length > 0" class="teacher-lectures-list">
-                    <div v-for="(lecture, index) in teacherLectures" :key="index" class="teacher-lecture-item"
-                         @click="openAttendanceModal(lecture)">
+                    <div v-for="(lecture, index) in teacherLectures" :key="index" 
+                         class="teacher-lecture-item"
+                         :class="{
+                             'status-current': lecture.locationStatus === 'current',
+                             'status-changed': lecture.locationStatus === 'change',
+                             'status-custom': lecture.locationStatus === 'custom',
+                             'status-canceled': lecture.locationStatus === 'canceled'
+                         }">
                         <div class="teacher-lecture-day">{{ getDayName(lecture.day) }}</div>
                         <div class="teacher-lecture-time">{{ lecture.time }}</div>
                         <div class="teacher-lecture-name">{{ lecture.lecture }}</div>
                         <div class="teacher-lecture-group">{{ lecture.group }}</div>
+                        <div class="teacher-lecture-location">
+                            <select v-model="lecture.locationStatus" class="location-select" @click.stop @change="handleLocationChange(lecture)">
+                                <option value="current">Nuvarande sal</option>
+                                <option value="change">Ändra sal</option>
+                                <option value="custom">Valfri plats</option>
+                                <option value="canceled">Inställd</option>
+                            </select>
+                            
+                            <!--KOLLA HÄR JESPER-->
+                            <select 
+                                v-if="lecture.locationStatus === 'change'" 
+                                v-model="lecture.newRoom" 
+                                class="room-select"
+                                @click.stop
+                                @change="saveLocationChange(lecture)"
+                            >
+                                <option value="" disabled selected>Välj sal</option>
+                                <option v-for="room in availableRooms" :key="room.id" :value="room.id">
+                                    {{ room.name }}
+                                </option>
+                            </select>
+                        </div>
                         <div class="teacher-lecture-actions">
-                            <span class="attendance-icon">📋</span>
+                            <span class="attendance-icon" @click.stop="openAttendanceModal(lecture)">📋</span>
                         </div>
                     </div>
                 </div>
@@ -154,8 +182,11 @@
     box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
     background-color: #f8f9fa;
     padding: 0.75rem;
-    max-width: 1200px;
-    margin-top: 50px;
+    max-width: 2000px;
+    width: 95%;
+    margin: 100px auto 0 auto;
+    position: relative;
+    z-index: 1;
 }
 
 .schedule-layout {
@@ -386,36 +417,34 @@ button {
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
-    overflow: hidden;
+    z-index: 200;
+    padding-top: 60px;
+    box-sizing: border-box;
 }
 
 .attendance-modal-content {
     background-color: #fff;
     border-radius: 8px;
-    width: 95%;
+    width: 80%;
     max-width: 800px;
     max-height: 85vh;
-    display: flex;
-    flex-direction: column;
+    overflow-y: auto;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    margin: auto;
     position: relative;
-    overflow: hidden;
+    margin-top: 20px;
 }
 
 .attendance-modal-header {
+    position: sticky;
+    top: 0;
+    background-color: #fff;
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+    border-radius: 8px 8px 0 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 20px;
-    background-color: #6597c9;
-    color: white;
-    border-radius: 8px 8px 0 0;
-    position: sticky;
-    top: 0;
     z-index: 10;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .attendance-modal-header h3 {
@@ -480,11 +509,16 @@ button {
 }
 
 .attendance-modal-footer {
-    padding: 15px 20px;
+    position: sticky;
+    bottom: 0;
+    background-color: #fff;
+    padding: 15px;
+    border-top: 1px solid #ddd;
+    border-radius: 0 0 8px 8px;
     display: flex;
     justify-content: flex-end;
     gap: 10px;
-    border-top: 1px solid #eee;
+    z-index: 10;
 }
 
 .save-button {
@@ -550,7 +584,7 @@ body.modal-open {
     border-radius: 8px;
     padding: 15px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    width: 95%;
+    width: 98%;
     margin-left: auto;
     margin-right: auto;
 }
@@ -563,34 +597,25 @@ body.modal-open {
 }
 
 .teacher-lectures-container {
-    max-height: 70vh;
+    max-height: 75vh;
     overflow-y: auto;
     border: 1px solid #eee;
     border-radius: 4px;
+    padding-bottom: 40px;
 }
 
 .teacher-lecture-item {
     display: grid;
-    grid-template-columns: 120px 120px 1fr 120px 50px;
+    grid-template-columns: minmax(80px, 120px) minmax(70px, 100px) minmax(150px, 1fr) minmax(80px, 120px) minmax(150px, 180px) minmax(40px, 60px);
     align-items: center;
     padding: 15px 20px;
     border-bottom: 1px solid #eee;
     transition: background-color 0.2s;
-    cursor: pointer;
     gap: 15px;
 }
 
 .teacher-lecture-item:hover {
     background-color: #f5f9ff;
-}
-
-.teacher-lecture-day, 
-.teacher-lecture-time,
-.teacher-lecture-name,
-.teacher-lecture-group {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .teacher-lecture-day {
@@ -611,6 +636,36 @@ body.modal-open {
 .teacher-lecture-group {
     color: #666;
     font-size: 1rem;
+}
+
+.teacher-lecture-location {
+    position: relative;
+    z-index: 10;
+}
+
+.location-select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #fff;
+    font-size: 0.9rem;
+}
+
+.room-select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #fff;
+    font-size: 0.9rem;
+    margin-top: 5px;
+}
+
+/* Style for the room select when a room is selected */
+.status-changed .room-select {
+    border-color: #FFEB3B;
+    background-color: rgba(255, 235, 59, 0.1);
 }
 
 .teacher-lecture-actions {
@@ -703,6 +758,243 @@ body.modal-open {
     height: 20px;
     border-radius: 4px;
 }
+
+/* Style for canceled lectures */
+.teacher-lecture-item.canceled {
+    opacity: 0.6;
+    text-decoration: line-through;
+    background-color: rgba(244, 67, 54, 0.05);
+}
+
+/* Style for custom location lectures */
+.teacher-lecture-item.custom-location {
+    background-color: rgba(33, 150, 243, 0.05);
+}
+
+.room-selector-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.room-selector-dialog {
+    background-color: white;
+    border-radius: 8px;
+    padding: 20px;
+    width: 400px;
+    max-width: 90%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.room-selector-dialog h4 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.room-options {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.room-option {
+    padding: 12px;
+    text-align: center;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.room-option:hover {
+    background-color: #e0e0e0;
+}
+
+.room-selector-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* Style for changed room lectures */
+.teacher-lecture-item.changed-room {
+    background-color: rgba(33, 150, 243, 0.05);
+}
+
+.teacher-lecture-item.changed-room .teacher-lecture-location::after {
+    content: "✓";
+    color: #4CAF50;
+    margin-left: 5px;
+}
+
+/* Status colors for lecture locations */
+.teacher-lecture-item.status-current {
+    background-color: #ffffff;
+    border-left: 5px solid transparent;
+}
+
+.teacher-lecture-item.status-changed {
+    background-color: rgba(255, 235, 59, 0.2);
+    border-left: 5px solid #FFEB3B; /* Yellow */
+}
+
+.teacher-lecture-item.status-custom {
+    background-color: rgba(255, 152, 0, 0.2);
+    border-left: 5px solid #FF9800; /* Orange */
+}
+
+.teacher-lecture-item.status-canceled {
+    background-color: rgba(244, 67, 54, 0.2);
+    border-left: 5px solid #F44336; /* Red */
+    text-decoration: line-through;
+    opacity: 0.7;
+}
+
+/* Style the select element based on status */
+.status-changed .location-select {
+    border-color: #FFEB3B;
+}
+
+.status-custom .location-select {
+    border-color: #FF9800;
+}
+
+.status-canceled .location-select {
+    border-color: #F44336;
+}
+
+/* Ensure the navbar has proper z-index */
+:deep(.navbar) {
+    z-index: 100;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+}
+
+/* Add more space to the Container element that holds the "Schema" heading */
+.Container {
+    margin-bottom: 15px;
+}
+
+/* Add media queries for smaller screens */
+@media (max-width: 1200px) {
+    .teacher-lecture-item {
+        grid-template-columns: minmax(80px, 100px) minmax(60px, 80px) minmax(120px, 1fr) minmax(70px, 100px) minmax(120px, 150px) minmax(40px, 50px);
+        padding: 12px 15px;
+        gap: 10px;
+    }
+}
+
+@media (max-width: 992px) {
+    .teacher-lecture-item {
+        grid-template-columns: minmax(70px, 90px) minmax(50px, 70px) minmax(100px, 1fr) minmax(60px, 80px) minmax(100px, 130px) minmax(30px, 40px);
+        padding: 10px 12px;
+        gap: 8px;
+        font-size: 0.9rem;
+    }
+    
+    .room-select {
+        font-size: 0.8rem;
+    }
+    
+    .location-select {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .teacher-lecture-item {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto;
+        gap: 5px;
+        padding: 15px;
+    }
+    
+    .teacher-lecture-day, 
+    .teacher-lecture-time {
+        grid-column: 1;
+        display: inline-block;
+        margin-right: 10px;
+    }
+    
+    .teacher-lecture-name,
+    .teacher-lecture-group {
+        grid-column: 1;
+    }
+    
+    .teacher-lecture-location {
+        grid-column: 1;
+        margin-top: 10px;
+    }
+    
+    .teacher-lecture-actions {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+    }
+    
+    /* Make the student schedule responsive */
+    .schedule-layout {
+        flex-direction: column;
+    }
+    
+    .weekly-schedule {
+        overflow-x: auto;
+    }
+    
+    .schedule-container {
+        min-width: 600px; /* Ensure minimum width for scrolling */
+    }
+}
+
+/* Improve the attendance modal for smaller screens */
+@media (max-width: 768px) {
+    .attendance-modal-content {
+        width: 95%;
+        max-height: 90vh;
+    }
+    
+    .student-attendance-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .attendance-actions {
+        margin-top: 5px;
+        width: 100%;
+    }
+    
+    .lateness-input-container {
+        position: static;
+        margin-top: 5px;
+        transform: none;
+    }
+}
+
+/* Ensure text doesn't overflow in grid cells */
+.teacher-lecture-day, 
+.teacher-lecture-time,
+.teacher-lecture-name,
+.teacher-lecture-group {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Make the room select dropdown responsive */
+.room-select {
+    width: 100%;
+    max-width: 200px;
+}
 </style>
 
 <script>
@@ -735,6 +1027,7 @@ export default {
             selectedLecture: {},
             students: [],
             teacherLectures: [], // New property to store teacher's lectures
+            availableRooms: [], // Initialize as empty array
         };
     },
     computed: {
@@ -775,6 +1068,10 @@ export default {
             }
 
             try {
+                // Add debug logging
+                console.log('Current user:', this.currentUser);
+                console.log('User groups:', this.currentUser.groups);
+
                 // Check if user has groups
                 if (!this.currentUser.groups || !this.currentUser.groups.length) {
                     console.log('No groups found for user:', this.currentUser);
@@ -782,14 +1079,16 @@ export default {
                 }
 
                 const schedules = [];
-                console.log('Fetching schedules for groups:', this.currentUser.groups);
-
+                
                 // Fetch schedules for each group the user belongs to
                 for (const group of this.currentUser.groups) {
                     try {
+                        console.log(`Fetching schedule for group ${group} on ${day}`);
                         const response = await axios.get(
                             `http://localhost:1010/api/schema/${day}/${group}`
                         );
+                        console.log('Response data:', response.data);
+                        
                         if (response.data && response.data.length > 0) {
                             schedules.push(...response.data);
                         }
@@ -800,10 +1099,8 @@ export default {
 
                 // Sort and update the schema
                 if (schedules.length > 0) {
-                    this.schema[i] = this.sortScheduleByTime(schedules.map(item => ({
-                        ...item,
-                        time: item.time.split(' - ')[0],
-                    })));
+                    this.schema[i] = this.sortScheduleByTime(schedules);
+                    console.log(`Updated schema for day ${day}:`, this.schema[i]);
                 }
             } catch (error) {
                 console.error(`Error fetching ${day} schedule:`, error);
@@ -1013,11 +1310,11 @@ export default {
                 
                 // Mock data for testing
                 this.teacherLectures = [
-                    { id: 1, day: 'monday', time: '08:30', lecture: 'Matematik', group: 'TE19A' },
-                    { id: 2, day: 'monday', time: '10:15', lecture: 'Fysik', group: 'NA20B' },
-                    { id: 3, day: 'tuesday', time: '13:00', lecture: 'Matematik', group: 'TE20A' },
-                    { id: 4, day: 'wednesday', time: '08:30', lecture: 'Programmering', group: 'TE19A' },
-                    { id: 5, day: 'friday', time: '14:45', lecture: 'Fysik', group: 'NA19C' },
+                    { id: 1, day: 'monday', time: '08:30', lecture: 'Matematik', group: 'TE19A', locationStatus: 'current', customLocation: '' },
+                    { id: 2, day: 'monday', time: '10:15', lecture: 'Fysik', group: 'NA20B', locationStatus: 'current', customLocation: '' },
+                    { id: 3, day: 'tuesday', time: '13:00', lecture: 'Matematik', group: 'TE20A', locationStatus: 'current', customLocation: '' },
+                    { id: 4, day: 'wednesday', time: '08:30', lecture: 'Programmering', group: 'TE19A', locationStatus: 'current', customLocation: '' },
+                    { id: 5, day: 'friday', time: '14:45', lecture: 'Fysik', group: 'NA19C', locationStatus: 'current', customLocation: '' },
                 ];
             }
         },
@@ -1069,7 +1366,51 @@ export default {
                 // Change back to present
                 student.attendanceStatus = 'present';
             }
-        }
+        },
+        handleLocationChange(lecture) {
+            // No need to show room selector for "change" anymore
+            if (lecture.locationStatus === 'canceled' || lecture.locationStatus === 'custom') {
+                // Save the change immediately
+                this.saveLocationChange(lecture);
+            }
+        },
+        selectRoom(lecture, roomId) {
+            // Set the new room
+            lecture.newRoom = roomId;
+            lecture.locationStatus = 'changed';
+            lecture.showRoomSelector = false;
+            
+            // Save the change
+            this.saveLocationChange(lecture);
+        },
+        cancelRoomChange(lecture) {
+            // Hide the room selector without making changes
+            lecture.showRoomSelector = false;
+        },
+        async saveLocationChange(lecture) {
+            try {
+                // Prepare the data
+                const locationData = {
+                    lectureId: lecture.id,
+                    locationStatus: lecture.locationStatus,
+                    newRoom: lecture.newRoom || '',
+                    customLocation: lecture.customLocation || ''
+                };
+                
+                // Send the data to your API
+                await axios.post('http://localhost:1010/api/update-lecture-location', locationData);
+                
+                // Optional: Show a success message
+                console.log('Location updated successfully');
+            } catch (error) {
+                console.error('Error updating location:', error);
+            }
+        },
+        async fetchRooms() {
+            const response = await axios.get('http://localhost:1010/api/rooms');
+            this.availableRooms = response.data;
+            console.log(this.availableRooms);
+        },
     },
     mounted() {
         for (let i = 0; i < 5; i++) {
@@ -1078,6 +1419,7 @@ export default {
         
         this.updateDateTime();
         this.fetchCourses();
+        this.fetchRooms();
         setInterval(this.updateDateTime, 1000);
         this.fetchTodaySchedule();
         this.fetchTestSchedule();

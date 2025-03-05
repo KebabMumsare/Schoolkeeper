@@ -69,8 +69,9 @@ const schedualSchema = mongoose.Schema({
     type: "string",
     required: true
   },
-  class: {
-    type: "string",
+  group: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Group',
     required: true
   },
   lecture: {
@@ -216,11 +217,39 @@ const CourseSchema = mongoose.Schema({
   },
 });
 const CourseModel = mongoose.model("Course", CourseSchema);
+// Attendance Schema
+const AttendanceSchema = mongoose.Schema({
+  student_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+  },
+  lesson_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Lesson',
+  },
+  date: {
+    type: "string",
+  },
+  status: {
+    type: "string",
+  },
+});
+const AttendanceModel = mongoose.model("Attendance", AttendanceSchema);
+// rooms
+const RoomSchema = mongoose.Schema({
+  name: {
+    type: "string",
+  },
+  capacity: {
+    type: "number",
+  },
+});
+const RoomModel = mongoose.model("Room", RoomSchema);
 
 // Login API
 app.post("/api/login", async (req, res) => {
   try {
-    const user = await UserModel.findOne({ name: req.body.name })
+    const user = await UserModel.findOne({ email: req.body.email })
       .populate("groups")
       .exec();
 
@@ -280,7 +309,7 @@ app.get("/api/users/", async (req, res) => {
     res.sendStatus(500); // Handle server error
   }
 });
-app.get("/api/users/:groupId", async (req, res) => {
+app.get("/api/users/group/:groupId", async (req, res) => {
   try {
     const users = await UserModel.find({ groups: req.params.groupId });
     res.json(users);
@@ -299,6 +328,16 @@ app.post("/api/groups/:groupId/:userId", async (req, res) => {
   } catch (error) {
     console.error("Error adding user to group:", error);
     res.sendStatus(500);
+  }
+});
+app.post("/api/users", async (req, res) => {
+  try {
+    const newUser = new UserModel(req.body);
+    await newUser.save();
+    res.status(201).json(newUser);
+  } catch (error) {
+    console.error("Error creating user:", error);
+    res.status(500).json({ message: "Error creating user", error: error.message });
   }
 });
 // Group API
@@ -367,18 +406,17 @@ app.delete("/api/groups/:id", async (req, res) => {
 // Schedual API
 app.get("/api/schema/:day/:groupId", async (req, res) => {
   try {
-    const group = await GroupModel.findById(req.params.groupId);
-    if (!group) {
-      console.log('Group not found:', req.params.groupId);
-      return res.status(404).json({ message: "Group not found" });
-    }
-
-    console.log('Found group:', group.name);
-    const schedule = await SchedualModel.find({ 
-      day: req.params.day.toLowerCase(),
-      class: group.name
+    // Add logging to debug the incoming request
+    console.log('Fetching schedule with params:', {
+      day: req.params.day,
+      groupId: req.params.groupId
     });
 
+    const schedule = await SchedualModel.find({ 
+      day: req.params.day.toLowerCase(),
+      group: req.params.groupId
+    }).populate('group');  // Add this to populate group details
+    
     console.log('Found schedule:', schedule);
     res.json(schedule);
   } catch (error) {
@@ -654,6 +692,27 @@ app.post("/api/schedule", async (req, res) => {
   } catch (error) {
     console.error('Error creating schedule:', error);
     res.status(500).json({ message: "Error creating schedule", error: error.message });
+  }
+});
+
+// Room API
+app.get("/api/rooms", async (req, res) => {
+  try {
+    const rooms = await RoomModel.find({});
+    res.json(rooms);
+  } catch (error) {
+    console.error('Error fetching rooms:', error);
+    res.status(500).json({ message: "Error fetching rooms", error: error.message });
+  }
+});
+app.post("/api/rooms", async (req, res) => {
+  try {
+    const newRoom = new RoomModel(req.body);
+    await newRoom.save();
+    res.status(201).json(newRoom);
+  } catch (error) {
+    console.error('Error creating room:', error);
+    res.status(500).json({ message: "Error creating room", error: error.message });
   }
 });
 
