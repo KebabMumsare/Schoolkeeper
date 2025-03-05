@@ -50,7 +50,7 @@ const router = createRouter({
      component: IndividualStudyPlan
    },
    {
-    path: '/schedulecreator',
+    path: '/ScheduleCreator',
     name: 'ScheduleCreator',
     component: ScheduleCreator
    },
