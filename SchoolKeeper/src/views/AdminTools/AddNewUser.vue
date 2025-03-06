@@ -63,13 +63,65 @@
     <div class="modal-content">
       <h3>Skapa användare</h3>
       <form @submit.prevent="createUser">
-        <input v-model="newUser.name" placeholder="Namn" required />
-        <select v-model="newUser.access" required>
-          <option value="" disabled>Välj behörighet</option>
-          <option value="Admin">Administratör</option>
-          <option value="Teacher">Lärare</option>
-          <option value="Student">Elev</option>
-        </select>
+        <div class="form-group">
+          <label for="name">Namn</label>
+          <input id="name" v-model="newUser.name" placeholder="Namn" required />
+        </div>
+        
+        <div class="form-group">
+          <label for="email">E-post</label>
+          <input id="email" type="email" v-model="newUser.email" placeholder="E-post" />
+          <small>Lämna tomt för automatiskt genererad e-post</small>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Lösenord</label>
+          <input id="password" type="password" v-model="newUser.password" placeholder="Lösenord" required />
+        </div>
+
+        <div class="form-group">
+          <label for="birthday">Födelsedatum</label>
+          <input id="birthday" type="date" v-model="newUser.birthday" placeholder="Födelsedatum" />
+        </div>
+
+        <div class="form-group">
+          <label for="phone">Telefonnummer</label>
+          <input id="phone" type="tel" v-model="newUser.phone" placeholder="Telefonnummer" />
+        </div>
+
+        <div class="form-group">
+          <label for="access">Behörighet</label>
+          <select id="access" v-model="newUser.access" required>
+            <option value="" disabled>Välj behörighet</option>
+            <option value="Admin">Administratör</option>
+            <option value="Teacher">Lärare</option>
+            <option value="Student">Elev</option>
+            <option value="Parent">Förälder/Vårdnadshavare</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="courses">Kurser</label>
+          <input id="courses" v-model="newUser.courses" placeholder="Ex: Matematik, Svenska, Engelska" />
+          <small>Separera kurser med kommatecken</small>
+        </div>
+
+        <div class="emergency-contact">
+          <h4>Kontakt vid nödfall</h4>
+          <div class="form-group">
+            <label for="emergencyName">Namn</label>
+            <input id="emergencyName" v-model="newUser.emergencyContact.name" placeholder="Namn" />
+          </div>
+          <div class="form-group">
+            <label for="emergencyPhone">Telefon</label>
+            <input id="emergencyPhone" type="tel" v-model="newUser.emergencyContact.phone" placeholder="Telefonnummer" />
+          </div>
+          <div class="form-group">
+            <label for="emergencyRelation">Relation</label>
+            <input id="emergencyRelation" v-model="newUser.emergencyContact.relation" placeholder="Relation" />
+          </div>
+        </div>
+
         <div class="modal-buttons">
           <button type="submit" class="create-button">Skapa användare</button>
           <button @click="closeModal" class="cancel-button">Avbryt</button>
@@ -80,6 +132,12 @@
 </template>
 
 <style scoped>
+/* Global Transition Variables */
+:root {
+  --transition-smooth: all 0.3s ease-out;
+  --shadow-hover: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
 .wraper {
   display: flex;
   width: 100vw;
@@ -138,11 +196,14 @@
   border-radius: 4px;
   border: 1px solid #ddd;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: var(--transition-smooth);
 }
 
 .user-item:hover {
   background-color: #f0f0f0;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+  border-color: #4fc0e5;
 }
 
 /* Main Content Area Styles */
@@ -212,11 +273,21 @@
   font-weight: bold;
   color: #fff;
   width: 100%;
-  transition: background-color 0.2s;
+  transition: var(--transition-smooth);
+  position: relative;
+  overflow: hidden;
 }
 
 .create-button:hover {
   background-color: #216e87;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+}
+
+.create-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.1s ease;
 }
 
 .back-button {
@@ -227,11 +298,19 @@
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
-  transition: background-color 0.2s;
+  transition: var(--transition-smooth);
 }
 
 .back-button:hover {
   background-color: #1d5d73;
+  transform: translateX(-2px);
+  box-shadow: var(--shadow-hover);
+}
+
+.back-button:active {
+  transform: translateX(0);
+  box-shadow: none;
+  transition: all 0.1s ease;
 }
 
 /* Modal Styles */
@@ -255,6 +334,8 @@
   width: 90%;
   max-width: 500px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  max-height: 80vh;
+  overflow-y: auto;
 }
 
 .modal-content h3 {
@@ -262,14 +343,59 @@
   margin-top: 0;
 }
 
-.modal-content input,
-.modal-content select {
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-weight: bold;
+  color: #216e87;
+}
+
+.form-group input,
+.form-group select {
   width: 100%;
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 5px;
-  margin-bottom: 1rem;
   font-size: 1rem;
+  transition: var(--transition-smooth);
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: #4fc0e5;
+  box-shadow: 0 0 0 2px rgba(79, 192, 229, 0.2);
+  outline: none;
+}
+
+.form-group small {
+  display: block;
+  color: #777;
+  font-size: 0.8rem;
+  margin-top: 0.2rem;
+}
+
+.emergency-contact {
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background-color: #f9f9f9;
+  transition: var(--transition-smooth);
+}
+
+.emergency-contact:hover {
+  border-color: #4fc0e5;
+  box-shadow: 0 0 0 1px rgba(79, 192, 229, 0.2);
+}
+
+.emergency-contact h4 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #216e87;
 }
 
 .modal-buttons {
@@ -286,11 +412,19 @@
   border-radius: 0.5rem;
   font-size: 1rem;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: var(--transition-smooth);
 }
 
 .cancel-button:hover {
   background-color: #e0e0e0;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+}
+
+.cancel-button:active {
+  transform: translateY(0);
+  box-shadow: none;
+  transition: all 0.1s ease;
 }
 </style>
 
@@ -309,7 +443,16 @@ export default {
       newUser: {
         name: '',
         email: '',
-        access: ''
+        password: '',
+        birthday: '',
+        phone: '',
+        access: '',
+        courses: '',
+        emergencyContact: {
+          name: '',
+          phone: '',
+          relation: ''
+        }
       },
       selectedUser: null
     };
@@ -335,19 +478,43 @@ export default {
     },
     closeModal() {
       this.showModal = false;
-      this.newUser = { name: '', email: '', access: '' };
+      this.newUser = { 
+        name: '', 
+        email: '', 
+        password: '',
+        birthday: '',
+        phone: '',
+        access: '',
+        courses: '',
+        emergencyContact: {
+          name: '',
+          phone: '',
+          relation: ''
+        }
+      };
     },
     selectUser(user) {
       this.selectedUser = user;
     },
     async createUser() {
-      if (this.newUser.name && this.newUser.access) {
+      if (this.newUser.name && this.newUser.access && this.newUser.password) {
         try {
+          // Process courses into array if provided
+          const coursesArray = this.newUser.courses 
+            ? this.newUser.courses.split(',').map(course => course.trim()) 
+            : [];
+          
           const payload = {
             name: this.newUser.name,
-            email: this.createEmail(this.newUser.name),
+            email: this.newUser.email || this.createEmail(this.newUser.name),
+            password: this.newUser.password,
+            birthday: this.newUser.birthday,
+            phone: this.newUser.phone,
             access: this.newUser.access,
+            courses: coursesArray,
+            emergencyContact: this.newUser.emergencyContact
           };
+          
           const response = await axios.post('http://localhost:1010/api/users', payload);
           this.users.push(response.data);
           this.closeModal();
@@ -370,6 +537,5 @@ export default {
   }
 };
 </script>
-
 
 

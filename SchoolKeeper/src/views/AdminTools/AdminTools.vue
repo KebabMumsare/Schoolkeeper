@@ -88,8 +88,10 @@
   --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --shadow-hover: 0 8px 15px rgba(67, 97, 238, 0.15);
   --border-radius: 12px;
   --transition-speed: 0.3s;
+  --transition-smooth: all 0.3s ease-out;
 }
 
 .admin-dashboard {
@@ -126,7 +128,7 @@
 
 .admintools-card {
   background-color: var(--bg-white);
-  border-radius: var(--border-radius);
+  border-radius: 16px;
   box-shadow: var(--shadow-md);
   padding: 1.5rem;
   text-decoration: none;
@@ -135,19 +137,15 @@
   align-items: center;
   position: relative;
   overflow: hidden;
-  transition: all var(--transition-speed) ease;
+  transition: var(--transition-smooth);
   height: 120px;
   border-left: 5px solid var(--primary-color);
 }
 
+/* Adding subtle hover effect */
 .admintools-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-  background-color: var(--primary-light);
-}
-
-.admintools-card:before {
-  content: none;
+  background-color: #f9faff;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.12);
 }
 
 .card-icon {
@@ -162,6 +160,12 @@
   font-size: 1.5rem;
   margin-right: 1rem;
   flex-shrink: 0;
+  transition: var(--transition-smooth);
+}
+
+/* Adding subtle icon hover effect */
+.admintools-card:hover .card-icon {
+  background-color: #e0e7ff;
 }
 
 .card-content {
@@ -173,6 +177,12 @@
   font-size: 1.1rem;
   font-weight: 600;
   color: var(--text-dark);
+  transition: var(--transition-smooth);
+}
+
+/* Adding subtle heading hover effect */
+.admintools-card:hover .card-content h3 {
+  color: #000000;
 }
 
 .card-content p {
@@ -180,17 +190,18 @@
   color: var(--text-medium);
   font-size: 0.9rem;
   line-height: 1.5;
+  transition: var(--transition-smooth);
 }
 
 .card-arrow {
   color: var(--text-light);
   font-size: 1rem;
-  transition: transform var(--transition-speed) ease;
+  transition: var(--transition-smooth);
 }
 
+/* Adding subtle arrow hover effect */
 .admintools-card:hover .card-arrow {
-  transform: translateX(5px);
-  color: var(--primary-color);
+  color: #4361ee;
 }
 
 @media (max-width: 768px) {
