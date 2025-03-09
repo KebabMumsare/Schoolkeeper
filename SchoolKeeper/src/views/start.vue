@@ -2,7 +2,7 @@
     <NavBar site="start" :currentUser="currentUser" />
     <main class="Schedule">
         <div class="Container">
-            <h3>Schema</h3>
+            <h3 class="schedule-title">Schema</h3>
         </div>
         
         <!-- Teacher's Lectures Section (only visible to teachers) -->
@@ -55,47 +55,97 @@
             </div>
         </div>
         
-        <!-- Regular schedule layout (only visible to non-teachers) -->
-        <div v-if="!isTeacher" class="schedule-layout">
-            <div class="today-schedule">
-                <h4>Dagens schema ({{ resolveDay(currentDayIndex) }})</h4>
-                <div class="schedule-timeline">
-                    <div v-for="(lecture, index) in todaySchedule" :key="index" class="lecture-item">
-                        <div class="lecture-time">{{ lecture.time }}</div>
-                        <div class="lecture-name" 
-                             :class="{ 'current-lecture': isCurrentLecture(lecture) }" 
-                             @click="hasAttendancePermission ? openAttendanceModal(lecture) : null"
-                             :style="{ cursor: hasAttendancePermission ? 'pointer' : 'default' }">
-                            {{ lecture.lecture }}
-                            <span v-if="hasAttendancePermission" class="attendance-icon">📋</span>
+        <!-- Replace the regular schedule layout with a time-grid layout -->
+        <div v-if="!isTeacher" class="enhanced-schedule-layout">
+            <!-- Day selector -->
+            <div class="days-header">
+                <div 
+                    v-for="(day, i) in ['Måndag', 'Tisdag', 'Onsdag', 'Torsdag', 'Fredag']" 
+                    :key="i"
+                    class="day-selector" 
+                    :class="{ 'selected-day': isCurrentDay(i) || testDay === i.toString() }"
+                    @click="testDay = i.toString(); updateSchedules()"
+                >
+                    {{ day }}
+                </div>
+            </div>
+            
+            <!-- Current day schedule -->
+            <div class="schedule-view-container">
+                <!-- Time grid background -->
+                <div class="time-grid-background">
+                    <div class="time-column">
+                        <div v-for="marker in timeMarkers" :key="marker.value" class="time-cell"
+                             :style="{ height: (60 * pixelsPerMinute) + 'px' }">
+                            {{ marker.label }}
+                        </div>
+                    </div>
+                    <div class="grid-lines">
+                        <div v-for="marker in timeMarkers" :key="marker.value" class="grid-line"
+                             :style="{ top: marker.position + 'px' }">
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="weekly-schedule">
-                <div class="schedule-container">
-                    <div class="column" v-for="(day, i) in schema" :key="i">
-                        <div class="day-header" :class="{ 'current-day': isCurrentDay(i) }">
-                            {{ resolveDay(i) }}
+                
+                <!-- No lectures message -->
+                <div v-if="todaySchedule.length === 0" class="no-lectures-message">
+                    Inga lektioner idag
+                </div>
+                
+                <!-- Lectures for the day in a visually appealing list format -->
+                <div v-else class="day-schedule-list">
+                    <div v-for="(lecture, index) in todaySchedule" :key="lecture.id" 
+                         class="schedule-lecture-item"
+                         :class="{ 
+                            'current-lecture': isCurrentLecture(lecture),
+                            'first-lecture': index === 0
+                         }"
+                         :style="positionLectureByTime(lecture)"
+                         @click="hasAttendancePermission ? openAttendanceModal(lecture) : null">
+                        <div class="lecture-time">
+                            {{ lecture.time.includes('-') ? lecture.time : lecture.time + (lecture.endTime ? ' - ' + lecture.endTime : '') }}
                         </div>
-                        <div class="time-slot" v-for="lecture in day" :key="lecture.id"
-                             :class="{ 'current-lecture': isCurrentDay(i) && isCurrentLecture(lecture) }"
-                             @click="hasAttendancePermission ? openAttendanceModal(lecture) : null"
-                             :style="{ cursor: hasAttendancePermission ? 'pointer' : 'default' }">
-                            {{ lecture.time }} <br> 
-                            <span>
-                                 {{ lecture.lecture }}
-                                 <span v-if="hasAttendancePermission" class="attendance-icon small">📋</span>
-                            </span>
+                        <div class="lecture-content">
+                            <div class="lecture-title" :title="lecture.lecture">{{ lecture.lecture }}</div>
+                            <div class="lecture-location" v-if="lecture.room" :title="lecture.room">{{ lecture.room }}</div>
+                        </div>
+                        <span v-if="hasAttendancePermission" class="attendance-button">📋</span>
+                    </div>
+                </div>
+                
+                <!-- Current time indicator -->
+                <div class="current-time-indicator" :style="{ top: currentTimeIndicatorPosition + 'px' }"
+                     v-if="isCurrentDay(currentDayIndex) && testDay === ''">
+                    <div class="indicator-dot"></div>
+                    <div class="indicator-line"></div>
+                </div>
+            </div>
+            
+            <!-- Weekly overview -->
+            <div class="weekly-overview">
+                <h4>Veckoöversikt</h4>
+                <div class="weekly-grid">
+                    <div class="day-column" v-for="(day, i) in schema" :key="i"
+                         :class="{ 'current-day-column': isCurrentDay(i) || testDay === i.toString() }">
+                        <div class="day-title">{{ resolveDay(i) }}</div>
+                        <div class="day-lectures">
+                            <div v-if="day.length === 0" class="no-mini-lectures">Inga lektioner</div>
+                            <div v-for="lecture in day" :key="lecture.id" 
+                                 class="mini-lecture"
+                                 :class="{ 'current-mini-lecture': isCurrentDay(i) && isCurrentLecture(lecture) }"
+                                 @click="hasAttendancePermission ? openAttendanceModal(lecture) : null">
+                                <span class="mini-time">{{ lecture.time }}</span>
+                                <span class="mini-title">{{ lecture.lecture }}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         
-        <!-- Test controls (only visible to non-teachers) -->
+        <!-- Replace the test controls with simpler design integrated into the layout -->
         <div v-if="!isTeacher" class="test-controls">
-            <label for="test-day">Dag:</label>
+            <label for="test-day">Visa schema för annan dag:</label>
             <select id="test-day" v-model="testDay" @change="updateSchedules">
                 <option value="">Idag</option>
                 <option v-for="(day, index) in ['Måndag', 'Tisdag', 'Onsdag', 'Torsdag', 'Fredag']" :key="index" :value="index">
@@ -295,12 +345,25 @@ button {
 }
 
 .test-controls {
-    margin-top: 1rem;
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0.5rem;
+}
+
+.test-controls label {
+    margin-right: 0.5rem;
     font-size: 0.9rem;
+    color: #555;
 }
 
 .test-controls select {
-    margin-left: 0.5rem;
+    padding: 0.3rem 0.5rem;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    background-color: white;
+    font-size: 0.9rem;
 }
 
 .schedule-timeline {
@@ -883,6 +946,29 @@ body.modal-open {
 /* Add more space to the Container element that holds the "Schema" heading */
 .Container {
     margin-bottom: 15px;
+    padding: 0 10px;
+}
+
+/* Enhance the "Schema" heading */
+.schedule-title {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #216e87;
+    margin: 10px 0 5px 0;
+    position: relative;
+    display: inline-block;
+    padding-bottom: 8px;
+}
+
+.schedule-title::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 4px;
+    width: 60px;
+    background-color: #4fc0e5;
+    border-radius: 2px;
 }
 
 /* Add media queries for smaller screens */
@@ -995,6 +1081,356 @@ body.modal-open {
     width: 100%;
     max-width: 200px;
 }
+
+/* Add these styles for the enhanced schedule layout */
+.enhanced-schedule-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    background-color: white;
+    border-radius: 12px;
+    padding: 0.75rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.days-header {
+    display: flex;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.day-selector {
+    flex: 1;
+    text-align: center;
+    padding: 8px;
+    color: #555;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    border-bottom: 3px solid transparent;
+    user-select: none;
+    z-index: 5;
+}
+
+.day-selector:hover {
+    background-color: #edf2f7;
+    color: #216e87;
+}
+
+.selected-day {
+    background-color: #ffffff;
+    color: #216e87;
+    font-weight: 600;
+    border-bottom: 3px solid #216e87;
+}
+
+.schedule-view-container {
+    position: relative;
+    border-radius: 8px;
+    border: 1px solid #edf2f7;
+    background-color: #ffffff;
+    overflow: hidden;
+    min-height: 360px;
+    max-height: 450px;
+}
+
+.time-grid-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    display: flex;
+}
+
+.time-column {
+    width: 50px;
+    background-color: #f8f9fa;
+    border-right: 1px solid #edf2f7;
+    flex-shrink: 0;
+}
+
+.time-cell {
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    color: #888;
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+}
+
+.grid-lines {
+    flex: 1;
+    position: relative;
+}
+
+.grid-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background-color: rgba(0,0,0,0.05);
+}
+
+.grid-line:nth-child(1) { top: 45px; }
+.grid-line:nth-child(2) { top: 90px; }
+.grid-line:nth-child(3) { top: 135px; }
+.grid-line:nth-child(4) { top: 180px; }
+.grid-line:nth-child(5) { top: 225px; }
+.grid-line:nth-child(6) { top: 270px; }
+.grid-line:nth-child(7) { top: 315px; }
+.grid-line:nth-child(8) { top: 360px; }
+.grid-line:nth-child(9) { top: 405px; }
+.grid-line:nth-child(10) { top: 450px; }
+
+.day-schedule-list {
+    position: relative;
+    z-index: 2;
+    height: 450px; /* Fixed height to match the time grid */
+    overflow-y: auto;
+    padding: 0 15px 15px 65px;
+}
+
+.schedule-lecture-item {
+    position: absolute; /* Use absolute positioning to place at exact time */
+    left: 65px;
+    right: 15px;
+    padding: 8px 10px;
+    background-color: rgba(79, 192, 229, 0.1);
+    border-left: 4px solid #4fc0e5;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    min-height: 40px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row; /* Change from column to row */
+    align-items: flex-start; /* Align items at the start */
+    gap: 8px; /* Add spacing between elements */
+}
+
+.schedule-lecture-item:hover {
+    transform: translateX(3px);
+    background-color: rgba(79, 192, 229, 0.2);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 3; /* Ensure hover item is above others */
+}
+
+.schedule-lecture-item.current-lecture {
+    background-color: rgba(79, 192, 229, 0.3);
+    border-left: 4px solid #216e87;
+    box-shadow: 0 2px 15px rgba(33, 110, 135, 0.1);
+    z-index: 4; /* Ensure current lecture is above others */
+}
+
+.schedule-lecture-item.first-lecture {
+    margin-top: 5px;
+}
+
+.schedule-lecture-item .lecture-time {
+    font-weight: 600;
+    color: #216e87;
+    font-size: 0.9rem;
+    white-space: nowrap; /* Prevent the time from wrapping */
+    flex-shrink: 0; /* Prevent the time from shrinking */
+    min-width: 60px; /* Give the time a minimum width */
+}
+
+.schedule-lecture-item .lecture-content {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    overflow: hidden; /* Prevent content overflow */
+}
+
+.schedule-lecture-item .lecture-title {
+    font-weight: 500;
+    font-size: 1rem;
+    color: #333;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.schedule-lecture-item .lecture-location {
+    font-size: 0.85rem;
+    color: #555;
+    margin-top: 1px;
+}
+
+.current-time-indicator {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 2px;
+    z-index: 5;
+    pointer-events: none;
+}
+
+.indicator-dot {
+    width: 10px;
+    height: 10px;
+    background-color: #e74c3c;
+    border-radius: 50%;
+    position: absolute;
+    left: 45px;
+    top: -4px;
+}
+
+.indicator-line {
+    position: absolute;
+    left: 50px;
+    right: 0;
+    height: 2px;
+    background-color: #e74c3c;
+}
+
+.no-lectures-message {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    height: 100%;
+    min-height: 300px;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.1rem;
+    color: #888;
+    padding: 30px;
+}
+
+/* Weekly overview styles */
+.weekly-overview {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 0.6rem;
+    max-height: none;
+    margin-top: 0.5rem;
+}
+
+.weekly-overview h4 {
+    margin-top: 0;
+    color: #216e87;
+    margin-bottom: 0.4rem;
+    font-size: 0.9rem;
+}
+
+.weekly-grid {
+    display: flex;
+    gap: 0.6rem;
+    overflow-x: hidden;
+    padding-bottom: 0.5rem;
+    max-height: none;
+    width: 100%;
+}
+
+.day-column {
+    flex: 1;
+    min-width: 140px;
+    max-width: 20%;
+    background-color: white;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid #edf2f7;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    margin: 0 1px;
+}
+
+.current-day-column {
+    border-color: #4fc0e5;
+    box-shadow: 0 2px 10px rgba(79, 192, 229, 0.2);
+}
+
+.day-title {
+    padding: 5px;
+    font-weight: 600;
+    background-color: #f8f9fa;
+    text-align: center;
+    color: #555;
+    border-bottom: 1px solid #edf2f7;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+}
+
+.current-day-column .day-title {
+    background-color: #4fc0e5;
+    color: white;
+}
+
+.day-lectures {
+    padding: 3px;
+    overflow-y: hidden;
+    flex: 1;
+    max-height: none;
+}
+
+.no-mini-lectures {
+    padding: 5px 0;
+    text-align: center;
+    color: #888;
+    font-style: italic;
+    font-size: 0.7rem;
+    white-space: normal;
+    word-break: break-word;
+    overflow: visible;
+}
+
+.mini-lecture {
+    padding: 5px;
+    margin-bottom: 5px;
+    background-color: rgba(79, 192, 229, 0.05);
+    border-left: 3px solid #4fc0e5;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.mini-lecture:hover {
+    background-color: rgba(79, 192, 229, 0.1);
+    transform: translateX(2px);
+}
+
+.current-mini-lecture {
+    background-color: rgba(79, 192, 229, 0.2);
+    border-left-color: #216e87;
+}
+
+.mini-time {
+    display: block;
+    font-size: 0.7rem;
+    color: #216e87;
+    margin-bottom: 2px;
+}
+
+.mini-title {
+    display: block;
+    font-weight: 500;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Media queries to ensure responsiveness */
+@media (max-width: 768px) {
+    .enhanced-schedule-layout {
+        padding: 0.5rem;
+    }
+    
+    .weekly-grid {
+        overflow-x: auto;
+    }
+    
+    .day-column {
+        min-width: 110px;
+    }
+}
 </style>
 
 <script>
@@ -1020,18 +1456,25 @@ export default {
             testDay: '',
             todaySchedule: [],
             currentTimePosition: 0,
-            testSchedule: [], // Corrected spelling and initialized as an empty array
+            testSchedule: [],
             courses: [],
-            // New data properties for attendance modal
             showAttendanceModal: false,
             selectedLecture: {},
             students: [],
-            teacherLectures: [], // New property to store teacher's lectures
-            availableRooms: [], // Initialize as empty array
+            teacherLectures: [],
+            availableRooms: [],
+            scheduleHeight: 450,
+            pixelsPerMinute: 0.75,
+            timeMarkers: [],
+            earliestTime: 8 * 60, // Default 8:00 AM in minutes
+            latestTime: 17 * 60,  // Default 5:00 PM in minutes
+            currentTimeIndicatorPosition: -100,
+            defaultStartHour: 8,   // Default start hour if no lectures
+            defaultEndHour: 17,    // Default end hour if no lectures
+            baseStartHour: 8,      // For positioning calculations
         };
     },
     computed: {
-        // Add a computed property to check if the user has permission to access attendance features
         hasAttendancePermission() {
             return this.currentUser && 
                   (this.currentUser.access === 'Admin' || 
@@ -1068,43 +1511,98 @@ export default {
             }
 
             try {
-                // Add debug logging
-                console.log('Current user:', this.currentUser);
-                console.log('User groups:', this.currentUser.groups);
-
-                // Check if user has groups
+                console.log(`Fetching schema for ${day}`);
+                
+                // If user has no groups, return empty schedule
                 if (!this.currentUser.groups || !this.currentUser.groups.length) {
-                    console.log('No groups found for user:', this.currentUser);
+                    console.log('No groups found, returning empty schedule for weekly view');
+                    this.schema[i] = [];
                     return;
                 }
 
+                // Fetch actual schedules from database
                 const schedules = [];
+                const seenLectures = new Set(); // Track unique lectures to avoid duplicates
                 
-                // Fetch schedules for each group the user belongs to
                 for (const group of this.currentUser.groups) {
                     try {
-                        console.log(`Fetching schedule for group ${group} on ${day}`);
+                        console.log(`Fetching ${day} schedule for group ${group}`);
                         const response = await axios.get(
                             `http://localhost:1010/api/schema/${day}/${group}`
                         );
-                        console.log('Response data:', response.data);
                         
                         if (response.data && response.data.length > 0) {
-                            schedules.push(...response.data);
+                            // Process the data to ensure it has duration information
+                            const processedData = response.data.map(lecture => {
+                                // Make a copy with added duration if needed
+                                const processedLecture = {...lecture};
+                                
+                                // Ensure the lecture has a duration
+                                if (!processedLecture.duration) {
+                                    // If we have both start and end time, calculate duration
+                                    if (processedLecture.endTime) {
+                                        const [startHours, startMinutes] = processedLecture.time.split(':').map(Number);
+                                        const [endHours, endMinutes] = processedLecture.endTime.split(':').map(Number);
+                                        const startInMinutes = startHours * 60 + startMinutes;
+                                        const endInMinutes = endHours * 60 + endMinutes;
+                                        processedLecture.duration = endInMinutes - startInMinutes;
+                                    } else {
+                                        // Default to 60 minutes for lectures without duration
+                                        processedLecture.duration = 60;
+                                    }
+                                }
+                                
+                                return processedLecture;
+                            });
+                            
+                            // Filter out duplicate lectures by checking time and name
+                            for (const lecture of processedData) {
+                                const lectureKey = `${lecture.time}-${lecture.lecture}`;
+                                if (!seenLectures.has(lectureKey)) {
+                                    seenLectures.add(lectureKey);
+                                    schedules.push(lecture);
+                                } else {
+                                    console.log(`Skipping duplicate lecture in weekly view: ${lecture.lecture} at ${lecture.time}`);
+                                }
+                            }
+                            
+                            console.log(`Found ${processedData.length} lectures for group ${group} on ${day}`);
+                        } else {
+                            console.log(`No lectures found for group ${group} on ${day}`);
                         }
-                    } catch (groupError) {
-                        console.error(`Error fetching schedule for group ${group}:`, groupError);
+                    } catch (error) {
+                        console.error(`Error fetching ${day} schedule for group ${group}:`, error);
                     }
                 }
 
-                // Sort and update the schema
                 if (schedules.length > 0) {
-                    this.schema[i] = this.sortScheduleByTime(schedules);
-                    console.log(`Updated schema for day ${day}:`, this.schema[i]);
+                    // Validate each lecture before sorting and displaying
+                    const validatedSchedules = schedules.filter(lecture => {
+                        // Make sure lecture has a title
+                        if (!lecture.lecture || typeof lecture.lecture !== 'string') {
+                            console.warn(`Invalid lecture title in weekly view: ${JSON.stringify(lecture)}`);
+                            return false;
+                        }
+                        
+                        // Make sure lecture has a valid time
+                        if (!lecture.time || !lecture.time.includes(':')) {
+                            console.warn(`Invalid lecture time in weekly view: ${JSON.stringify(lecture)}`);
+                            return false;
+                        }
+                        
+                        return true;
+                    });
+                    
+                    this.schema[i] = this.sortScheduleByTime(validatedSchedules);
+                    console.log(`Successfully processed ${validatedSchedules.length} lectures for ${day}`);
+                } else {
+                    // Empty array if no schedules found
+                    this.schema[i] = [];
                 }
             } catch (error) {
                 console.error(`Error fetching ${day} schedule:`, error);
-                this.error = `Failed to load ${day} schedule`;
+                // Keep the array empty if there's an error
+                this.schema[i] = [];
             }
         },
         updateDateTime() {
@@ -1119,62 +1617,157 @@ export default {
                 return dayIndex === parseInt(this.testDay);
             }
             const today = new Date().getDay();
-            const adjustedToday = today === 0 ? 6 : today - 1;
+            const adjustedToday = today === 0 ? 4 : today - 1;
             return dayIndex === adjustedToday;
         },
         async fetchTodaySchedule() {
+            // Skip for teachers
+            if (this.isTeacher) return;
+            
             const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
             const dayIndex = this.testDay !== '' ? parseInt(this.testDay) : new Date().getDay() - 1;
-            this.currentDayIndex = dayIndex;
-            const dayName = days[dayIndex + 1];
+            
+            // For Sunday, use Friday's schedule (index 4) if no test day is selected
+            const adjustedDayIndex = dayIndex < 0 ? 4 : dayIndex;
+            this.currentDayIndex = adjustedDayIndex;
+            
+            const dayName = days[adjustedDayIndex === 4 && new Date().getDay() === 0 ? 5 : adjustedDayIndex + 1];
             
             try {
+                console.log(`Fetching schedule for ${dayName}`);
+                
+                // If user has no groups, return empty schedule
                 if (!this.currentUser.groups || !this.currentUser.groups.length) {
-                    console.log('No groups found for today schedule');
+                    console.log('No groups found, returning empty schedule');
+                    this.todaySchedule = [];
+                    this.calculateScheduleLayout();
+                    this.updateCurrentTimePosition();
                     return;
                 }
 
+                // Attempt to fetch real data
                 const schedules = [];
+                const seenLectures = new Set(); // Track unique lectures to avoid duplicates
+                let fetchSucceeded = false;
+                
                 for (const groupId of this.currentUser.groups) {
-                    const response = await axios.get(
-                        `http://localhost:1010/api/schema/${dayName}/${groupId}`
-                    );
-                    if (response.data && response.data.length > 0) {
-                        schedules.push(...response.data);
+                    try {
+                        console.log(`Fetching ${dayName} schedule for group ${groupId}`);
+                        const response = await axios.get(
+                            `http://localhost:1010/api/schema/${dayName}/${groupId}`
+                        );
+                        
+                        if (response.data && response.data.length > 0) {
+                            fetchSucceeded = true;
+                            
+                            // Process each lecture to ensure it has a duration
+                            const processedData = response.data.map(lecture => {
+                                // Make a copy to avoid modifying the original
+                                const processedLecture = {...lecture};
+                                
+                                // Ensure the lecture has a duration
+                                if (!processedLecture.duration) {
+                                    // If has endTime, calculate duration
+                                    if (processedLecture.endTime) {
+                                        const [startHours, startMinutes] = processedLecture.time.split(':').map(Number);
+                                        const [endHours, endMinutes] = processedLecture.endTime.split(':').map(Number);
+                                        const startInMinutes = startHours * 60 + startMinutes;
+                                        const endInMinutes = endHours * 60 + endMinutes;
+                                        processedLecture.duration = endInMinutes - startInMinutes;
+                                    } else {
+                                        // Default to 60 minutes
+                                        processedLecture.duration = 60; 
+                                    }
+                                }
+                                
+                                return processedLecture;
+                            });
+                            
+                            // Filter out duplicate lectures by checking time and name
+                            for (const lecture of processedData) {
+                                const lectureKey = `${lecture.time}-${lecture.lecture}`;
+                                if (!seenLectures.has(lectureKey)) {
+                                    seenLectures.add(lectureKey);
+                                    schedules.push(lecture);
+                                } else {
+                                    console.log(`Skipping duplicate lecture: ${lecture.lecture} at ${lecture.time}`);
+                                }
+                            }
+                            
+                            console.log(`Found ${processedData.length} lectures for group ${groupId} on ${dayName}`);
+                        } else {
+                            console.log(`No lectures found for group ${groupId} on ${dayName}`);
+                        }
+                    } catch (error) {
+                        console.error(`Error fetching for group ${groupId} on ${dayName}:`, error);
                     }
                 }
 
-                this.todaySchedule = this.sortScheduleByTime(schedules);
+                if (schedules.length > 0) {
+                    // Validate each lecture before sorting and displaying
+                    const validatedSchedules = schedules.filter(lecture => {
+                        // Make sure lecture has a title
+                        if (!lecture.lecture || typeof lecture.lecture !== 'string') {
+                            console.warn(`Invalid lecture title: ${JSON.stringify(lecture)}`);
+                            return false;
+                        }
+                        
+                        // Make sure lecture has a valid time
+                        if (!lecture.time || !lecture.time.includes(':')) {
+                            console.warn(`Invalid lecture time: ${JSON.stringify(lecture)}`);
+                            return false;
+                        }
+                        
+                        return true;
+                    });
+                    
+                    this.todaySchedule = this.sortScheduleByTime(validatedSchedules);
+                    console.log('Successfully loaded schedule data:', this.todaySchedule);
+                } else {
+                    // No schedules found
+                    console.log('No lectures found for today');
+                    this.todaySchedule = [];
+                }
+                
+                // Calculate layout and update time position regardless of data source
+                this.calculateScheduleLayout();
                 this.updateCurrentTimePosition();
             } catch (error) {
-                console.error('Error fetching today\'s schedule:', error);
+                console.error('Error fetching schedule:', error);
+                this.todaySchedule = [];
+                this.calculateScheduleLayout();
             }
         },
         async fetchTestSchedule() {
             try {
                 const response = await axios.get(`http://localhost:1010/api/tests/`);
-                this.testSchedule = response.data; // Assign the fetched data to the array
+                this.testSchedule = response.data;
             } catch (error) {
                 console.error('Error fetching test schedule:', error);
             }
         },
         updateCurrentTimePosition() {
             const now = new Date();
-            const startTime = new Date(now.setHours(8, 0, 0)); // Assuming school day starts at 8:00
-            const currentTime = new Date();
-            const timeDiff = (currentTime - startTime) / (1000 * 60); // Difference in minutes
-            this.currentTimePosition = timeDiff * 2; // 2px per minute
+            const currentMinutes = now.getHours() * 60 + now.getMinutes();
+            
+            if (currentMinutes >= this.earliestTime && currentMinutes <= this.latestTime) {
+                const minutesFromEarliest = currentMinutes - this.earliestTime;
+                this.currentTimePosition = (minutesFromEarliest / (this.latestTime - this.earliestTime)) * this.scheduleHeight;
+            } else {
+                this.currentTimePosition = -1;
+            }
         },
         isCurrentLecture(lecture) {
             const now = new Date();
             const [startHour, startMinute] = lecture.time.split(':').map(Number);
             const lectureStart = new Date(now.setHours(startHour, startMinute, 0));
-            const lectureEnd = new Date(lectureStart.getTime() + 60 * 60 * 1000); // Assuming 1-hour lectures
+            const lectureEnd = new Date(lectureStart.getTime() + 60 * 60 * 1000);
             return now >= lectureStart && now < lectureEnd;
         },
         updateSchedules() {
-            this.fetchTodaySchedule();
-            // If you need to update the weekly schedule as well, call that method here
+            if (!this.isTeacher) {
+                this.fetchTodaySchedule();
+            }
         },
         hasTest(subject) {
             return this.testSchedule.some(test => 
@@ -1199,9 +1792,7 @@ export default {
         attendanceRoute() {
             this.$router.push('/attendance')
         },
-        // New methods for attendance modal
         openAttendanceModal(lecture) {
-            // Only allow teachers and admins to open the attendance modal
             if (!this.hasAttendancePermission) {
                 return;
             }
@@ -1221,12 +1812,9 @@ export default {
         
         async fetchStudentsForLecture(lecture) {
             try {
-                // Assuming you have an API endpoint to fetch students for a specific lecture
                 const response = await axios.get(`http://localhost:1010/api/students/${lecture.group}`);
                 
-                // If you don't have a specific endpoint, you can use mock data for now
                 if (!response.data || response.data.length === 0) {
-                    // Mock data if no students are returned
                     this.students = [
                         { id: 1, name: 'Anna Andersson', attendanceStatus: 'present' },
                         { id: 2, name: 'Erik Eriksson', attendanceStatus: 'present' },
@@ -1235,7 +1823,6 @@ export default {
                         { id: 5, name: 'Lina Lindberg', attendanceStatus: 'present' },
                     ];
                 } else {
-                    // Map the response data to include attendanceStatus set to 'present' by default
                     this.students = response.data.map(student => ({
                         ...student,
                         attendanceStatus: 'present'
@@ -1243,7 +1830,6 @@ export default {
                 }
             } catch (error) {
                 console.error('Error fetching students:', error);
-                // Use mock data in case of error
                 this.students = [
                     { id: 1, name: 'Anna Andersson', attendanceStatus: 'present' },
                     { id: 2, name: 'Erik Eriksson', attendanceStatus: 'present' },
@@ -1256,7 +1842,6 @@ export default {
         
         async saveAttendance() {
             try {
-                // Prepare the attendance data
                 const attendanceData = {
                     lectureId: this.selectedLecture.id,
                     lectureName: this.selectedLecture.lecture,
@@ -1269,13 +1854,10 @@ export default {
                     }))
                 };
                 
-                // Send the attendance data to your API
                 await axios.post('http://localhost:1010/api/attendance', attendanceData);
                 
-                // Close the modal after saving
                 this.closeAttendanceModal();
                 
-                // Optional: Show a success message
                 alert('Närvaro har sparats!');
             } catch (error) {
                 console.error('Error saving attendance:', error);
@@ -1295,26 +1877,170 @@ export default {
         async fetchTeacherLectures() {
             if (!this.isTeacher) return;
             
+            console.log("Attempting to fetch teacher lectures...");
+            console.log("Current user:", this.currentUser);
+            
             try {
-                // Assuming there's an API endpoint to fetch lectures by teacher ID
+                // Check if we have a user ID before making the request
+                if (!this.currentUser.id) {
+                    console.error("Teacher ID missing, cannot fetch lectures");
+                    // Add fallback test data since the ID is missing
+                    this.teacherLectures = [
+                        {
+                            id: 1,
+                            day: 'monday',
+                            time: '09:00',
+                            lecture: 'Matematik',
+                            group: 'TE2',
+                            room: 'A101',
+                            locationStatus: 'current'
+                        },
+                        {
+                            id: 2,
+                            day: 'monday',
+                            time: '13:00',
+                            lecture: 'Programmering',
+                            group: 'TE2',
+                            room: 'B204',
+                            locationStatus: 'current'
+                        },
+                        {
+                            id: 3,
+                            day: 'tuesday',
+                            time: '10:30',
+                            lecture: 'Matematik',
+                            group: 'NA3',
+                            room: 'A101',
+                            locationStatus: 'current'
+                        },
+                        {
+                            id: 4,
+                            day: 'wednesday',
+                            time: '09:00',
+                            lecture: 'Programmering',
+                            group: 'TE2',
+                            room: 'B204',
+                            locationStatus: 'current'
+                        },
+                        {
+                            id: 5,
+                            day: 'friday',
+                            time: '13:15',
+                            lecture: 'Matematik',
+                            group: 'TE2',
+                            room: 'A101',
+                            locationStatus: 'current'
+                        }
+                    ];
+                    return;
+                }
+                
+                console.log(`Making API request to fetch lectures for teacher ID: ${this.currentUser.id}`);
                 const response = await axios.get(`http://localhost:1010/api/teacher-lectures/${this.currentUser.id}`);
                 
                 if (response.data && response.data.length > 0) {
-                    // Sort lectures by day and time
+                    console.log(`Received ${response.data.length} lectures from server`);
                     this.teacherLectures = this.sortLecturesByDayAndTime(response.data);
                 } else {
-                    this.teacherLectures = [];
+                    console.log("No lectures returned from server, using fallback data");
+                    // Add fallback test data since no data was returned
+                    this.teacherLectures = [
+                        {
+                            id: 1,
+                            day: 'monday',
+                            time: '09:00',
+                            lecture: 'Matematik',
+                            group: 'TE2',
+                            room: 'A101',
+                            locationStatus: 'current'
+                        },
+                        {
+                            id: 2,
+                            day: 'monday',
+                            time: '13:00',
+                            lecture: 'Programmering',
+                            group: 'TE2',
+                            room: 'B204',
+                            locationStatus: 'current'
+                        },
+                        {
+                            id: 3,
+                            day: 'tuesday',
+                            time: '10:30',
+                            lecture: 'Matematik',
+                            group: 'NA3',
+                            room: 'A101',
+                            locationStatus: 'current'
+                        },
+                        {
+                            id: 4,
+                            day: 'wednesday',
+                            time: '09:00',
+                            lecture: 'Programmering',
+                            group: 'TE2',
+                            room: 'B204',
+                            locationStatus: 'current'
+                        },
+                        {
+                            id: 5,
+                            day: 'friday',
+                            time: '13:15',
+                            lecture: 'Matematik',
+                            group: 'TE2',
+                            room: 'A101',
+                            locationStatus: 'current'
+                        }
+                    ];
                 }
             } catch (error) {
                 console.error('Error fetching teacher lectures:', error);
-                
-                // Mock data for testing
+                // Add fallback test data since there was an error
                 this.teacherLectures = [
-                    { id: 1, day: 'monday', time: '08:30', lecture: 'Matematik', group: 'TE19A', locationStatus: 'current', customLocation: '' },
-                    { id: 2, day: 'monday', time: '10:15', lecture: 'Fysik', group: 'NA20B', locationStatus: 'current', customLocation: '' },
-                    { id: 3, day: 'tuesday', time: '13:00', lecture: 'Matematik', group: 'TE20A', locationStatus: 'current', customLocation: '' },
-                    { id: 4, day: 'wednesday', time: '08:30', lecture: 'Programmering', group: 'TE19A', locationStatus: 'current', customLocation: '' },
-                    { id: 5, day: 'friday', time: '14:45', lecture: 'Fysik', group: 'NA19C', locationStatus: 'current', customLocation: '' },
+                    {
+                        id: 1,
+                        day: 'monday',
+                        time: '09:00',
+                        lecture: 'Matematik',
+                        group: 'TE2',
+                        room: 'A101',
+                        locationStatus: 'current'
+                    },
+                    {
+                        id: 2,
+                        day: 'monday',
+                        time: '13:00',
+                        lecture: 'Programmering',
+                        group: 'TE2',
+                        room: 'B204',
+                        locationStatus: 'current'
+                    },
+                    {
+                        id: 3,
+                        day: 'tuesday',
+                        time: '10:30',
+                        lecture: 'Matematik',
+                        group: 'NA3',
+                        room: 'A101',
+                        locationStatus: 'current'
+                    },
+                    {
+                        id: 4,
+                        day: 'wednesday',
+                        time: '09:00',
+                        lecture: 'Programmering',
+                        group: 'TE2',
+                        room: 'B204',
+                        locationStatus: 'current'
+                    },
+                    {
+                        id: 5,
+                        day: 'friday',
+                        time: '13:15',
+                        lecture: 'Matematik',
+                        group: 'TE2',
+                        room: 'A101',
+                        locationStatus: 'current'
+                    }
                 ];
             }
         },
@@ -1322,74 +2048,55 @@ export default {
             const dayOrder = { 'monday': 0, 'tuesday': 1, 'wednesday': 2, 'thursday': 3, 'friday': 4 };
             
             return [...lectures].sort((a, b) => {
-                // First sort by day
                 if (dayOrder[a.day] !== dayOrder[b.day]) {
                     return dayOrder[a.day] - dayOrder[b.day];
                 }
                 
-                // Then sort by time
                 const timeA = this.convertTimeToMinutes(a.time);
                 const timeB = this.convertTimeToMinutes(b.time);
                 return timeA - timeB;
             });
         },
         toggleAttendanceStatus(student) {
-            // Cycle through attendance statuses (skipping 'late' status)
             if (student.attendanceStatus === 'present') {
-                // Skip 'late' and go directly to 'absent'
                 student.attendanceStatus = 'absent';
-                // Remove late minutes when marked as absent
                 delete student.lateMinutes;
             } else if (student.attendanceStatus === 'absent') {
                 student.attendanceStatus = 'registered-absence';
-                // Remove late minutes when marked as registered absence
                 delete student.lateMinutes;
             } else if (student.attendanceStatus === 'registered-absence') {
                 student.attendanceStatus = 'present';
-                // Remove late minutes when marked as present
                 delete student.lateMinutes;
             } else if (student.attendanceStatus === 'late') {
-                // If currently late, go to absent
                 student.attendanceStatus = 'absent';
-                // Remove late minutes when marked as absent
                 delete student.lateMinutes;
             }
         },
         handleLatenessInput(student) {
-            // If the student has any value in lateMinutes
             if (student.lateMinutes) {
-                // Set the status to late
                 student.attendanceStatus = 'late';
             }
-            // If the lateMinutes field is cleared and the student is marked as late
             else if (!student.lateMinutes && student.attendanceStatus === 'late') {
-                // Change back to present
                 student.attendanceStatus = 'present';
             }
         },
         handleLocationChange(lecture) {
-            // No need to show room selector for "change" anymore
             if (lecture.locationStatus === 'canceled' || lecture.locationStatus === 'custom') {
-                // Save the change immediately
                 this.saveLocationChange(lecture);
             }
         },
         selectRoom(lecture, roomId) {
-            // Set the new room
             lecture.newRoom = roomId;
             lecture.locationStatus = 'changed';
             lecture.showRoomSelector = false;
             
-            // Save the change
             this.saveLocationChange(lecture);
         },
         cancelRoomChange(lecture) {
-            // Hide the room selector without making changes
             lecture.showRoomSelector = false;
         },
         async saveLocationChange(lecture) {
             try {
-                // Prepare the data
                 const locationData = {
                     lectureId: lecture.id,
                     locationStatus: lecture.locationStatus,
@@ -1397,10 +2104,8 @@ export default {
                     customLocation: lecture.customLocation || ''
                 };
                 
-                // Send the data to your API
                 await axios.post('http://localhost:1010/api/update-lecture-location', locationData);
                 
-                // Optional: Show a success message
                 console.log('Location updated successfully');
             } catch (error) {
                 console.error('Error updating location:', error);
@@ -1411,27 +2116,242 @@ export default {
             this.availableRooms = response.data;
             console.log(this.availableRooms);
         },
+        calculateScheduleLayout() {
+            // First, let's determine the earliest and latest times from the schedule
+            if (this.todaySchedule.length > 0) {
+                // Find the earliest start time
+                let earliestHour = this.defaultStartHour;
+                let latestHour = this.defaultEndHour;
+                
+                this.todaySchedule.forEach(lecture => {
+                    try {
+                        let startHour, startMinute;
+                        
+                        // Parse the start time
+                        if (lecture.time.includes('-')) {
+                            const [startTime] = lecture.time.split('-').map(t => t.trim());
+                            [startHour, startMinute] = startTime.split(':').map(Number);
+                        } else {
+                            [startHour, startMinute] = lecture.time.split(':').map(Number);
+                        }
+                        
+                        // Calculate end time
+                        let endHour = startHour + 1; // Default 1 hour duration
+                        let endMinute = startMinute;
+                        
+                        if (lecture.time && lecture.time.includes('-')) {
+                            const [, endTime] = lecture.time.split('-').map(t => t.trim());
+                            [endHour, endMinute] = endTime.split(':').map(Number);
+                        } else if (lecture.endTime) {
+                            [endHour, endMinute] = lecture.endTime.split(':').map(Number);
+                        } else if (lecture.duration) {
+                            const durationMinutes = lecture.duration;
+                            const endTimeMinutes = startHour * 60 + startMinute + durationMinutes;
+                            endHour = Math.floor(endTimeMinutes / 60);
+                            endMinute = endTimeMinutes % 60;
+                        }
+                        
+                        // Update earliest and latest times
+                        earliestHour = Math.min(earliestHour, startHour);
+                        latestHour = Math.max(latestHour, endHour + (endMinute > 0 ? 1 : 0));
+                        
+                    } catch (error) {
+                        console.error('Error parsing lecture time:', error, lecture);
+                    }
+                });
+                
+                // Ensure we have a reasonable buffer (at least 1 hour before first lecture)
+                earliestHour = Math.max(7, earliestHour - 1);
+                latestHour = Math.min(18, latestHour + 1);
+                
+                // Set the calculated times
+                this.earliestTime = earliestHour * 60;
+                this.latestTime = latestHour * 60;
+                this.baseStartHour = earliestHour;
+                
+                console.log(`Dynamic schedule times: ${earliestHour}:00 - ${latestHour}:00`);
+            } else {
+                // No lectures, use default values
+                this.earliestTime = this.defaultStartHour * 60;
+                this.latestTime = this.defaultEndHour * 60;
+                this.baseStartHour = this.defaultStartHour;
+                
+                console.log(`Using default schedule times: ${this.defaultStartHour}:00 - ${this.defaultEndHour}:00`);
+            }
+            
+            // Calculate the total time range and update the schedule display
+            const totalMinutes = this.latestTime - this.earliestTime;
+            const totalHours = totalMinutes / 60;
+            
+            // The height of the schedule is fixed, but we adjust pixels per hour based on range
+            this.scheduleHeight = 450; // Keep a consistent height
+            this.pixelsPerMinute = this.scheduleHeight / totalMinutes;
+            
+            // Generate the time markers and update the indicator
+            this.generateTimeMarkers();
+            this.updateCurrentTimeIndicator();
+            
+            console.log("Schedule layout calculated:", {
+                earliestTime: this.earliestTime,
+                latestTime: this.latestTime,
+                scheduleHeight: this.scheduleHeight,
+                pixelsPerMinute: this.pixelsPerMinute
+            });
+        },
+        generateTimeMarkers() {
+            this.timeMarkers = [];
+            
+            const startHour = Math.floor(this.earliestTime / 60);
+            const endHour = Math.ceil(this.latestTime / 60);
+            
+            for (let hour = startHour; hour <= endHour; hour++) {
+                this.timeMarkers.push({
+                    value: hour,
+                    label: `${hour}:00`,
+                    position: ((hour * 60) - this.earliestTime) * this.pixelsPerMinute
+                });
+            }
+            
+            console.log("Generated dynamic time markers:", this.timeMarkers);
+        },
+        positionLectureByTime(lecture) {
+            try {
+                // Parse time from the lecture
+                let startHour, startMinute;
+                
+                if (lecture.time.includes('-')) {
+                    // If format is "HH:MM - HH:MM"
+                    const [startTime] = lecture.time.split('-').map(t => t.trim());
+                    [startHour, startMinute] = startTime.split(':').map(Number);
+                } else {
+                    [startHour, startMinute] = lecture.time.split(':').map(Number);
+                }
+                
+                // Calculate duration
+                let duration = 60; // Default to 60 minutes
+                
+                if (lecture.time && lecture.time.includes('-')) {
+                    // Calculate from time range "HH:MM - HH:MM"
+                    const [startTime, endTime] = lecture.time.split('-').map(t => t.trim());
+                    const [startH, startM] = startTime.split(':').map(Number);
+                    const [endH, endM] = endTime.split(':').map(Number);
+                    
+                    const startInMinutes = startH * 60 + startM;
+                    const endInMinutes = endH * 60 + endM;
+                    duration = endInMinutes - startInMinutes;
+                } else if (lecture.endTime) {
+                    // Calculate from separate start and end times
+                    const [endHour, endMinute] = lecture.endTime.split(':').map(Number);
+                    const startInMinutes = startHour * 60 + startMinute;
+                    const endInMinutes = endHour * 60 + endMinute;
+                    duration = endInMinutes - startInMinutes;
+                } else if (lecture.duration) {
+                    duration = lecture.duration;
+                }
+                
+                // Ensure reasonable duration (at least 30 min, at most 4 hours)
+                duration = Math.max(30, Math.min(duration, 240));
+                
+                // Position relative to the dynamic earliest time
+                const lectureStartMinutes = startHour * 60 + startMinute;
+                const minutesFromEarliest = lectureStartMinutes - this.earliestTime;
+                
+                // Calculate position using the pixels per minute
+                const topPosition = minutesFromEarliest * this.pixelsPerMinute;
+                const height = duration * this.pixelsPerMinute;
+                
+                console.log(`Positioning lecture "${lecture.lecture}" at ${lecture.time} → top: ${topPosition}px, height: ${height}px`);
+                
+                return {
+                    top: `${topPosition}px`,
+                    height: `${height}px`
+                };
+            } catch (error) {
+                console.error(`Error positioning lecture ${lecture.lecture}:`, error);
+                return { top: '0px', height: '45px' }; // Fallback position
+            }
+        },
+        updateCurrentTimeIndicator() {
+            const now = new Date();
+            const hour = now.getHours();
+            const minutes = now.getMinutes();
+            const currentMinutes = hour * 60 + minutes;
+            
+            // Only show the indicator if the current time is within the displayed time range
+            if (currentMinutes >= this.earliestTime && currentMinutes <= this.latestTime) {
+                const minutesFromEarliest = currentMinutes - this.earliestTime;
+                this.currentTimeIndicatorPosition = minutesFromEarliest * this.pixelsPerMinute;
+            } else {
+                this.currentTimeIndicatorPosition = -100; // Hide off-screen
+            }
+        },
     },
     mounted() {
+        console.log('Component mounted');
+        
         for (let i = 0; i < 5; i++) {
             this.fetchSchema(i);
         }
         
-        this.updateDateTime();
-        this.fetchCourses();
+        setTimeout(() => {
+            this.fetchTodaySchedule();
+        }, 100);
+        
+        this.$nextTick(() => {
+            const daySelectors = document.querySelectorAll('.day-selector');
+            daySelectors.forEach((el, index) => {
+                el.addEventListener('click', () => {
+                    console.log(`Clicked on day ${index}`);
+                    this.testDay = index.toString();
+                    this.updateSchedules();
+                });
+            });
+        });
+        
+        if (typeof this.updateDateTime === 'function') {
+            this.updateDateTime();
+            setInterval(this.updateDateTime, 1000);
+        }
+        
+        if (typeof this.fetchCourses === 'function') {
+            this.fetchCourses();
+        }
+        
         this.fetchRooms();
-        setInterval(this.updateDateTime, 1000);
-        this.fetchTodaySchedule();
-        this.fetchTestSchedule();
+        
         setInterval(() => {
             this.updateCurrentTimePosition();
             this.$forceUpdate();
         }, 60000);
         
-        // Add this to fetch teacher's lectures
-        this.fetchTeacherLectures();
+        // Fetch teacher lectures with a slight delay to ensure current user is loaded
+        setTimeout(() => {
+            if (this.isTeacher) {
+                console.log("Teacher detected, fetching lectures...");
+                this.fetchTeacherLectures();
+            }
+        }, 500);
+        
+        // Update the current time indicator every minute
+        setInterval(() => {
+            this.updateCurrentTimeIndicator();
+        }, 60000);
+        
+        // Initial update
+        this.updateCurrentTimeIndicator();
     },
     watch: {
+        // Add a watcher for currentUser to fetch teacher lectures when user data changes
+        currentUser: {
+            handler(newValue, oldValue) {
+                console.log("Current user changed:", newValue);
+                if (newValue && newValue.access === 'Lärare' && (!oldValue || oldValue.access !== 'Lärare')) {
+                    console.log("Teacher user detected, fetching lectures");
+                    this.fetchTeacherLectures();
+                }
+            },
+            deep: true
+        },
         testDay() {
             this.updateSchedules();
         }
