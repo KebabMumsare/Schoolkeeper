@@ -11,6 +11,7 @@ import AdminTools from '../views/AdminTools/AdminTools.vue'
 import AddNewUser from '../views/AdminTools/AddNewUser.vue'
 import GroupCreator from '../views/AdminTools/GroupCreator.vue'
 import RoomsCreator from '../views/AdminTools/RoomsCreator.vue'
+import ScheduleCreatorJ from '../views/AdminTools/ScheduleCreatorJ.vue'
 const router = createRouter({
  history: createWebHistory(import.meta.env.BASE_URL),
  routes: [
@@ -51,14 +52,19 @@ const router = createRouter({
      component: IndividualStudyPlan
    },
    {
-    path: '/ScheduleCreator',
-    name: 'ScheduleCreator',
-    component: ScheduleCreator
+    path: '/ScheduleCreatorJ',
+    name: 'ScheduleCreatorJ',
+    component: ScheduleCreatorJ
    },
    {
     path: '/admintools',
     name: 'AdminTools',
     component: AdminTools
+   },
+   {
+    path: '/admintools/ScheduleCreator',
+    name: 'ScheduleCreator',
+    component: ScheduleCreator
    },
    {
     path: '/admintools/addnewuser',

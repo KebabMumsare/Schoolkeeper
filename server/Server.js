@@ -89,6 +89,10 @@ const schedualSchema = mongoose.Schema({
   duration: {
     type: "number",
     required: true
+  },
+  teacher: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
   }
 });
 const SchedualModel = mongoose.model("Schema", schedualSchema);
@@ -341,7 +345,6 @@ app.post("/api/users", async (req, res) => {
   }
 });
 // Group API
-
 app.get("/api/groups", async (req, res) => {
   try {
     const groups = await GroupModel.find({});
