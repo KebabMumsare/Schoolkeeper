@@ -84,8 +84,18 @@
   align-items: center;
   border-radius: 0 0 20px 20px;
   position: relative;
-  backdrop-filter: blur(5px);
   box-shadow: none;
+}
+
+.nav-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  backdrop-filter: blur(5px);
+  z-index: -1;
 }
 
 .logo-placeholder {
@@ -114,7 +124,7 @@
   transform: translateX(-50%);
   background-color: white;
   border-radius: 0px 0px 20px 20px;
-  padding: 8px 50px;
+  padding: 10px 58px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -124,7 +134,7 @@
   list-style-type: none;
   margin: 0;
   padding: 0;
-  gap: 25px;
+  gap: 32px;
 }
 
 .nav-item {
@@ -140,7 +150,7 @@
   justify-content: center;
   text-decoration: none;
   height: 100%;
-  width: 50px;
+  width: 54px;
   padding: 8px;
   border-radius: 12px;
   transition: all 0.2s ease-in-out;
@@ -170,10 +180,10 @@
 }
 
 .nav-icon, .nav-icon-selected {
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   transition: transform 0.2s ease-in-out;
-  border-radius: 6px;
+  border-radius: 0;
   object-fit: contain;
 }
 
