@@ -93,10 +93,31 @@ const schedualSchema = mongoose.Schema({
   teacher: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
+  },
+  room: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Room',
   }
 });
 const SchedualModel = mongoose.model("Schema", schedualSchema);
-
+const schedualPresetSchema = mongoose.Schema({
+  lecture: {
+    type: "string",
+  },
+  group: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Group',
+  },
+  teacher: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+  },
+  room: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Room',
+  }
+});
+const SchedualPresetModel = mongoose.model("SchemaPreset", schedualPresetSchema);
 const ClassroomSchema = mongoose.Schema({
   name: {
     type: "string",
@@ -344,6 +365,24 @@ app.post("/api/users", async (req, res) => {
     res.status(500).json({ message: "Error creating user", error: error.message });
   }
 });
+app.get("/api/teachers", async (req, res) => {
+  try {
+    const teachers = await UserModel.find({ access: "Lärare" });
+    res.json(teachers);
+  } catch (error) { 
+    console.error("Error fetching teachers:", error);
+    res.sendStatus(500);
+  }
+});
+app.get("/api/teacher/:id", async (req, res) => {
+  try {
+    const teacher = await UserModel.findById(req.params.id);
+    res.json(teacher);
+  } catch (error) {
+    console.error('Error fetching teacher:', error);
+    res.status(500).json({ message: "Error fetching teacher", error: error.message });
+  }
+});
 // Group API
 app.get("/api/groups", async (req, res) => {
   try {
@@ -353,7 +392,7 @@ app.get("/api/groups", async (req, res) => {
       return res.sendStatus(404);
     }
 
-    res.json(groups.map(group => group.name));
+    res.json(groups);
   } catch (error) {
     console.error("Error fetching groups:", error);
     res.sendStatus(500);
@@ -432,6 +471,27 @@ app.get("/api/schema/:day/:groupId", async (req, res) => {
     });
   }
 });
+app.post("/api/schedulePreset", async (req, res) => {
+  try {
+    const schedual = new SchedualPresetModel(req.body);
+    await schedual.save();
+    res.status(201).json({ message: "Schedule preset created successfully" });
+  } catch (error) {
+    console.error('Error creating schedule preset:', error);
+    res.status(500).json({ message: "Error creating schedule preset", error: error.message });
+  }
+});
+app.get("/api/schedulePresets/:groupId", async (req, res) => {
+  try {
+    const presets = await SchedualPresetModel.find({ group: req.params.groupId });
+    console.log(presets);
+    res.json(presets);
+  } catch (error) { 
+    console.error('Error fetching schedule presets:', error);
+    res.status(500).json({ message: "Error fetching schedule presets", error: error.message });
+  }
+});
+
 
 // Classroom API
 app.get("/api/classrooms/", async (req, res) => {
@@ -676,17 +736,19 @@ app.post("/api/schedule", async (req, res) => {
     }
 
     // Delete existing schedules for this group
-    await SchedualModel.deleteMany({ class: group.name });
+    await SchedualModel.deleteMany({ group: group._id });
     
     // Create array of new schedule items
     const scheduleItems = Object.entries(schedules).flatMap(([day, items]) =>
       items.map(item => ({
         day: day.toLowerCase(),
-        class: group.name, // Using group name
-        lecture: item.name,
-        time: getTimeRange(item.top, item.minutes),
-        startMinutes: item.top,
-        duration: item.minutes
+        group: group._id,
+        lecture: item.lecture,
+        time: getTimeRange(item.startMinutes, item.duration),
+        startMinutes: item.startMinutes,
+        duration: item.duration,
+        teacher: item.teacher,
+        room: item.room
       }))
     );
     
@@ -718,7 +780,15 @@ app.post("/api/rooms", async (req, res) => {
     res.status(500).json({ message: "Error creating room", error: error.message });
   }
 });
-
+app.get("/api/rooms/:id", async (req, res) => {
+  try {
+    const room = await RoomModel.findById(req.params.id);
+    res.json(room);
+  } catch (error) {
+    console.error('Error fetching room:', error);
+    res.status(500).json({ message: "Error fetching room", error: error.message });
+  }
+});
 // Helper function to format time range
 function getTimeRange(startMinutes, duration) {
   const startHour = Math.floor(startMinutes / 60);
