@@ -15,7 +15,7 @@
         <i class="fas fa-calendar-alt"></i>
       </div>
       <div class="card-content">
-        <h3>Schema Skapare</h3>
+        <h3>Hantera Schema</h3>
         <p>Skapa och hantera scheman för klasser och lärare</p>
       </div>
       <div class="card-arrow">
@@ -31,7 +31,7 @@
         <i class="fas fa-user-plus"></i>
       </div>
       <div class="card-content">
-        <h3>Skapa Användare</h3>
+        <h3>Hantera Användare</h3>
         <p>Lägg till nya elever, lärare och administratörer</p>
       </div>
       <div class="card-arrow">
@@ -47,7 +47,7 @@
         <i class="fas fa-users"></i>
       </div>
       <div class="card-content">
-        <h3>Skapa Grupper</h3>
+        <h3>Hantera Grupper</h3>
         <p>Hantera klasser, grupper och organisera användare</p>
       </div>
       <div class="card-arrow">
@@ -63,7 +63,7 @@
         <i class="fas fa-door-open"></i>
       </div>
       <div class="card-content">
-        <h3>Skapa Salar</h3>
+        <h3>Hantera Salar</h3>
         <p>Lägg till och hantera rum och lokaler för lektioner</p>
       </div>
       <div class="card-arrow">
