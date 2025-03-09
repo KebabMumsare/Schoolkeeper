@@ -52,8 +52,15 @@
       </nav>
       
       <div v-if="currentUser" class="user-info">
-        <p>{{ currentUser.name }} | {{ currentUser.class }}</p>
-        <a id="logout-button" href="/" @click.prevent="logout">Logga ut</a>
+        <div class="user-info-wrapper">
+          <p class="user-name">{{ currentUser.name }} | {{ currentUser.class }}</p>
+          <a id="logout-button" href="/" @click.prevent="logout">Logga ut</a>
+        </div>
+        <div class="additional-info">
+          <p><strong>ID:</strong> {{ currentUser.id || 'N/A' }}</p>
+          <p><strong>Access:</strong> {{ currentUser.access }}</p>
+          <p><strong>Last Login:</strong> Today</p>
+        </div>
       </div>
     </div>
   </div>
@@ -62,34 +69,34 @@
 <style scoped>
 .nav-wrap {
   position: fixed;
-  height: 1rem;
   top: 0;
   left: 0;
   right: 0;
   z-index: 1000;
-  padding: 0 0px;
+  padding: 0;
 }
 
 .nav-container {
-  background-color: rgba(255, 255, 255, 0.95);
-  height: 3rem;
+  background-color: transparent;
+  height: 4.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-radius: 0 0 30px 30px;
+  border-radius: 0 0 20px 20px;
   position: relative;
   backdrop-filter: blur(5px);
+  box-shadow: none;
 }
 
 .logo-placeholder {
-  width: 35px;
-  height: 35px;
+  width: 45px;
+  height: 45px;
   display: flex;
   align-items: center;
   justify-content: center;
   background-color: white;
   border-radius: 12px;
-  margin-left: 0px;
+  margin-left: 20px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   padding: 5px;
 }
@@ -106,9 +113,9 @@
   left: 50%;
   transform: translateX(-50%);
   background-color: white;
-  border-radius: 0px 0px 30px 30px;
-  padding: 5px 40px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  border-radius: 0px 0px 20px 20px;
+  padding: 8px 50px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .nav-list {
@@ -117,12 +124,12 @@
   list-style-type: none;
   margin: 0;
   padding: 0;
-  gap: 15px;
+  gap: 25px;
 }
 
 .nav-item {
   position: relative;
-  height: 2.2rem;
+  height: 2.5rem;
   display: flex;
   align-items: center;
 }
@@ -133,49 +140,45 @@
   justify-content: center;
   text-decoration: none;
   height: 100%;
-  padding: 5px;
-  border-radius: 10px;
+  width: 50px;
+  padding: 8px;
+  border-radius: 12px;
   transition: all 0.2s ease-in-out;
+  position: relative;
+  background-color: transparent;
 }
 
 .nav-link:hover {
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: rgba(0, 0, 0, 0.03);
 }
 
 .nav-link-active {
-  width: 2.8rem;
-  height: 2.8rem;
-  border-radius: 14px;
-  background-color: #ffffff;
-  position: relative;
-  top: 8px;
+  background-color: transparent;
+  box-shadow: none;
 }
 
 .nav-link-active::after {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  border-radius: 12px;
-  z-index: -1;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 3px;
+  background-color: #4361ee;
+  border-radius: 10px;
 }
 
-.nav-icon {
-  width: 20px;
-  height: 20px;
+.nav-icon, .nav-icon-selected {
+  width: 26px;
+  height: 26px;
   transition: transform 0.2s ease-in-out;
   border-radius: 6px;
   object-fit: contain;
 }
 
 .nav-icon-selected {
-  width: 2.2rem;
-  height: 2.2rem;
-  position: absolute;
-  border-radius: 10px;
-  object-fit: contain;
+  opacity: 1;
 }
 
 .nav-icon:hover {
@@ -186,27 +189,87 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  margin-right: 0px;
-  font-size: 0.75rem;
+  margin-right: 20px;
+  font-size: 0.85rem;
   color: #333;
   background-color: white;
-  border-radius: 0px 0px 0px 30px;
-  padding: 5px 10px;
+  border-radius: 12px 12px 0 20px;
+  padding: 8px 15px 10px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  min-width: 180px;
+  position: relative;
+  z-index: 110;
 }
 
-.user-info p {
-  margin: 0 0 3px 0;
+.user-info:hover {
+  min-width: 220px;
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  border-radius: 12px 12px 0 0;
+}
+
+.user-info-wrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.user-name {
+  margin: 0 0 5px 0;
   font-weight: 500;
+  white-space: nowrap;
+  text-align: right;
+  width: 100%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.user-info:hover .user-name {
+  font-weight: 600;
+}
+
+.additional-info {
+  max-height: 0;
+  opacity: 0;
+  transition: all 0.3s ease;
+  width: 100%;
+  overflow: hidden;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: #f9f9f9;
+  border-radius: 0 0 12px 20px;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  padding: 0 15px;
+}
+
+.user-info:hover .additional-info {
+  max-height: 120px;
+  opacity: 1;
+  padding: 0px 15px 12px;
+}
+
+.additional-info p {
+  margin: 8px 0;
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: #666;
+  text-align: right;
 }
 
 #logout-button {
   color: #48aae6;
   text-decoration: none;
-  font-size: 0.7rem;
-  padding: 2px 5px;
+  font-size: 0.8rem;
+  padding: 3px 8px;
   border-radius: 5px;
   transition: background-color 0.2s;
+  display: inline-block;
+  margin-top: 2px;
 }
 
 #logout-button:hover {
