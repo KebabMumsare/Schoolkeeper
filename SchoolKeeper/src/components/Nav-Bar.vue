@@ -1,50 +1,50 @@
 <template>
   <div class="nav-wrap">
     <div class="nav-container">
-      <!-- Logo placeholder -->
       <div class="logo-placeholder">
         <img src="/public/pictures/placeholder.png" alt="Logo" class="logo-image">
       </div>
 
       <nav class="nav-center">
-        <ul class="nav-list">
-          <li class="nav-item">
+        <ul class="nav-list" ref="navList">
+          <div class="sliding-indicator" ref="indicator"></div>
+          <li class="nav-item" @mouseenter="moveIndicator($event)" @mouseleave="resetIndicator">
             <a v-if="site !== 'personal'" href="/personal" class="nav-link">
               <img src="https://cdn-icons-png.flaticon.com/128/1077/1077114.png" alt="" class="nav-icon">
             </a>
-            <a v-if="site === 'personal'" href="/personal" class="nav-link nav-link-active">
+            <a v-if="site === 'personal'" href="/personal" class="nav-link nav-link-active" ref="activeLink">
               <img src="https://cdn-icons-png.flaticon.com/128/1077/1077114.png" alt="" class="nav-icon-selected">
             </a>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" @mouseenter="moveIndicator($event)" @mouseleave="resetIndicator">
             <a v-if="site !== 'start'" href="/start" class="nav-link">
               <img src="https://cdn-icons-png.flaticon.com/512/55/55281.png" alt="" class="nav-icon">
             </a>
-            <a v-if="site === 'start'" href="/start" class="nav-link nav-link-active">
+            <a v-if="site === 'start'" href="/start" class="nav-link nav-link-active" ref="activeLink">
               <img src="https://cdn-icons-png.flaticon.com/512/55/55281.png" alt="" class="nav-icon-selected">
             </a>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" @mouseenter="moveIndicator($event)" @mouseleave="resetIndicator">
             <a v-if="site !== 'notice'" href="/notice" class="nav-link">
               <img src="https://www.iconpacks.net/icons/1/free-bell-icon-860-thumb.png" alt="" class="nav-icon">
             </a>
-            <a v-if="site === 'notice'" href="/notice" class="nav-link nav-link-active">
+            <a v-if="site === 'notice'" href="/notice" class="nav-link nav-link-active" ref="activeLink">
               <img src="https://www.iconpacks.net/icons/1/free-bell-icon-860-thumb.png" alt="" class="nav-icon-selected">
             </a>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" @mouseenter="moveIndicator($event)" @mouseleave="resetIndicator">
             <a v-if="site !== 'files'" href="/classrooms" class="nav-link">
               <img src="https://banner2.cleanpng.com/20180411/zxq/avf25i5q7.webp" alt="" class="nav-icon">
             </a>
-            <a v-if="site === 'files'" href="/classrooms" class="nav-link nav-link-active">
+            <a v-if="site === 'files'" href="/classrooms" class="nav-link nav-link-active" ref="activeLink">
               <img src="https://banner2.cleanpng.com/20180411/zxq/avf25i5q7.webp" alt="" class="nav-icon-selected">
             </a>
           </li>
-          <li class="nav-item" v-if="this.currentUser.access === 'Admin'">
+          <li class="nav-item" v-if="this.currentUser.access === 'Admin'" @mouseenter="moveIndicator($event)" @mouseleave="resetIndicator">
             <a v-if="site !== 'admintools'" href="/admintools" class="nav-link">
               <img src="/public/pictures/placeholder.png" alt="" class="nav-icon">
             </a>
-            <a v-if="site === 'admintools'" href="/admintools" class="nav-link nav-link-active">
+            <a v-if="site === 'admintools'" href="/admintools" class="nav-link nav-link-active" ref="activeLink">
               <img src="/public/pictures/placeholder.png" alt="" class="nav-icon-selected">
             </a>
           </li>
@@ -74,6 +74,7 @@
   right: 0;
   z-index: 1000;
   padding: 0;
+  margin: 0;
 }
 
 .nav-container {
@@ -85,6 +86,8 @@
   border-radius: 0 0 20px 20px;
   position: relative;
   box-shadow: none;
+  padding-top: 0;
+  margin-top: 0;
 }
 
 .nav-container::before {
@@ -124,8 +127,12 @@
   transform: translateX(-50%);
   background-color: white;
   border-radius: 0px 0px 20px 20px;
-  padding: 10px 58px;
+  padding: 0 58px 10px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  top: 0;
+  margin-top: 0;
+  overflow: visible;
+  height: auto;
 }
 
 .nav-list {
@@ -135,6 +142,21 @@
   margin: 0;
   padding: 0;
   gap: 32px;
+  padding-top: 10px;
+  position: relative;
+}
+
+.sliding-indicator {
+  position: absolute;
+  bottom: -8px;
+  height: 3px;
+  width: 20px;
+  background-color: #4361ee;
+  border-radius: 10px;
+  transition: left 0.3s ease-in-out;
+  opacity: 1;
+  z-index: 3;
+  pointer-events: none;
 }
 
 .nav-item {
@@ -142,6 +164,13 @@
   height: 2.5rem;
   display: flex;
   align-items: center;
+  padding-top: 0;
+  margin-top: 0;
+  transition: transform 0.3s ease-in-out;
+}
+
+.nav-item:hover ~ .nav-item {
+  --hovered: 1;
 }
 
 .nav-link {
@@ -151,44 +180,65 @@
   text-decoration: none;
   height: 100%;
   width: 54px;
-  padding: 8px;
+  padding: 10px 0 0 0;
   border-radius: 12px;
-  transition: all 0.2s ease-in-out;
+  transition: all 0.3s ease-in-out;
   position: relative;
   background-color: transparent;
+  z-index: 2;
 }
 
 .nav-link:hover {
   background-color: rgba(0, 0, 0, 0.03);
 }
 
+.nav-link::after {
+  display: none;
+}
+
+.nav-link:hover::after {
+  display: none;
+}
+
 .nav-link-active {
   background-color: transparent;
   box-shadow: none;
+  transform: translateY(-5px);
 }
 
 .nav-link-active::after {
-  content: '';
-  position: absolute;
-  bottom: -8px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 20px;
-  height: 3px;
-  background-color: #4361ee;
-  border-radius: 10px;
+  display: none;
 }
 
 .nav-icon, .nav-icon-selected {
   width: 28px;
   height: 28px;
-  transition: transform 0.2s ease-in-out;
+  transition: all 0.3s ease-in-out;
   border-radius: 0;
   object-fit: contain;
 }
 
 .nav-icon-selected {
+  width: 36px;
+  height: 36px;
   opacity: 1;
+  filter: drop-shadow(0 4px 6px rgba(67, 97, 238, 0.3));
+  transform: translateY(-2px);
+}
+
+.nav-link-active::before {
+  content: '';
+  position: absolute;
+  bottom: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 15px;
+  background-color: white;
+  border-radius: 0 0 15px 15px;
+  z-index: 1;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease-in-out;
 }
 
 .nav-icon:hover {
@@ -199,11 +249,11 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  margin-right: 20px;
+  margin-right: 0px;
   font-size: 0.85rem;
   color: #333;
   background-color: white;
-  border-radius: 12px 12px 0 20px;
+  border-radius: 0px 0px 0px 20px;
   padding: 8px 15px 10px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
@@ -296,10 +346,58 @@ export default {
     site: String,
     currentUser: Object,
   },
+  data() {
+    return {
+      indicatorPosition: { left: 0 }
+    };
+  },
+  mounted() {
+    window.addEventListener('load', this.initializeIndicator);
+    this.$nextTick(() => {
+      this.initializeIndicator();
+    });
+  },
+  updated() {
+    this.initializeIndicator();
+  },
   methods: {
     logout() {
       localStorage.removeItem('currentUser'); 
       this.$router.replace('/');
+    },
+    initializeIndicator() {
+      const activeLink = this.$refs.activeLink || document.querySelector('.nav-link-active');
+      const indicator = this.$refs.indicator || document.querySelector('.sliding-indicator');
+      const navList = this.$refs.navList || document.querySelector('.nav-list');
+      
+      if (activeLink && indicator && navList) {
+        const navListRect = navList.getBoundingClientRect();
+        const activeLinkRect = activeLink.getBoundingClientRect();
+        
+        const left = activeLinkRect.left - navListRect.left + (activeLinkRect.width - 20) / 2;
+        
+        indicator.style.left = `${left}px`;
+        this.indicatorPosition.left = left;
+      }
+    },
+    moveIndicator(event) {
+      const indicator = this.$refs.indicator || document.querySelector('.sliding-indicator');
+      const navList = this.$refs.navList || document.querySelector('.nav-list');
+      
+      if (!indicator || !navList) return;
+      
+      const navListRect = navList.getBoundingClientRect();
+      const linkRect = event.currentTarget.getBoundingClientRect();
+      
+      const left = linkRect.left - navListRect.left + (linkRect.width - 20) / 2;
+      
+      indicator.style.left = `${left}px`;
+    },
+    resetIndicator() {
+      const indicator = this.$refs.indicator || document.querySelector('.sliding-indicator');
+      if (!indicator) return;
+      
+      indicator.style.left = `${this.indicatorPosition.left}px`;
     }
   }
 };
