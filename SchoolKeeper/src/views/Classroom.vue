@@ -3,158 +3,299 @@
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    background-color: #f0f2f5;
 }
 
 main {
     flex-grow: 1;
     display: flex;
-    padding: 1rem;
+    padding: 2rem;
     margin-top: 5rem;
     /* Adjust based on your NavBar height */
 }
 
 .box-container {
     display: flex;
-    width: 95vw;
+    width: calc(95vw - 50px); /* Subtract the width of the chat toggle button */
     height: calc(100vh - 10rem);
     /* Adjust based on your NavBar height and desired margins */
-    gap: 1rem;
+    gap: 1.5rem;
+    margin-right: 50px; /* Add margin to avoid overlap with chat toggle */
 }
 
 .box {
-    background-color: #f8f9fa;
+    background-color: #fff;
     border-radius: 8px;
-    padding: 1rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     overflow-y: auto;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .left-column {
     display: flex;
     flex-direction: column;
-    width: 20%;
-    gap: 1rem;
+    width: 25%;
+    gap: 1.5rem;
 }
 
 .info-box {
-    background-color: #e6f2ff;
+    background-color: #fff;
     flex: 0 0 auto;
+    border-left: 4px solid #007bff;
 }
 
 .chat-box {
-    background-color: #f0fff0;
+    background-color: #fff;
     flex: 1;
     display: flex;
     flex-direction: column;
+    border-left: 4px solid #4CAF50;
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    height: 100%;
+    border-top-left-radius: 8px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.chat-container.collapsed .chat-header,
+.chat-container.collapsed .chat-messages,
+.chat-container.collapsed .chat-input {
+    visibility: hidden;
+}
+
+.chat-toggle {
+    position: absolute;
+    left: -50px;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50% 0 0 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    box-shadow: -3px 0 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+    z-index: 101; /* Ensure toggle is above the content */
+}
+
+.chat-toggle:hover {
+    background-color: #45a049;
+    width: 55px;
+    left: -55px;
+}
+
+.chat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #eee;
+}
+
+.chat-header h2 {
+    margin: 0;
+    font-size: 1.4rem;
+}
+
+.chat-header h2::after {
+    display: none;
+}
+
+.chat-close {
+    background: none;
+    border: none;
+    color: #555;
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: 0.2rem;
+    transition: all 0.2s ease;
+}
+
+.chat-close:hover {
+    color: #333;
 }
 
 .right-box {
-    background-color: #fff0f5;
+    background-color: #fff;
     flex: 1;
 }
 
 h2 {
     margin-top: 0;
     color: #333;
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
+    font-size: 1.6rem;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    position: relative;
+}
+
+h2::after {
+    content: '';
+    display: block;
+    width: 50px;
+    height: 3px;
+    background-color: #007bff;
+    margin-top: 8px;
+    position: absolute;
+    bottom: -8px;
+    left: 0;
 }
 
 p {
-    margin: 0.5rem 0;
+    margin: 0.75rem 0;
     color: #666;
     font-size: 1rem;
+    line-height: 1.5;
 }
 
 strong {
     color: #333;
+    font-weight: 600;
 }
 
 .chat-messages {
     flex-grow: 1;
     overflow-y: auto;
-    margin-bottom: 10px;
-    font-size: 0.85rem;
+    margin-bottom: 15px;
+    padding: 0.75rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    max-height: calc(100% - 120px);
 }
 
 .chat-messages p {
-    margin: 0.3rem 0;
-    color: #666;
+    margin: 0.5rem 0;
+    color: #555;
+    font-size: 0.95rem;
+    padding: 0.6rem 1rem;
+    background-color: #e9ecef;
+    border-radius: 12px;
+    border-top-left-radius: 0;
+    width: fit-content;
+    max-width: 80%;
+    word-break: break-word;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.3s ease-out;
+}
+
+.chat-messages p strong {
+    display: block;
+    margin-bottom: 4px;
+    color: #007bff;
     font-size: 0.85rem;
 }
 
 .chat-input {
     display: flex;
     margin-top: 10px;
-    gap: 6px;
+    gap: 10px;
+    background-color: #f8f9fa;
+    padding: 12px;
+    border-radius: 8px;
 }
 
 .chat-input input {
     flex-grow: 1;
-    padding: 4px 6px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 0.85rem;
-    height: 28px;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    font-size: 0.95rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    height: 40px;
     width: 80%;
 }
 
+.chat-input input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+    outline: none;
+}
+
 .chat-input button {
-    padding: 4px 10px;
+    padding: 0 15px;
     background-color: #4CAF50;
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 20px;
     cursor: pointer;
-    font-size: 0.85rem;
-    height: 28px;
+    font-size: 0.95rem;
+    height: 40px;
+    font-weight: 500;
+    transition: background-color 0.3s;
 }
 
 .chat-input button:hover {
     background-color: #45a049;
+    transform: translateY(-1px);
 }
 
 .assignments-list {
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
 }
 
 .assignment-item {
     background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    margin-bottom: 0.5rem;
+    border: 1px solid #e6e6e6;
+    border-radius: 8px;
+    margin-bottom: 1rem;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
 }
 
 .assignment-item:hover {
-    background-color: #f0f0f0;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
 .create-button {
-    background-color: #4CAF50;
+    background-color: #007bff;
     color: white;
     border: none;
-    padding: 0.5rem;
+    padding: 0.8rem 1.2rem;
     border-radius: 4px;
     cursor: pointer;
+    font-weight: 500;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
 .create-button:hover {
-    background-color: #45a049;
+    background-color: #0069d9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+}
+
+.create-button:active {
+    transform: translateY(0);
 }
 
 .right-column {
     flex: 1;
     display: flex;
-    gap: 1rem;
+    gap: 1.5rem;
     position: relative;
 }
 
 .assignments-box {
     flex: 2;
-    background-color: #fff0f5;
+    background-color: #fff;
     transition: flex 0.3s ease-out;
+    border-left: 4px solid #ff9800;
 }
 
 .assignments-box.with-submissions {
@@ -163,11 +304,12 @@ strong {
 
 .details-box {
     flex: 1;
-    background-color: #f5f5f5;
+    background-color: #fff;
     min-width: 300px;
     max-width: 400px;
     animation: slideIn 0.3s ease-out;
     transform-origin: right;
+    border-left: 4px solid #9c27b0;
 }
 
 @keyframes slideIn {
@@ -182,57 +324,67 @@ strong {
 }
 
 .assignment-details {
-    padding: 1rem 0;
+    padding: 1.5rem 0;
 }
 
 .assignment-details .description {
-    margin: 1rem 0;
-    line-height: 1.5;
+    margin: 1.5rem 0;
+    line-height: 1.6;
+    color: #555;
 }
 
 .submissions-list {
-    margin-top: 1rem;
+    margin-top: 1.5rem;
 }
 
 .submission-item {
     background-color: white;
-    padding: 0.75rem;
-    border-radius: 4px;
-    margin-bottom: 0.5rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    border: 1px solid #eee;
+    transition: all 0.3s ease;
+}
+
+.submission-item:hover {
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
 }
 
 .student-name {
-    font-weight: 500;
+    font-weight: 600;
     display: block;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.35rem;
+    color: #333;
+    font-size: 1.05rem;
 }
 
 .submission-date {
     font-size: 0.85rem;
     color: #666;
     display: block;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
 }
 
 .file-list {
-    margin-top: 0.5rem;
+    margin-top: 0.75rem;
 }
 
 .create-assignment {
     flex: 2;
-    background-color: #f0f0f0;
+    background-color: #fff;
     align-self: flex-start;
-}
-
-.create-assignment {
-    background-color: #f0f0f0;
-    border-radius: 4px;
-    padding: 1rem;
+    border-radius: 8px;
+    padding: 1.5rem;
 }
 
 .create-assignment h3 {
     margin-top: 0;
+    margin-bottom: 1.5rem;
+    color: #333;
+    font-size: 1.4rem;
+    font-weight: 600;
 }
 
 .create-assignment form {
@@ -242,16 +394,27 @@ strong {
 
 .create-assignment input,
 .create-assignment textarea {
-    margin-bottom: 0.5rem;
-    padding: 0.5rem;
+    margin-bottom: 1rem;
+    padding: 0.75rem;
     border: 1px solid #ddd;
     border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.create-assignment input:focus,
+.create-assignment textarea:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+    outline: none;
 }
 
 .create-assignment textarea {
-    height: 100px;
+    height: 150px;
     resize: vertical;
+    line-height: 1.5;
 }
+
 .modal {
     position: fixed !important;
     z-index: 1000 !important;
@@ -259,38 +422,42 @@ strong {
     top: 0 !important;
     width: 100% !important;
     height: 100% !important;
-    background-color: rgba(0, 0, 0, 0.4) !important;
+    background-color: rgba(0, 0, 0, 0.5) !important;
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
+    animation: fadeIn 0.3s ease-out !important;
 }
 
 .modal-content {
-    position: fixed !important;
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%) !important;
-    background-color: #fefefe !important;
-    padding: 20px !important;
-    border: 1px solid #888 !important;
-    width: 80% !important;
-    max-width: 500px !important;
-    max-height: 80vh !important;
-    border-radius: 5px !important;
+    position: relative !important;
+    background-color: #fff !important;
+    padding: 2rem !important;
+    border-radius: 8px !important;
+    width: 90% !important;
+    max-width: 600px !important;
+    max-height: 85vh !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
     overflow-y: auto !important;
+    animation: zoomIn 0.3s ease-out !important;
 }
 
 .modal-buttons {
-    margin-top: auto;
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1.5rem;
+    gap: 1rem;
 }
 
 .cancel-button {
     background-color: #f44336;
     color: white;
     border: none;
-    padding: 0.5rem;
+    padding: 0.8rem 1.2rem;
     border-radius: 4px;
     cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.3s;
 }
 
 .cancel-button:hover {
@@ -299,28 +466,45 @@ strong {
 
 /* Adjust the create-button style to be used in both places */
 .create-button {
-    background-color: #4CAF50;
+    background-color: #007bff;
     color: white;
     border: none;
-    padding: 0.5rem;
+    padding: 0.8rem 1.2rem;
     border-radius: 4px;
     cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.3s;
 }
 
 .create-button:hover {
-    background-color: #45a049;
+    background-color: #0069d9;
 }
 
 /* Styles for the create assignment form within the modal */
 .create-assignment {
-    background-color: #f0f0f0;
-    border-radius: 4px;
-    padding: 1rem;
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 0;
 }
 
 .create-assignment h3 {
     margin-top: 0;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
+    color: #333;
+    font-size: 1.5rem;
+    font-weight: 600;
+    position: relative;
+}
+
+.create-assignment h3::after {
+    content: '';
+    display: block;
+    width: 50px;
+    height: 3px;
+    background-color: #007bff;
+    position: absolute;
+    bottom: -8px;
+    left: 0;
 }
 
 .create-assignment form {
@@ -330,26 +514,37 @@ strong {
 
 .create-assignment input,
 .create-assignment textarea {
-    margin-bottom: 0.5rem;
-    padding: 0.5rem;
+    margin-bottom: 1rem;
+    padding: 0.75rem;
     border: 1px solid #ddd;
     border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.create-assignment input:focus,
+.create-assignment textarea:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+    outline: none;
 }
 
 .create-assignment textarea {
-    height: 100px;
+    height: 150px;
     resize: vertical;
+    line-height: 1.5;
 }
 
 .v-expansion-panel-title--active {
-    background-color: #e8f5e9 !important;  /* Light green background when active */
-    font-weight: bold;
-    font-size: 1.2rem;
+    background-color: #f8f9fa !important;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #007bff !important;
 }
 
 .v-expansion-panel-title {
-    transition: background-color 0.2s ease;
-    padding: 8px 16px !important;
+    transition: all 0.3s ease;
+    padding: 12px 16px !important;
 }
 
 .v-expansion-panel-title:hover {
@@ -357,36 +552,42 @@ strong {
 }
 
 .v-expansion-panel-text {
-    padding: 8px 16px 16px !important;
-    font-size: 0.9rem !important;
+    padding: 16px !important;
+    font-size: 1rem !important;
 }
 
 /* Optional: If you want to adjust the icon position */
 .v-expansion-panel-title__icon {
-    margin-right: 8px !important;
+    margin-right: 10px !important;
 }
 
 /* Make the expansion panels more compact */
 .v-expansion-panels {
     width: 100% !important;
+    border-radius: 8px !important;
+    overflow: hidden !important;
 }
 
 .v-expansion-panel {
     box-shadow: none !important;
-    border: 1px solid #ddd !important;
-    margin-bottom: 0.5rem !important;
+    border: 1px solid #e6e6e6 !important;
+    margin-bottom: 1rem !important;
     overflow: hidden !important;
-    transition: none !important;
+    transition: all 0.3s ease !important;
+    border-radius: 8px !important;
+}
+
+.v-expansion-panel:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1) !important;
 }
 
 .v-expansion-panel-text__wrapper {
     padding: 0 !important;
-    transition: none !important;
 }
 
 .v-expansion-panel-text {
-    padding: 8px 16px 16px !important;
-    font-size: 0.9rem !important;
+    padding: 16px !important;
+    font-size: 1rem !important;
 }
 
 .assignment-title-container {
@@ -400,50 +601,60 @@ strong {
     font-size: 0.9rem;
     color: #666;
     margin-right: 24px; /* Add space for the expansion icon */
+    background-color: #eff6ff;
+    padding: 4px 10px;
+    border-radius: 20px;
 }
 
 .message-container {
     display: flex;
     align-items: flex-start;
-    gap: 1rem;
-    padding: 0.5rem 0 !important;
+    gap: 1.5rem;
+    padding: 1rem 0 !important;
     margin: 0 !important;
 }
 
 .message-container p {
     flex: 1;
+    line-height: 1.6;
+    color: #555;
 }
 
 .side-box {
-    width: 25%;
+    width: 30%;
     max-height: 100%;
-    background-color: #f5f5f5;
-    padding: 0.75rem;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    font-size: 0.85rem;
+    background-color: #f8f9fa;
+    padding: 1.2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    font-size: 0.95rem;
+    border: 1px solid #e6e6e6;
 }
 
 .side-box h3 {
-    font-size: 1rem;
-    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: #333;
+    font-weight: 600;
 }
 
 .file-upload {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.2rem;
 }
 
 .file-input {
     position: relative;
-    padding: 2rem;
-    border: 2px dashed #ccc;
-    border-radius: 4px;
+    padding: 2.5rem 1.5rem;
+    border: 2px dashed #007bff;
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 0.85rem;
+    font-size: 0.95rem;
     text-align: center;
-    background-color: #fff;
+    background-color: #f8f9fa;
+    transition: all 0.3s ease;
 }
 
 .file-input::before {
@@ -452,13 +663,14 @@ strong {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    color: #666;
+    color: #007bff;
     pointer-events: none;
+    font-weight: 500;
 }
 
 .file-input:hover {
-    border-color: #4CAF50;
-    background-color: #f8f9fa;
+    border-color: #0056b3;
+    background-color: #e8f4ff;
 }
 
 /* Hide the default file input appearance */
@@ -475,7 +687,7 @@ strong {
 .selected-files {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.6rem;
 }
 
 .file-item {
@@ -483,10 +695,16 @@ strong {
     justify-content: space-between;
     align-items: center;
     background-color: #fff;
-    padding: 0.4rem;
-    border-radius: 4px;
-    border: 1px solid #ddd;
-    font-size: 0.85rem;
+    padding: 0.6rem 0.8rem;
+    border-radius: 6px;
+    border: 1px solid #e6e6e6;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.file-item:hover {
+    background-color: #f8f9fa;
+    border-color: #ddd;
 }
 
 .remove-file {
@@ -496,6 +714,7 @@ strong {
     cursor: pointer;
     font-size: 1.2rem;
     padding: 0 0.5rem;
+    transition: color 0.2s ease;
 }
 
 .remove-file:hover {
@@ -503,14 +722,16 @@ strong {
 }
 
 .submit-button {
-    background-color: #4CAF50;
+    background-color: #007bff;
     color: white;
     border: none;
-    padding: 0.5rem;
+    padding: 0.75rem 1rem;
     border-radius: 4px;
     cursor: pointer;
-    font-weight: bold;
-    font-size: 0.85rem;
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    text-align: center;
 }
 
 .submit-button:disabled {
@@ -519,7 +740,9 @@ strong {
 }
 
 .submit-button:not(:disabled):hover {
-    background-color: #45a049;
+    background-color: #0069d9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
 }
 
 .v-expansion-panel--inactive .v-expansion-panel-text__wrapper {
@@ -530,37 +753,38 @@ strong {
 
 /* Add these custom scrollbar styles for the chat messages */
 .chat-messages::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
 }
 
 .chat-messages::-webkit-scrollbar-track {
-    background: #ffffff00;
-    border-radius: 4px;
+    background: #f8f9fa;
+    border-radius: 6px;
 }
 
 .chat-messages::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 4px;
+    background: #ccc;
+    border-radius: 6px;
 }
 
 .chat-messages::-webkit-scrollbar-thumb:hover {
-    background: #666;
+    background: #aaa;
 }
 
 /* For Firefox */
 .chat-messages {
     scrollbar-width: thin;
-    scrollbar-color: #888 #ffffff00;
+    scrollbar-color: #ccc #f8f9fa;
 }
 
 .submitted-files {
-    margin-top: 1rem;
+    margin-top: 1.2rem;
 }
 
 .submitted-files h4 {
-    margin-bottom: 0.5rem;
-    font-size: 0.9rem;
-    color: #666;
+    margin-bottom: 0.75rem;
+    font-size: 0.95rem;
+    color: #555;
+    font-weight: 600;
 }
 
 .file-actions {
@@ -571,54 +795,63 @@ strong {
 .download-file {
     background: none;
     border: none;
-    color: #4CAF50;
+    color: #007bff;
     cursor: pointer;
     font-size: 1.2rem;
     padding: 0 0.5rem;
+    transition: color 0.2s ease;
 }
 
 .download-file:hover {
-    color: #45a049;
+    color: #0056b3;
 }
 
 /* Add these styles */
 .file-display {
-    margin: 1rem 0;
+    margin: 1.2rem 0;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.2rem;
 }
 
 .selected-files, .submitted-files {
     background-color: #fff;
-    border-radius: 4px;
-    padding: 0.5rem;
+    border-radius: 6px;
+    padding: 0.8rem;
+    border: 1px solid #e6e6e6;
 }
 
 .selected-files h4, .submitted-files h4 {
-    margin-bottom: 0.5rem;
-    font-size: 0.9rem;
-    color: #666;
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+    font-size: 0.95rem;
+    color: #555;
     border-bottom: 1px solid #eee;
-    padding-bottom: 0.3rem;
+    padding-bottom: 0.5rem;
+    font-weight: 600;
 }
 
 .file-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.3rem 0.5rem;
+    padding: 0.5rem 0.8rem;
     background-color: #f8f9fa;
-    border-radius: 4px;
-    margin-bottom: 0.3rem;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+    transition: all 0.2s ease;
 }
 
 .file-item:last-child {
     margin-bottom: 0;
 }
 
+.file-item:hover {
+    background-color: #eff6ff;
+}
+
 .file-item span {
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     color: #333;
 }
 
@@ -630,6 +863,7 @@ strong {
 
 .file-name {
     font-weight: 500;
+    color: #333;
 }
 
 .submission-date {
@@ -649,11 +883,12 @@ strong {
     cursor: pointer;
     padding: 0.2rem 0.5rem;
     font-size: 1.1rem;
-    color: #4CAF50;
+    color: #007bff;
+    transition: color 0.2s ease;
 }
 
 .download-file:hover {
-    color: #45a049;
+    color: #0056b3;
 }
 
 .remove-file {
@@ -663,20 +898,21 @@ strong {
     padding: 0.2rem 0.5rem;
     font-size: 1.1rem;
     color: #f44336;
+    transition: color 0.2s ease;
 }
 
 .remove-file:hover {
     color: #d32f2f;
 }
 
-/* Add these new styles */
 .details-box {
     flex: 1;
-    background-color: #f5f5f5;
+    background-color: #fff;
     min-width: 300px;
     max-width: 400px;
     animation: slideIn 0.3s ease-out;
     transform-origin: right;
+    border-left: 4px solid #9c27b0;
 }
 
 @keyframes slideIn {
@@ -690,11 +926,21 @@ strong {
     }
 }
 
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes zoomIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
 /* Optional: Add transition for when the box disappears */
 .right-column {
     flex: 1;
     display: flex;
-    gap: 1rem;
+    gap: 1.5rem;
     position: relative;
 }
 
@@ -722,36 +968,163 @@ strong {
 .download-button {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 0.5rem;
-    background-color: #4CAF50;
+    background-color: #007bff;
     color: white;
     border: none;
-    padding: 0.4rem 0.8rem;
+    padding: 0.6rem 1rem;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 0.85rem;
-    transition: background-color 0.2s ease;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
 }
 
 .download-button:hover {
-    background-color: #45a049;
-}
-
-.download-button i {
-    font-size: 1rem;
+    background-color: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
 }
 
 .details-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #eee;
 }
 
 .details-header h2 {
     margin: 0;  /* Remove default margin to ensure proper alignment */
+    padding-bottom: 0;
+}
+
+.details-header h2::after {
+    display: none;
+}
+
+/* Box scrollbars */
+.box::-webkit-scrollbar {
+    width: 6px;
+}
+
+.box::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.box::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+}
+
+.box::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+/* For Firefox */
+.box {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+
+/* Right column for chat */
+.chat-container {
+    position: fixed;
+    right: 0;
+    top: 5rem; /* Adjust based on your NavBar height */
+    bottom: 0;
+    width: 350px;
+    z-index: 100;
+    transition: transform 0.3s ease;
+    display: flex;
+}
+
+.chat-container.collapsed {
+    transform: translateX(346px);  /* Show only the 4px green border */
+}
+
+.chat-box {
+    background-color: #fff;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    border-left: 4px solid #4CAF50;
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    height: 100%;
+    border-top-left-radius: 8px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.chat-container.collapsed .chat-header,
+.chat-container.collapsed .chat-messages,
+.chat-container.collapsed .chat-input {
+    visibility: hidden;
+}
+
+.chat-toggle {
+    position: absolute;
+    left: -50px;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50% 0 0 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    box-shadow: -3px 0 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+    z-index: 101; /* Ensure toggle is above the content */
+}
+
+.chat-toggle:hover {
+    background-color: #45a049;
+    width: 55px;
+    left: -55px;
+}
+
+.chat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #eee;
+}
+
+.chat-header h2 {
+    margin: 0;
+    font-size: 1.4rem;
+}
+
+.chat-header h2::after {
+    display: none;
+}
+
+.chat-close {
+    background: none;
+    border: none;
+    color: #555;
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: 0.2rem;
+    transition: all 0.2s ease;
+}
+
+.chat-close:hover {
+    color: #333;
 }
 </style>
+
 <template>
     <div class="classroom-view">
         <NavBar site="files" :currentUser="currentUser" />
@@ -762,19 +1135,6 @@ strong {
                         <h2>{{ classroom.name }}</h2>
                         <p><strong>Uppgift:</strong> {{ classroom.subject }}</p>
                         <p><strong>Klass:</strong> {{ classroom.class }}</p>
-                    </div>
-                    <div class="box chat-box">
-                        <h2>Chat</h2>
-                        <div class="chat-messages">
-                            <p v-for="(message, index) in messages" :key="index">
-                                <strong>{{ message.user_id }}:</strong>
-                                <br> {{ message.message }}
-                            </p>
-                        </div>
-                        <div class="chat-input">
-                            <input v-model="newMessage" @keyup.enter="sendMessage" placeholder="Skriv ett meddelande..." />
-                            <button @click="sendMessage">Skicka</button>
-                        </div>
                     </div>
                 </div>
                 <div class="right-column">
@@ -883,6 +1243,29 @@ strong {
             </div>
         </main>
 
+        <!-- Chat container (fixed on right side) -->
+        <div class="chat-container" :class="{ 'collapsed': isChatCollapsed }">
+            <button class="chat-toggle" @click="toggleChat">
+                <span v-if="isChatCollapsed">💬</span>
+                <span v-else>→</span>
+            </button>
+            <div class="chat-box">
+                <div class="chat-header">
+                    <h2>Chat</h2>
+                    <button class="chat-close" @click="closeChat">×</button>
+                </div>
+                <div class="chat-messages">
+                    <p v-for="(message, index) in messages" :key="index">
+                        <strong>{{ message.user_id }}</strong>
+                        {{ message.message }}
+                    </p>
+                </div>
+                <div class="chat-input">
+                    <input v-model="newMessage" @keyup.enter="sendMessage" placeholder="Skriv ett meddelande..." />
+                    <button @click="sendMessage">Skicka</button>
+                </div>
+            </div>
+        </div>
 
         <!-- Modal for creating assignments -->
         <div v-if="showModal" class="modal">
@@ -902,6 +1285,7 @@ strong {
     </div>
     <Footer />
 </template>
+
 <script>
 import NavBar from '@/components/Nav-Bar.vue';
 import { useStorage } from "@vueuse/core";
@@ -930,7 +1314,7 @@ export default {
             submittedFiles: {},
             allSubmissions: {},
             selectedAssignment: null,
-            
+            isChatCollapsed: true
         }
     },
     setup() {
@@ -1155,6 +1539,12 @@ export default {
         },
         removeFile(index) {
             this.selectedFiles.splice(index, 1);
+        },
+        toggleChat() {
+            this.isChatCollapsed = !this.isChatCollapsed;
+        },
+        closeChat() {
+            this.isChatCollapsed = true;
         },
     },
     async mounted() {
