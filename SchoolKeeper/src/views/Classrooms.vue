@@ -154,16 +154,18 @@ export default {
 
 <template>
   <NavBar site="files" :currentUser="currentUser" />
-  <main class="content">
+  <div class="classrooms-container-wrapper">
     <div id="classrooms" :class="{ 'full-width': currentUser.access === 'Elev' }">
-      <h2>Klassrum</h2>
+      <h2 class="section-title">Klassrum</h2>
       <div class="classroom-grid">
         <div v-for="classroom in filteredClassrooms" :key="classroom.id" 
-             class="classroom-item" 
+             class="classroom-card" 
              @click="enterClassroom(classroom)">
-          <h3>{{ classroom.name }}</h3>
-          <p>Klass: {{ classroom.class }}</p>
-          <p>Ämne: {{ classroom.subject }}</p>
+          <div class="classroom-card-content">
+            <h3 class="classroom-title">{{ classroom.name }}</h3>
+            <p class="classroom-detail">Klass: {{ classroom.class }}</p>
+            <p class="classroom-detail">Ämne: {{ classroom.subject }}</p>
+          </div>
           <div v-if="currentUser.access === 'Admin' || currentUser.access === 'Lärare'" class="admin-buttons">
             <button @click.stop="openEditModal(classroom)" class="edit-button">Ändra</button>
             <button @click.stop="deleteClassroom(classroom._id)" class="delete-button">Ta bort</button>
@@ -171,171 +173,319 @@ export default {
         </div>
       </div>
     </div>
+    
     <div id="create-classroom" v-if="currentUser.access === 'Admin' || currentUser.access === 'Lärare'">
-      <h2>Skapa Klassrum</h2>
-      <form @submit.prevent="createClassroom">
-        <input v-model="currentClassroom.name" placeholder="Klassrum namn" required>
-        <select v-model="currentClassroom.groupId" required>
-          <option value="" disabled>Välj grupp</option>
-          <option v-for="group in availableGroups" :key="group._id" :value="group._id">
-            {{ group }}
-          </option>
-        </select>
-        <select v-model="currentClassroom.subject" required>
-          <option value="" disabled>Välj ämne</option>
-          <option value="Math">Matte</option>
-          <option value="Science">Vetenskap</option>
-          <option value="History">Historia</option>
-          <option value="Literature">Litteratur</option>
-        </select>
+      <h2 class="section-title">Skapa Klassrum</h2>
+      <form @submit.prevent="createClassroom" class="create-form">
+        <div class="form-group">
+          <input v-model="currentClassroom.name" placeholder="Klassrum namn" required>
+        </div>
+        <div class="form-group">
+          <select v-model="currentClassroom.groupId" required>
+            <option value="" disabled>Välj grupp</option>
+            <option v-for="group in availableGroups" :key="group._id" :value="group._id">
+              {{ group }}
+            </option>
+          </select>
+        </div>
+        <div class="form-group">
+          <select v-model="currentClassroom.subject" required>
+            <option value="" disabled>Välj ämne</option>
+            <option value="Math">Matte</option>
+            <option value="Science">Vetenskap</option>
+            <option value="History">Historia</option>
+            <option value="Literature">Litteratur</option>
+          </select>
+        </div>
         <button type="submit" class="create-button">Skapa Klassrum</button>
       </form>
     </div>
-  </main>
+  </div>
 
   <div v-if="showModal" class="modal">
+    <div class="modal-overlay" @click="closeModal"></div>
     <div class="modal-content">
-      <h2>Ändra Klassrum</h2>
-      <input v-model="currentClassroom.name" placeholder="Klass Namn">
-      <select v-model="currentClassroom.groupId">
-        <option value="" disabled>Välj grupp</option>
-        <option v-for="group in availableGroups" :key="group._id" :value="group._id">
-          {{ group.name }}
-        </option>
-      </select>
-      <select v-model="currentClassroom.subject">
-        <option value="" disabled>Välj Klassrum</option>
-        <option value="Math">Matte</option>
-        <option value="Science">Vetenskap</option>
-        <option value="History">Historia</option>
-        <option value="Literature">Litteratur</option>
-      </select>
-      <div class="modal-buttons">
-        <button @click="saveClassroom" class="save-button">Spara</button>
-        <button @click="closeModal" class="cancel-button">Avbryt</button>
+      <div class="modal-header">
+        <h2>{{ isEditing ? 'Ändra Klassrum' : 'Skapa Klassrum' }}</h2>
+        <button @click="closeModal" class="close-button">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <input v-model="currentClassroom.name" placeholder="Klass Namn">
+        </div>
+        <div class="form-group">
+          <select v-model="currentClassroom.groupId">
+            <option value="" disabled>Välj grupp</option>
+            <option v-for="group in availableGroups" :key="group._id" :value="group._id">
+              {{ group.name }}
+            </option>
+          </select>
+        </div>
+        <div class="form-group">
+          <select v-model="currentClassroom.subject">
+            <option value="" disabled>Välj Klassrum</option>
+            <option value="Math">Matte</option>
+            <option value="Science">Vetenskap</option>
+            <option value="History">Historia</option>
+            <option value="Literature">Litteratur</option>
+          </select>
+        </div>
+        <div class="modal-buttons">
+          <button @click="saveClassroom" class="save-button">Spara</button>
+          <button @click="closeModal" class="cancel-button">Avbryt</button>
+        </div>
       </div>
     </div>
   </div>
+  
   <Footer />
 </template>
 
 <style scoped>
-main {
+/* Container styling */
+.classrooms-container-wrapper {
   display: flex;
-  border: solid rgb(212, 212, 212) 1px;
-  width: 80vw;
-  height: 70vh;
-  background-color: #ebebeb;
-  border-radius: 1rem;
-  box-shadow: 1px 1px 20px 10px rgba(0, 0, 0, 0.1);
-  padding: 1rem;
+  width: 100vw;
+  min-height: 80vh;
+  padding: 2rem;
+  padding-top: 100px;
+  box-sizing: border-box;
+  background-color: #f0f2f5;
 }
 
+/* Section titles */
+.section-title {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  color: #333;
+  font-size: 1.6rem;
+  font-weight: 600;
+}
 
-
+/* Classrooms section styling */
 #classrooms {
-  width: 70%;
-  padding: 1rem;
-  background-color: #e6f2ff;
-  border-radius: 0.5rem;
+  flex: 2;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  margin-right: 2rem;
+  max-height: 75vh;
   overflow-y: auto;
-  margin-right: 1rem;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
 }
 
 #classrooms.full-width {
+  flex: 1;
   width: 100%;
   margin-right: 0;
 }
 
+/* Create classroom section styling */
 #create-classroom {
-  width: 30%;
-  padding: 1rem;
-  background-color: #f0f0f0;
-  border-radius: 0.5rem;
-  display: flex;
-  flex-direction: column;
+  flex: 1;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  height: fit-content;
+  max-width: 400px;
 }
 
+/* Classroom grid layout */
 .classroom-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1rem;
-  margin-top: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.5rem;
 }
 
-.classroom-item {
-  background-color: white;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  padding: 0.5rem;
-  text-align: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+/* Classroom card styling */
+.classroom-card {
+  background-color: #fff;
+  border-radius: 8px;
+  border: 1px solid #e6e6e6;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   cursor: pointer;
+  overflow: hidden;
+  position: relative;
+  animation: fadeIn 0.5s ease-out;
 }
 
-.create-button, .edit-button, .delete-button {
-  color: white;
+.classroom-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+.classroom-card-content {
+  padding: 1.5rem;
+}
+
+.classroom-title {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  color: #333;
+  font-size: 1.3rem;
+}
+
+.classroom-detail {
+  margin: 0.5rem 0;
+  color: #666;
+  font-size: 0.95rem;
+}
+
+/* Admin buttons styling */
+.admin-buttons {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 1.5rem;
+  background-color: #f9f9f9;
+  border-top: 1px solid #eee;
+}
+
+.create-button,
+.edit-button,
+.delete-button,
+.save-button,
+.cancel-button {
+  padding: 0.6rem 1rem;
   border: none;
-  padding: 5px 10px;
-  border-radius: 3px;
+  border-radius: 4px;
   cursor: pointer;
-  margin-top: 0.5rem;
-  font-size: 0.8rem;
+  font-weight: 500;
+  transition: background-color 0.3s;
 }
 
 .create-button {
-  background-color: #4caf50;
+  background-color: #007bff;
+  color: white;
+  width: 100%;
+  padding: 0.8rem;
+  font-size: 1rem;
+  margin-top: 1rem;
+}
+
+.create-button:hover {
+  background-color: #0056b3;
 }
 
 .edit-button {
   background-color: #2196F3;
+  color: white;
+  flex: 1;
+  margin-right: 0.5rem;
+}
+
+.edit-button:hover {
+  background-color: #0b7dda;
 }
 
 .delete-button {
   background-color: #f44336;
+  color: white;
+  flex: 1;
+  margin-left: 0.5rem;
 }
 
+.delete-button:hover {
+  background-color: #d32f2f;
+}
+
+/* Form styling */
+.create-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group {
+  margin-bottom: 1.2rem;
+}
+
+input, select {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+input:focus, select:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+  outline: none;
+}
+
+/* Modal styling */
 .modal {
   position: fixed;
-  z-index: 1;
-  left: 0;
   top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
-  overflow: auto;
-  background-color: rgba(0,0,0,0.4);
+  z-index: 1000;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.modal-content {
-  background-color: #fefefe;
-  padding: 20px;
-  border: 1px solid #888;
-  width: 300px;
-  border-radius: 5px;
+.modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
 }
 
-input, select {
-  width: 100%;
-  padding: 10px;
-  margin: 10px 0;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+.modal-content {
+  position: relative;
+  background-color: #fff;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  z-index: 1001;
+  animation: modalFadeIn 0.3s;
+}
+
+.modal-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #999;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.close-button:hover {
+  color: #333;
 }
 
 .modal-buttons {
   display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
-}
-
-.save-button, .cancel-button {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+  gap: 0.75rem;
 }
 
 .save-button {
@@ -343,37 +493,58 @@ input, select {
   color: white;
 }
 
+.save-button:hover {
+  background-color: #45a049;
+}
+
 .cancel-button {
   background-color: #f44336;
   color: white;
 }
 
-select {
+.cancel-button:hover {
+  background-color: #d32f2f;
+}
+
+/* Animation keyframes */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; transform: translateY(-30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Scrollbar styling */
+#classrooms::-webkit-scrollbar {
+  width: 6px;
+}
+
+#classrooms::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#classrooms::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+}
+
+/* Fixed navbar and footer positioning */
+:deep(.navbar) {
+  z-index: 100;
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
-  padding: 10px;
-  margin: 10px 0;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  background-color: white;
-  font-size: 14px;
 }
 
-.enter-button {
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  border-radius: 3px;
-  cursor: pointer;
-  margin-top: 0.5rem;
-  font-size: 0.8rem;
-}
-
-.enter-button:hover {
-  background-color: #45a049;
-}
-
-.admin-buttons {
-  margin-top: 10px;
+:deep(footer) {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 10;
 }
 </style>
