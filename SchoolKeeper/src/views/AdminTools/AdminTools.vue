@@ -8,7 +8,7 @@
   
   <div class="admintools-grid">
     <router-link 
-      to="/schedulecreator" 
+      to="/admintools/schedulecreator" 
       class="admintools-card"
     >
       <div class="card-icon">

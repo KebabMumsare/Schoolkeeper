@@ -51,14 +51,14 @@ const router = createRouter({
      component: IndividualStudyPlan
    },
    {
-    path: '/ScheduleCreator',
-    name: 'ScheduleCreator',
-    component: ScheduleCreator
-   },
-   {
     path: '/admintools',
     name: 'AdminTools',
     component: AdminTools
+   },
+   {
+    path: '/admintools/ScheduleCreator',
+    name: 'ScheduleCreator',
+    component: ScheduleCreator
    },
    {
     path: '/admintools/addnewuser',
