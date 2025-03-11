@@ -184,7 +184,7 @@ export default {
           <select v-model="currentClassroom.groupId" required>
             <option value="" disabled>Välj grupp</option>
             <option v-for="group in availableGroups" :key="group._id" :value="group._id">
-              {{ group }}
+              {{ group.name }}
             </option>
           </select>
         </div>
