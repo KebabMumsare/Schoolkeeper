@@ -37,7 +37,12 @@
                     <span class="button-icon">{{ showDetails ? '▲' : '▼' }}</span>
                     {{ showDetails ? 'Mindre information' : 'Mer information' }}
                 </button>
-                <button @click="goToStudyPlan" class="action-button study-plan-button">
+                <!-- Only show study plan button for students -->
+                <button 
+                    v-if="isStudent" 
+                    @click="goToStudyPlan" 
+                    class="action-button study-plan-button"
+                >
                     <span class="button-icon">📚</span>
                     Individuell Studieplan
                 </button>
@@ -59,24 +64,6 @@
                         <div class="info-value">{{ user.emergencyContact }}</div>
                     </div>
                 </div>
-            </div>
-        </div>
-        
-        <div class="quick-stats">
-            <div class="stat-card">
-                <div class="stat-icon">📊</div>
-                <div class="stat-value">92%</div>
-                <div class="stat-label">Närvaro</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">📝</div>
-                <div class="stat-value">5</div>
-                <div class="stat-label">Kommande prov</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">📅</div>
-                <div class="stat-value">12</div>
-                <div class="stat-label">Lektioner denna vecka</div>
             </div>
         </div>
     </main>
@@ -235,46 +222,6 @@
     animation: fadeIn 0.3s ease;
 }
 
-.quick-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 20px;
-    margin-top: 10px;
-}
-
-.stat-card {
-    background-color: white;
-    border-radius: 12px;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-    transition: transform 0.2s ease;
-}
-
-.stat-card:hover {
-    transform: translateY(-5px);
-}
-
-.stat-icon {
-    font-size: 2rem;
-    margin-bottom: 10px;
-}
-
-.stat-value {
-    font-size: 1.8rem;
-    font-weight: 600;
-    color: #216e87;
-    margin-bottom: 5px;
-}
-
-.stat-label {
-    font-size: 0.95rem;
-    color: #666;
-}
-
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
@@ -287,10 +234,6 @@
     }
     
     .info-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .quick-stats {
         grid-template-columns: 1fr;
     }
     
@@ -327,6 +270,15 @@ export default {
             user: {},
             error: null,
             showDetails: false,
+        }
+    },
+    computed: {
+        isStudent() {
+            // Check if the user is a student (not admin or teacher)
+            const access = this.user.access || this.currentUser.access || '';
+            return access.toLowerCase() !== 'admin' && 
+                   access.toLowerCase() !== 'teacher' && 
+                   access.toLowerCase() !== 'lärare';
         }
     },
     methods: {
