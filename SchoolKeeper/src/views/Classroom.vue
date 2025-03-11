@@ -16,11 +16,10 @@ main {
 
 .box-container {
     display: flex;
-    width: calc(95vw - 50px); /* Subtract the width of the chat toggle button */
+    width: 95vw;
     height: calc(100vh - 10rem);
     /* Adjust based on your NavBar height and desired margins */
     gap: 1.5rem;
-    margin-right: 50px; /* Add margin to avoid overlap with chat toggle */
 }
 
 .box {
@@ -51,77 +50,6 @@ main {
     display: flex;
     flex-direction: column;
     border-left: 4px solid #4CAF50;
-    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    height: 100%;
-    border-top-left-radius: 8px;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-.chat-container.collapsed .chat-header,
-.chat-container.collapsed .chat-messages,
-.chat-container.collapsed .chat-input {
-    visibility: hidden;
-}
-
-.chat-toggle {
-    position: absolute;
-    left: -50px;
-    top: 50%;
-    transform: translateY(-50%);
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    width: 50px;
-    height: 50px;
-    border-radius: 50% 0 0 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    box-shadow: -3px 0 10px rgba(0, 0, 0, 0.1);
-    transition: all 0.2s ease;
-    z-index: 101; /* Ensure toggle is above the content */
-}
-
-.chat-toggle:hover {
-    background-color: #45a049;
-    width: 55px;
-    left: -55px;
-}
-
-.chat-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 1.5rem;
-    border-bottom: 1px solid #eee;
-}
-
-.chat-header h2 {
-    margin: 0;
-    font-size: 1.4rem;
-}
-
-.chat-header h2::after {
-    display: none;
-}
-
-.chat-close {
-    background: none;
-    border: none;
-    color: #555;
-    cursor: pointer;
-    font-size: 1.2rem;
-    padding: 0.2rem;
-    transition: all 0.2s ease;
-}
-
-.chat-close:hover {
-    color: #333;
 }
 
 .right-box {
@@ -1042,7 +970,7 @@ strong {
 }
 
 .chat-container.collapsed {
-    transform: translateX(346px);  /* Show only the 4px green border */
+    transform: translateX(calc(100% - 50px));
 }
 
 .chat-box {
@@ -1055,15 +983,6 @@ strong {
     width: 100%;
     height: 100%;
     border-top-left-radius: 8px;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-.chat-container.collapsed .chat-header,
-.chat-container.collapsed .chat-messages,
-.chat-container.collapsed .chat-input {
-    visibility: hidden;
 }
 
 .chat-toggle {
@@ -1084,7 +1003,6 @@ strong {
     font-size: 1.5rem;
     box-shadow: -3px 0 10px rgba(0, 0, 0, 0.1);
     transition: all 0.2s ease;
-    z-index: 101; /* Ensure toggle is above the content */
 }
 
 .chat-toggle:hover {
