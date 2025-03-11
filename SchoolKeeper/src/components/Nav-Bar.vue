@@ -347,7 +347,12 @@ export default {
   },
   data() {
     return {
-      indicatorPosition: { left: 0 }
+      indicatorPosition: { left: 0 },
+      lastHoveredPosition: { left: 0 },
+      hoverTimer: null,
+      resetTimer: null,
+      isHovering: false,
+      resetDelay: 450
     };
   },
   mounted() {
@@ -380,23 +385,63 @@ export default {
       }
     },
     moveIndicator(event) {
-      const indicator = this.$refs.indicator || document.querySelector('.sliding-indicator');
-      const navList = this.$refs.navList || document.querySelector('.nav-list');
+      if (this.hoverTimer) {
+        clearTimeout(this.hoverTimer);
+      }
+      if (this.resetTimer) {
+        clearTimeout(this.resetTimer);
+      }
       
-      if (!indicator || !navList) return;
+      const targetElement = event.currentTarget;
+      this.isHovering = true;
       
-      const navListRect = navList.getBoundingClientRect();
-      const linkRect = event.currentTarget.getBoundingClientRect();
-      
-      const left = linkRect.left - navListRect.left + (linkRect.width - 20) / 2;
-      
-      indicator.style.left = `${left}px`;
+      this.hoverTimer = setTimeout(() => {
+        const indicator = this.$refs.indicator || document.querySelector('.sliding-indicator');
+        const navList = this.$refs.navList || document.querySelector('.nav-list');
+        
+        if (!indicator || !navList) return;
+        
+        const navListRect = navList.getBoundingClientRect();
+        const linkRect = targetElement.getBoundingClientRect();
+        
+        const left = linkRect.left - navListRect.left + (linkRect.width - 20) / 2;
+        
+        this.lastHoveredPosition.left = left;
+        
+        indicator.style.left = `${left}px`;
+      }, 100);
     },
     resetIndicator() {
-      const indicator = this.$refs.indicator || document.querySelector('.sliding-indicator');
-      if (!indicator) return;
+      if (this.hoverTimer) {
+        clearTimeout(this.hoverTimer);
+        this.hoverTimer = null;
+      }
       
-      indicator.style.left = `${this.indicatorPosition.left}px`;
+      this.isHovering = false;
+      
+      setTimeout(() => {
+        if (this.isHovering) return;
+        
+        const indicator = this.$refs.indicator || document.querySelector('.sliding-indicator');
+        if (!indicator) return;
+        
+        if (this.lastHoveredPosition.left !== 0) {
+          indicator.style.left = `${this.lastHoveredPosition.left}px`;
+          
+          if (this.resetTimer) {
+            clearTimeout(this.resetTimer);
+          }
+          
+          this.resetTimer = setTimeout(() => {
+            if (!this.isHovering) {
+              indicator.style.left = `${this.indicatorPosition.left}px`;
+              this.lastHoveredPosition.left = 0;
+            }
+          }, this.resetDelay);
+        } else {
+          indicator.style.left = `${this.indicatorPosition.left}px`;
+        }
+      }, 50);
     }
   }
 };
