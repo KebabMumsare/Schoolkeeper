@@ -128,7 +128,7 @@
   background-color: white;
   border-radius: 0px 0px 20px 20px;
   padding: 0 58px 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   top: 0;
   margin-top: 0;
   overflow: visible;
