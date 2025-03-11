@@ -4,24 +4,37 @@
     width: 100vw;
     height: 100vh;
     overflow: hidden;
+    background-color: #f0f2f5;
+    background-image: linear-gradient(135deg, #f5f7fa 0%, #e4efe9 100%);
 }
 
 .components {
-    width: 20vw;
-    background-color: #f5f5f5;
+    width: 350px;
+    background-color: #fff;
     position: relative;
+    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    z-index: 10;
 }
 
 .create-button {
-    background-color: #4fc0e5;
-    padding: 0.5rem;
-    border-radius: 0.5rem;
+    background: linear-gradient(90deg, #4776E6 0%, #8E54E9 100%);
+    padding: 0.8rem;
+    border-radius: 8px;
     border: none;
     cursor: pointer;
     font-size: 1rem;
-    font-weight: bold;
+    font-weight: 600;
     color: #fff;
     width: 100%;
+    box-shadow: 0 4px 10px rgba(71, 118, 230, 0.2);
+    transition: all 0.3s ease;
+}
+
+.create-button:hover {
+    box-shadow: 0 6px 15px rgba(71, 118, 230, 0.3);
+    transform: translateY(-2px);
 }
 
 .schedule-container {
@@ -34,9 +47,11 @@
 .days-header {
     display: flex;
     justify-content: space-around;
-    background-color: #216e87;
-    padding: 10px 0;
+    background: linear-gradient(90deg, #216e87 0%, #4fc0e5 100%);
+    padding: 0;
     flex-shrink: 0;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    z-index: 5;
 }
 
 .day {
@@ -44,28 +59,50 @@
     text-align: center;
     cursor: pointer;
     color: white;
-    font-weight: bold;
+    font-weight: 600;
+    padding: 15px 0;
+    margin: 0;
+    transition: all 0.3s ease;
+    font-size: 1.1rem;
+}
+
+.day:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.day.selected {
+    background-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .schedule {
     flex: 1;
-    background-color: #4fc0e5;
+    background-color: white;
     position: relative;
     overflow-y: auto;
     overflow-x: hidden;
     min-width: 800px;
-    scrollbar-width: none;
+    scrollbar-width: thin;
+    scrollbar-color: #4fc0e5 #f0f2f5;
+    box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.schedule::-webkit-scrollbar {
+    width: 8px;
+}
+
+.schedule::-webkit-scrollbar-track {
+    background: #f0f2f5;
+}
+
+.schedule::-webkit-scrollbar-thumb {
+    background: #4fc0e5;
+    border-radius: 4px;
 }
 
 .schedule-content {
     position: relative;
     min-height: 1440px; /* 24 hours * 60px */
-    scrollbar-width: none;
-}
-
-.schedule-content::-webkit-scrollbar {
-    width: 0 !important;
-    display: none !important;
 }
 
 .schedule-grid {
@@ -84,19 +121,48 @@
     padding: 20px;
     display: flex;
     justify-content: center;
+    background: linear-gradient(to top, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.8));
+    border-top: 1px solid #eee;
 }
 
 .draggable-items {
     padding: 1rem;
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #4fc0e5 #f0f2f5;
+}
+
+.draggable-items::-webkit-scrollbar {
+    width: 6px;
+}
+
+.draggable-items::-webkit-scrollbar-track {
+    background: #f0f2f5;
+}
+
+.draggable-items::-webkit-scrollbar-thumb {
+    background: #4fc0e5;
+    border-radius: 3px;
 }
 
 .draggable-item {
     background-color: white;
-    padding: 0.5rem;
-    margin: 0.5rem 0;
-    border-radius: 0.25rem;
+    padding: 0.8rem;
+    margin: 0.8rem 0;
+    border-radius: 8px;
     cursor: move;
-    border: 1px solid #ddd;
+    border: 1px solid #eee;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    font-weight: 500;
+    color: #333;
+}
+
+.draggable-item:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+    border-color: #4fc0e5;
 }
 
 .grid-lines {
@@ -113,7 +179,7 @@
     left: 0;
     right: 0;
     height: 1px;
-    background-color: rgba(255, 255, 255, 0.3);
+    background-color: rgba(0, 0, 0, 0.05);
 }
 
 .time-markers {
@@ -128,22 +194,17 @@
 
 .time-marker {
     height: 60px;
-    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
     padding: 2px 8px;
     font-size: 0.8rem;
-    color: white;
+    color: #666;
     width: 70px;
-    background-color: #4fc0e5;
+    background-color: #f9f9f9;
     z-index: 1;
     text-align: right;
     padding-right: 10px;
     position: relative;
-}
-
-.day.selected {
-    background-color: #1d5d73;
-    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
-    border: 2px solid rgba(0, 0, 0, 0.3);
+    font-weight: 500;
 }
 
 .schedule-controls {
@@ -152,91 +213,132 @@
     right: 20px;
     display: flex;
     gap: 10px;
-    padding: 10px;
-    background-color: rgba(255, 255, 255, 0.9);
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     z-index: 10;
 }
 
 .schedule-dropdown {
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
+    padding: 10px 15px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    font-size: 0.95rem;
     background-color: white;
+    color: #333;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.schedule-dropdown:focus {
+    border-color: #4fc0e5;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(79, 192, 229, 0.2);
 }
 
 .schedule-save-btn {
-    padding: 8px 16px;
-    background-color: #216e87;
+    padding: 10px 20px;
+    background: linear-gradient(90deg, #216e87 0%, #4fc0e5 100%);
     color: white;
     border: none;
-    border-radius: 4px;
-    font-size: 14px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(33, 110, 135, 0.2);
 }
 
 .schedule-save-btn:hover {
-    background-color: #1d5d73;
+    box-shadow: 0 6px 15px rgba(33, 110, 135, 0.3);
+    transform: translateY(-2px);
 }
 
 .components-header {
-    padding: 1rem;
+    padding: 1.2rem;
     display: flex;
     align-items: center;
-    gap: 1rem;
-    border-bottom: 1px solid #ddd;
+    gap: 1.5rem;
+    border-bottom: 1px solid #eee;
+    background-color: #f9f9f9;
 }
 
 .components-header h2 {
     margin: 0;
     color: #216e87;
+    font-size: 1.4rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .back-button {
-    padding: 0.5rem 1rem;
-    background-color: #216e87;
+    padding: 0.6rem 1rem;
+    background: linear-gradient(90deg, #216e87 0%, #4fc0e5 100%);
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.2s;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(33, 110, 135, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .back-button:hover {
-    background-color: #1d5d73;
+    box-shadow: 0 4px 12px rgba(33, 110, 135, 0.3);
+    transform: translateY(-2px);
+}
+
+.back-button::before {
+    content: none;
 }
 
 .item-form {
-    padding: 1rem;
-    border-top: 1px solid #ddd;
-    margin-top: 1rem;
+    padding: 1.2rem;
+    border-bottom: 1px solid #eee;
 }
 
 .item-form input {
     width: 100%;
-    padding: 0.5rem;
-    margin-bottom: 0.5rem;
-    border: 1px solid #ddd;
-    border-radius: 0.25rem;
+    padding: 0.8rem;
+    margin-bottom: 0.8rem;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+.item-form input:focus {
+    border-color: #4fc0e5;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(79, 192, 229, 0.2);
 }
 
 .add-item-button {
-    background-color: #216e87;
+    background: linear-gradient(90deg, #36D1DC 0%, #5B86E5 100%);
     color: white;
     border: none;
-    border-radius: 0.25rem;
-    padding: 0.5rem;
+    border-radius: 8px;
+    padding: 0.8rem;
     cursor: pointer;
     width: 100%;
     margin-top: 0.5rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(91, 134, 229, 0.2);
 }
 
 .add-item-button:hover {
-    background-color: #1d5d73;
+    background: linear-gradient(90deg, #28c7d2 0%, #4a75d9 100%);
+    box-shadow: 0 6px 15px rgba(91, 134, 229, 0.3);
+    transform: translateY(-2px);
 }
 
 .scheduled-item {
@@ -244,14 +346,20 @@
     left: 70px;
     right: 20px;
     background-color: white;
-    padding: 0.5rem;
-    border-radius: 0.25rem;
+    padding: 0.8rem;
+    border-radius: 8px;
     min-height: 60px;
     cursor: move;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     z-index: 3;
     display: flex;
     align-items: center;
+    border-left: 4px solid #4fc0e5;
+    transition: box-shadow 0.3s ease;
+}
+
+.scheduled-item:hover {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
 }
 
 .scheduled-item-content {
@@ -263,23 +371,31 @@
 .header-row {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
 }
 
 .time-range {
     white-space: nowrap;
+    font-weight: 600;
+    color: #216e87;
+    font-size: 0.9rem;
+    background-color: rgba(79, 192, 229, 0.1);
+    padding: 3px 8px;
+    border-radius: 4px;
 }
 
 .item-details {
     display: flex;
-    gap: 8px;
-    font-size: 0.8rem;
+    gap: 12px;
+    font-size: 0.85rem;
     color: #666;
-    margin-top: 4px;
+    margin-top: 6px;
 }
 
 .item-name {
     margin-left: 8px;
+    font-weight: 600;
+    color: #333;
 }
 
 .item-info {
@@ -293,18 +409,23 @@
     left: 0;
     right: 0;
     height: 8px;
-    background-color: #ddd;
+    background-color: rgba(0, 0, 0, 0.05);
     cursor: ns-resize;
+    transition: background-color 0.3s ease;
+}
+
+.resize-handle:hover {
+    background-color: rgba(79, 192, 229, 0.3);
 }
 
 .resize-handle.top {
     top: 0;
-    border-radius: 0.25rem 0.25rem 0 0;
+    border-radius: 8px 8px 0 0;
 }
 
 .resize-handle.bottom {
     bottom: 0;
-    border-radius: 0 0 0.25rem 0.25rem;
+    border-radius: 0 0 8px 8px;
 }
 
 .modal-overlay {
@@ -318,40 +439,77 @@
     justify-content: center;
     align-items: center;
     z-index: 1000;
+    backdrop-filter: blur(3px);
 }
 
 .modal-content {
     background-color: white;
     padding: 2rem;
-    border-radius: 8px;
-    width: 400px;
+    border-radius: 12px;
+    width: 450px;
     max-width: 90%;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    animation: modalFadeIn 0.4s;
+}
+
+@keyframes modalFadeIn {
+    from { opacity: 0; transform: translateY(-40px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.modal-content h3 {
+    margin-top: 0;
+    color: #216e87;
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+    padding-bottom: 0.8rem;
+}
+
+.modal-content h3::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, #216e87 0%, #4fc0e5 100%);
+    border-radius: 2px;
 }
 
 .modal-form {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.2rem;
 }
 
 .form-group {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.6rem;
 }
 
 .form-group label {
-    font-weight: 500;
-    color: #216e87;
+    font-weight: 600;
+    color: #333;
+    font-size: 0.95rem;
 }
 
 .form-group input,
 .form-group select {
-    padding: 0.5rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 1rem;
+    padding: 0.8rem;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    font-size: 0.95rem;
     width: 100%;
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #4fc0e5;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(79, 192, 229, 0.2);
 }
 
 .form-group select {
@@ -363,28 +521,39 @@
     display: flex;
     justify-content: flex-end;
     gap: 1rem;
-    margin-top: 1rem;
+    margin-top: 1.5rem;
 }
 
 .cancel-button {
-    padding: 0.5rem 1rem;
+    padding: 0.8rem 1.5rem;
     background-color: #f5f5f5;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    border: 1px solid #eee;
+    border-radius: 8px;
     cursor: pointer;
+    font-weight: 600;
+    color: #666;
+    transition: all 0.3s ease;
+}
+
+.cancel-button:hover {
+    background-color: #e5e5e5;
 }
 
 .submit-button {
-    padding: 0.5rem 1rem;
-    background-color: #216e87;
+    padding: 0.8rem 1.5rem;
+    background: linear-gradient(90deg, #216e87 0%, #4fc0e5 100%);
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 8px;
     cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(33, 110, 135, 0.2);
 }
 
 .submit-button:hover {
-    background-color: #1d5d73;
+    box-shadow: 0 6px 15px rgba(33, 110, 135, 0.3);
+    transform: translateY(-2px);
 }
 </style>
 
@@ -397,13 +566,13 @@
         >
             <div class="components-header">
                 <button @click="goBack" class="back-button">
-                    Back
+                    <span>←</span> Tillbaka
                 </button>
-                <h2>Schedule Creator</h2>
+                <h2>Schemaläggare</h2>
             </div>
 
             <div class="item-form">
-                <button @click="addItem" class="add-item-button">Add Item</button>
+                <button @click="addItem" class="add-item-button">Lägg till objekt</button>
             </div>
 
             <div class="draggable-items">
@@ -419,7 +588,7 @@
             </div>
             
             <div class="button-wrapper">
-                <button @click="createSchedule" class="create-button">Create Schedule</button>
+                <button @click="createSchedule" class="create-button">Skapa schema</button>
             </div>
         </div>
         <div class="schedule-container">
@@ -431,7 +600,7 @@
                     :class="{ selected: selectedDay === day }"
                     @click="selectDay(day)"
                 >
-                    {{ day }}
+                    {{ getDayName(day) }}
                 </div>
             </div>
             <div 
@@ -475,8 +644,8 @@
                                     <div class="item-name">{{ scheduledItem.name }}</div>
                                 </div>
                                 <div class="item-details">
-                                    <span v-if="scheduledItem.teacher">Teacher: {{ scheduledItem.teacher }}</span>
-                                    <span v-if="scheduledItem.room">Room: {{ scheduledItem.room }}</span>
+                                    <span v-if="scheduledItem.teacher">Lärare: {{ scheduledItem.teacher }}</span>
+                                    <span v-if="scheduledItem.room">Sal: {{ scheduledItem.room }}</span>
                                 </div>
                             </div>
 
@@ -488,14 +657,14 @@
                     </div>
                     
                     <div class="schedule-controls">
-                        <select v-model="selectedGroupId" required>
+                        <select v-model="selectedGroupId" class="schedule-dropdown" required>
                             <option value="" disabled>Välj grupp</option>
                             <option v-for="group in availableGroups" :key="group._id" :value="group._id">
                                 {{ group.name }}
                             </option>
                         </select>
                         <button @click="saveSchedule" class="schedule-save-btn">
-                            Save Schedule
+                            Spara schema
                         </button>
                     </div>
                 </div>
@@ -504,19 +673,19 @@
 
         <div v-if="showModal" class="modal-overlay">
             <div class="modal-content">
-                <h3>Create New Item</h3>
+                <h3>Skapa nytt objekt</h3>
                 <div class="modal-form">
                     <div class="form-group">
-                        <label>Name:</label>
+                        <label>Namn:</label>
                         <input 
                             v-model="newItem.name" 
-                            placeholder="Enter item name"
+                            placeholder="Ange objektnamn"
                         />
                     </div>
                     <div class="form-group">
-                        <label>Teacher:</label>
+                        <label>Lärare:</label>
                         <select v-model="newItem.teacher">
-                            <option value="">Select Teacher</option>
+                            <option value="">Välj lärare</option>
                             <option 
                                 v-for="teacher in teachersList" 
                                 :key="teacher" 
@@ -527,9 +696,9 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Room:</label>
+                        <label>Sal:</label>
                         <select v-model="newItem.room">
-                            <option value="">Select Room</option>
+                            <option value="">Välj sal</option>
                             <option 
                                 v-for="room in roomsList" 
                                 :key="room" 
@@ -540,8 +709,8 @@
                         </select>
                     </div>
                     <div class="modal-buttons">
-                        <button @click="closeModal" class="cancel-button">Cancel</button>
-                        <button @click="createSchedulePreset" class="submit-button">Create</button>
+                        <button @click="closeModal" class="cancel-button">Avbryt</button>
+                        <button @click="createSchedulePreset" class="submit-button">Skapa</button>
                     </div>
                 </div>
             </div>
@@ -568,6 +737,13 @@ export default {
             },
             selectedDay: 'monday',
             days: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
+            dayTranslations: {
+                'monday': 'Måndag',
+                'tuesday': 'Tisdag',
+                'wednesday': 'Onsdag',
+                'thursday': 'Torsdag',
+                'friday': 'Fredag'
+            },
             selectedGroupId: '',
             availableGroups: [],
             resizing: false,
@@ -583,7 +759,9 @@ export default {
                 teacher: '',
                 room: ''
             },
-            schedulePresets: []
+            schedulePresets: [],
+            teachersList: [],
+            roomsList: []
         }
     },
     mounted() {
@@ -920,6 +1098,9 @@ export default {
             const response = await axios.get(`http://localhost:1010/api/schedulePresets/${this.selectedGroupId}`);
             console.log(response);
             this.schedulePresets = response.data;
+        },
+        getDayName(day) {
+            return this.dayTranslations[day] || day;
         }
     },
     watch: {
