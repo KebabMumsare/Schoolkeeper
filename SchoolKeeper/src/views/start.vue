@@ -57,101 +57,87 @@
         
         <!-- Replace the regular schedule layout with a time-grid layout -->
         <div v-if="!isTeacher" class="enhanced-schedule-layout">
-            <!-- Day selector -->
-            <div class="days-header">
-                <div 
-                    v-for="(day, i) in ['Måndag', 'Tisdag', 'Onsdag', 'Torsdag', 'Fredag']" 
-                    :key="i"
-                    class="day-selector" 
-                    :class="{ 'selected-day': isCurrentDay(i) || testDay === i.toString() }"
-                    @click="testDay = i.toString(); updateSchedules()"
-                >
-                    {{ day }}
-                </div>
-            </div>
+            <!-- Removed day selector from here -->
             
-            <!-- Current day schedule -->
-            <div class="schedule-view-container">
-                <!-- Time grid background -->
-                <div class="time-grid-background">
-                    <div class="time-column">
-                        <div v-for="marker in timeMarkers" :key="marker.value" class="time-cell"
-                             :style="{ height: (60 * pixelsPerMinute) + 'px' }">
-                            {{ marker.label }}
+            <div class="schedule-content-wrapper">
+                <!-- Current day schedule (now on the left side) -->
+                <div class="schedule-view-container side-content">
+                    <h4>Dagens Schema</h4>
+                    <!-- Time grid background -->
+                    <div class="time-grid-background">
+                        <div class="time-column">
+                            <div v-for="marker in timeMarkers" :key="marker.value" class="time-cell"
+                                 :style="{ height: (60 * pixelsPerMinute) + 'px' }">
+                                {{ marker.label }}
+                            </div>
+                        </div>
+                        <div class="grid-lines">
+                            <div v-for="marker in timeMarkers" :key="marker.value" class="grid-line"
+                                 :style="{ top: marker.position + 'px' }">
+                            </div>
                         </div>
                     </div>
-                    <div class="grid-lines">
-                        <div v-for="marker in timeMarkers" :key="marker.value" class="grid-line"
-                             :style="{ top: marker.position + 'px' }">
+                    
+                    <!-- No lectures message -->
+                    <div v-if="todaySchedule.length === 0" class="no-lectures-message">
+                        Inga lektioner idag
+                    </div>
+                    
+                    <!-- Lectures for the day in a visually appealing list format -->
+                    <div v-else class="day-schedule-list">
+                        <div v-for="(lecture, index) in todaySchedule" :key="lecture.id" 
+                             class="schedule-lecture-item"
+                             :class="{ 
+                                'current-lecture': isCurrentLecture(lecture),
+                                'first-lecture': index === 0
+                             }"
+                             :style="positionLectureByTime(lecture)"
+                             @click="hasAttendancePermission ? openAttendanceModal(lecture) : null">
+                            <div class="lecture-time">
+                                {{ lecture.time.includes('-') ? lecture.time : lecture.time + (lecture.endTime ? ' - ' + lecture.endTime : '') }}
+                            </div>
+                            <div class="lecture-content">
+                                <div class="lecture-title">{{ lecture.lecture }}</div>
+                                <div class="lecture-location" v-if="lecture.room">{{ lecture.room }}</div>
+                                <div class="lecture-id" v-if="lecture.id">{{ lecture.id }}</div>
+                            </div>
+                            <span v-if="hasAttendancePermission" class="attendance-button">📋</span>
                         </div>
+                    </div>
+                    
+                    <!-- Current time indicator -->
+                    <div class="current-time-indicator" :style="{ top: currentTimeIndicatorPosition + 'px' }"
+                         v-if="isCurrentDay(currentDayIndex) && testDay === ''">
+                        <div class="indicator-dot"></div>
+                        <div class="indicator-line"></div>
                     </div>
                 </div>
                 
-                <!-- No lectures message -->
-                <div v-if="todaySchedule.length === 0" class="no-lectures-message">
-                    Inga lektioner idag
-                </div>
-                
-                <!-- Lectures for the day in a visually appealing list format -->
-                <div v-else class="day-schedule-list">
-                    <div v-for="(lecture, index) in todaySchedule" :key="lecture.id" 
-                         class="schedule-lecture-item"
-                         :class="{ 
-                            'current-lecture': isCurrentLecture(lecture),
-                            'first-lecture': index === 0
-                         }"
-                         :style="positionLectureByTime(lecture)"
-                         @click="hasAttendancePermission ? openAttendanceModal(lecture) : null">
-                        <div class="lecture-time">
-                            {{ lecture.time.includes('-') ? lecture.time : lecture.time + (lecture.endTime ? ' - ' + lecture.endTime : '') }}
-                        </div>
-                        <div class="lecture-content">
-                            <div class="lecture-title" :title="lecture.lecture">{{ lecture.lecture }}</div>
-                            <div class="lecture-location" v-if="lecture.room" :title="lecture.room">{{ lecture.room }}</div>
-                        </div>
-                        <span v-if="hasAttendancePermission" class="attendance-button">📋</span>
-                    </div>
-                </div>
-                
-                <!-- Current time indicator -->
-                <div class="current-time-indicator" :style="{ top: currentTimeIndicatorPosition + 'px' }"
-                     v-if="isCurrentDay(currentDayIndex) && testDay === ''">
-                    <div class="indicator-dot"></div>
-                    <div class="indicator-line"></div>
-                </div>
-            </div>
-            
-            <!-- Weekly overview -->
-            <div class="weekly-overview">
-                <h4>Veckoöversikt</h4>
-                <div class="weekly-grid">
-                    <div class="day-column" v-for="(day, i) in schema" :key="i"
-                         :class="{ 'current-day-column': isCurrentDay(i) || testDay === i.toString() }">
-                        <div class="day-title">{{ resolveDay(i) }}</div>
-                        <div class="day-lectures">
-                            <div v-if="day.length === 0" class="no-mini-lectures">Inga lektioner</div>
-                            <div v-for="lecture in day" :key="lecture.id" 
-                                 class="mini-lecture"
-                                 :class="{ 'current-mini-lecture': isCurrentDay(i) && isCurrentLecture(lecture) }"
-                                 @click="hasAttendancePermission ? openAttendanceModal(lecture) : null">
-                                <span class="mini-time">{{ lecture.time }}</span>
-                                <span class="mini-title">{{ lecture.lecture }}</span>
+                <!-- Weekly overview (now on the right side) -->
+                <div class="weekly-overview main-content">
+                    <h4>Veckoöversikt</h4>
+                    <div class="weekly-grid">
+                        <div class="day-column" v-for="(day, i) in schema" :key="i"
+                             :class="{ 'current-day-column': isCurrentDay(i) }"
+                             @click="testDay = i.toString(); updateSchedules()">
+                            <div class="day-title">{{ resolveDay(i) }}</div>
+                            <div class="day-lectures">
+                                <div v-if="day.length === 0" class="no-mini-lectures">Inga lektioner</div>
+                                <div v-for="lecture in day" :key="lecture.id" 
+                                     class="mini-lecture"
+                                     :class="{ 'current-mini-lecture': isCurrentDay(i) && isCurrentLecture(lecture) }"
+                                     @click="hasAttendancePermission ? openAttendanceModal(lecture) : null">
+                                    <span class="mini-time">{{ lecture.time }}</span>
+                                    <span class="mini-title">{{ lecture.lecture }}</span>
+                                    <span v-if="lecture.id" class="mini-id">{{ lecture.id }}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-        
-        <!-- Replace the test controls with simpler design integrated into the layout -->
-        <div v-if="!isTeacher" class="test-controls">
-            <label for="test-day">Visa schema för annan dag:</label>
-            <select id="test-day" v-model="testDay" @change="updateSchedules">
-                <option value="">Idag</option>
-                <option v-for="(day, index) in ['Måndag', 'Tisdag', 'Onsdag', 'Torsdag', 'Fredag']" :key="index" :value="index">
-                    {{ day }}
-                </option>
-            </select>
+            
+            <!-- Removed test controls from here -->
         </div>
         
         <!-- Attendance Modal -->
@@ -228,60 +214,239 @@
 
 <style scoped>
 .Schedule {
-    border-radius: 8px;
-    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
+    border-radius: 0;
+    box-shadow: none;
     background-color: #f8f9fa;
-    padding: 0.75rem;
-    max-width: 2000px;
-    width: 95%;
-    margin: 100px auto 0 auto;
+    padding: 0;
+    max-width: 100%;
+    width: calc(100vw - 20px);
+    margin: 60px auto 0;
     position: relative;
     z-index: 1;
-}
-
-.schedule-layout {
-    display: flex;
-    gap: 1rem;
-    margin-top: 1rem;
-}
-
-.today-schedule {
-    flex: 1;
-    background-color: #ffffff;
-    border-radius: 8px;
-    padding: 1rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.weekly-schedule {
-    flex: 2;
-}
-
-.additional-info {
-    flex: 1;
-    background-color: #ffffff;
-    border-radius: 1vh;
-    padding: 1vh;
-    box-shadow: 0 2vh 4vh rgba(0, 0, 0, 0.1);
-}
-
-.schedule-container {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 0.3vh;
-    border-radius: 1vh;
-    box-shadow: 0 3vh 6vh rgba(0, 0, 0, 0.1);
-    background-color: #ffffff;
-    padding: 0.3vh;
-    gap: 1vh;
-    min-height: 43vh;
-}
-
-.column {
+    min-height: calc(100vh - 60px);
     display: flex;
     flex-direction: column;
+}
+
+.Container {
+    margin-bottom: 5px;
+    padding: 0 15px;
+    width: 100%;
+}
+
+.enhanced-schedule-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    background-color: white;
+    border-radius: 0;
+    padding: 0 10px;
+    box-shadow: none;
+    margin: 0;
+    flex: 1;
+    height: calc(100vh - 100px);
+    width: 100%;
+}
+
+.schedule-content-wrapper {
+    display: flex;
+    gap: 0.5rem;
+    width: 100%;
+    flex: 1;
+    height: 100%;
+    padding: 0 5px 10px;
+}
+
+.main-content {
+    flex: 3;
+    order: 2;
+    height: 100%;
+}
+
+.side-content {
+    flex: 1;
+    order: 1;
+    min-width: 250px;
+    height: 100%;
+}
+
+.schedule-view-container {
+    position: relative;
+    border-radius: 8px;
+    border: 1px solid #edf2f7;
+    background-color: #ffffff;
+    overflow: hidden;
+    height: 100%;
+    min-height: unset;
+    max-height: none;
+    margin: 0 5px;
+}
+
+.day-schedule-list {
+    position: relative;
+    z-index: 2;
+    height: calc(100% - 35px);
+    overflow-y: auto;
+    padding: 0 15px 15px 65px;
+    margin-top: 35px;
+}
+
+.weekly-overview {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 0.75rem;
+    border: 1px solid #edf2f7;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    height: 100%; /* Make it fill the height */
+    display: flex;
+    flex-direction: column;
+    margin: 0 5px;
+}
+
+.weekly-grid {
+    display: flex;
+    gap: 0.75rem;
+    overflow-x: hidden;
+    padding-bottom: 0.5rem;
+    width: 100%;
+    flex: 1; /* Make it fill the available space */
+}
+
+.day-column {
     flex: 1;
     min-width: 0;
+    background-color: white;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid #edf2f7;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    min-height: calc(100vh - 150px); /* Increase to fill most of viewport */
+}
+
+.current-day-column {
+    border-color: #4fc0e5;
+    box-shadow: 0 2px 10px rgba(79, 192, 229, 0.2);
+}
+
+.day-title {
+    padding: 8px;
+    font-weight: 600;
+    background-color: #f8f9fa;
+    text-align: center;
+    color: #555;
+    border-bottom: 1px solid #edf2f7;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.current-day-column .day-title {
+    background-color: #4fc0e5;
+    color: white;
+}
+
+.day-lectures {
+    padding: 8px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.no-mini-lectures {
+    padding: 10px 0;
+    text-align: center;
+    color: #888;
+    font-style: italic;
+    font-size: 0.85rem;
+}
+
+.mini-lecture {
+    padding: 8px;
+    margin-bottom: 8px;
+    background-color: rgba(79, 192, 229, 0.05);
+    border-left: 3px solid #4fc0e5;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.mini-lecture:hover {
+    background-color: rgba(79, 192, 229, 0.1);
+    transform: translateX(2px);
+}
+
+.current-mini-lecture {
+    background-color: rgba(79, 192, 229, 0.2);
+    border-left-color: #216e87;
+}
+
+.mini-time {
+    display: block;
+    font-size: 0.8rem;
+    color: #216e87;
+    margin-bottom: 3px;
+    font-weight: 500;
+}
+
+.mini-title {
+    display: block;
+    font-weight: 500;
+    font-size: 0.9rem;
+    word-wrap: break-word; /* Allow text to wrap */
+    white-space: normal; /* Allow text to wrap */
+    overflow-wrap: break-word; /* Help with long words */
+}
+
+/* Media queries to ensure responsiveness */
+@media (max-width: 992px) {
+    .schedule-content-wrapper {
+        flex-direction: column;
+    }
+    
+    .main-content, .side-content {
+        flex: 1;
+        width: 100%;
+        order: unset;
+        min-height: calc(50vh - 80px); /* Adjust height for smaller screens */
+    }
+    
+    .day-column {
+        min-width: 120px;
+        min-height: calc(50vh - 100px); /* Adjust height for smaller screens */
+    }
+    
+    .schedule-view-container {
+        min-height: calc(50vh - 80px); /* Adjust height for smaller screens */
+    }
+    
+    .day-schedule-list {
+        height: calc(50vh - 100px); /* Adjust height for smaller screens */
+    }
+}
+
+@media (max-width: 768px) {
+    .Schedule {
+        margin-top: 50px;
+        min-height: calc(100vh - 50px);
+        width: 100vw;
+        padding: 0 5px;
+    }
+    
+    .enhanced-schedule-layout {
+        height: calc(100vh - 90px);
+        width: 100%;
+        padding: 0 5px;
+    }
+    
+    .schedule-content-wrapper {
+        padding: 0 0 5px;
+    }
+    
+    .teacher-lectures {
+        margin: 0 5px 10px;
+        width: calc(100% - 10px);
+    }
 }
 
 .day-header {
@@ -642,14 +807,12 @@ body.modal-open {
 
 /* Styles for teacher's lectures section */
 .teacher-lectures {
-    margin-bottom: 20px;
+    margin: 0 10px 10px;
     background-color: #ffffff;
     border-radius: 8px;
     padding: 15px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    width: 98%;
-    margin-left: auto;
-    margin-right: auto;
+    width: calc(100% - 20px);
 }
 
 .teacher-lectures h4 {
@@ -660,7 +823,7 @@ body.modal-open {
 }
 
 .teacher-lectures-container {
-    max-height: 75vh;
+    max-height: calc(100vh - 200px); /* Increase to use more vertical space */
     overflow-y: auto;
     border: 1px solid #eee;
     border-radius: 4px;
@@ -945,19 +1108,19 @@ body.modal-open {
 
 /* Add more space to the Container element that holds the "Schema" heading */
 .Container {
-    margin-bottom: 15px;
+    margin-bottom: 10px; /* Reduce margin */
     padding: 0 10px;
 }
 
 /* Enhance the "Schema" heading */
 .schedule-title {
-    font-size: 2rem;
+    font-size: 1.8rem; /* Slightly smaller for better space usage */
     font-weight: 600;
     color: #216e87;
-    margin: 10px 0 5px 0;
+    margin: 5px 0; /* Reduce margin */
     position: relative;
     display: inline-block;
-    padding-bottom: 8px;
+    padding-bottom: 5px; /* Reduce padding */
 }
 
 .schedule-title::after {
@@ -1086,11 +1249,15 @@ body.modal-open {
 .enhanced-schedule-layout {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.5rem;
     background-color: white;
-    border-radius: 12px;
-    padding: 0.75rem;
+    border-radius: 8px;
+    padding: 0.5rem;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    margin-top: 0.25rem;
+    flex: 1; /* Make it fill available space */
+    display: flex;
+    flex-direction: column;
 }
 
 .days-header {
@@ -1127,19 +1294,47 @@ body.modal-open {
     border-bottom: 3px solid #216e87;
 }
 
+/* New layout wrapper for the switched content */
+.schedule-content-wrapper {
+    display: flex;
+    gap: 0.75rem;
+    width: 100%;
+    flex: 1; /* Make it fill available space */
+}
+
+.main-content {
+    flex: 3;
+    order: 2; /* Changed to 2 to put it on the right */
+}
+
+.side-content {
+    flex: 1;
+    order: 1; /* Changed to 1 to put it on the left */
+    min-width: 250px;
+}
+
 .schedule-view-container {
     position: relative;
     border-radius: 8px;
     border: 1px solid #edf2f7;
     background-color: #ffffff;
     overflow: hidden;
-    min-height: 360px;
-    max-height: 450px;
+    min-height: calc(100vh - 150px); /* Increase minimum height to fill most of viewport */
+    max-height: none; /* Remove max height restriction */
+}
+
+.schedule-view-container h4 {
+    margin: 0;
+    padding: 10px;
+    background-color: #f8f9fa;
+    color: #216e87;
+    font-size: 0.9rem;
+    border-bottom: 1px solid #edf2f7;
 }
 
 .time-grid-background {
     position: absolute;
-    top: 0;
+    top: 35px; /* Adjusted to account for the header */
     left: 0;
     right: 0;
     bottom: 0;
@@ -1177,23 +1372,13 @@ body.modal-open {
     background-color: rgba(0,0,0,0.05);
 }
 
-.grid-line:nth-child(1) { top: 45px; }
-.grid-line:nth-child(2) { top: 90px; }
-.grid-line:nth-child(3) { top: 135px; }
-.grid-line:nth-child(4) { top: 180px; }
-.grid-line:nth-child(5) { top: 225px; }
-.grid-line:nth-child(6) { top: 270px; }
-.grid-line:nth-child(7) { top: 315px; }
-.grid-line:nth-child(8) { top: 360px; }
-.grid-line:nth-child(9) { top: 405px; }
-.grid-line:nth-child(10) { top: 450px; }
-
 .day-schedule-list {
     position: relative;
     z-index: 2;
-    height: 450px; /* Fixed height to match the time grid */
+    height: calc(100vh - 150px); /* Match container height */
     overflow-y: auto;
     padding: 0 15px 15px 65px;
+    margin-top: 35px; /* Adjusted to account for the header */
 }
 
 .schedule-lecture-item {
@@ -1252,14 +1437,27 @@ body.modal-open {
     font-weight: 500;
     font-size: 1rem;
     color: #333;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    word-wrap: break-word; /* Allow text to wrap */
+    white-space: normal; /* Allow text to wrap */
+    overflow-wrap: break-word; /* Help with long words */
+    hyphens: auto; /* Add hyphens for very long words */
 }
 
 .schedule-lecture-item .lecture-location {
     font-size: 0.85rem;
     color: #555;
     margin-top: 1px;
+    word-wrap: break-word; /* Allow text to wrap */
+    white-space: normal; /* Allow text to wrap */
+}
+
+.schedule-lecture-item .lecture-id {
+    font-size: 0.75rem;
+    color: #777;
+    margin-top: 2px;
+    word-wrap: break-word; /* Allow text to wrap */
+    white-space: normal; /* Allow text to wrap */
+    font-family: monospace; /* Better for IDs */
 }
 
 .current-time-indicator {
@@ -1269,6 +1467,7 @@ body.modal-open {
     height: 2px;
     z-index: 5;
     pointer-events: none;
+    top: 35px; /* Adjusted to account for the header */
 }
 
 .indicator-dot {
@@ -1293,44 +1492,40 @@ body.modal-open {
     position: relative;
     z-index: 2;
     display: flex;
-    height: 100%;
-    min-height: 300px;
+    height: calc(100% - 35px); /* Adjusted to account for the header */
     justify-content: center;
     align-items: center;
     font-size: 1.1rem;
     color: #888;
     padding: 30px;
+    margin-top: 35px; /* Adjusted to account for the header */
 }
 
-/* Weekly overview styles */
+/* Weekly overview styles - now as side content */
 .weekly-overview {
-    background-color: #f8f9fa;
+    background-color: #ffffff;
     border-radius: 8px;
-    padding: 0.6rem;
-    max-height: none;
-    margin-top: 0.5rem;
-}
-
-.weekly-overview h4 {
-    margin-top: 0;
-    color: #216e87;
-    margin-bottom: 0.4rem;
-    font-size: 0.9rem;
+    padding: 0.75rem;
+    border: 1px solid #edf2f7;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    height: 100%; /* Make it fill the height */
+    display: flex;
+    flex-direction: column;
+    margin: 0 5px;
 }
 
 .weekly-grid {
     display: flex;
-    gap: 0.6rem;
+    gap: 0.75rem;
     overflow-x: hidden;
     padding-bottom: 0.5rem;
-    max-height: none;
     width: 100%;
+    flex: 1; /* Make it fill the available space */
 }
 
 .day-column {
     flex: 1;
-    min-width: 140px;
-    max-width: 20%;
+    min-width: 0;
     background-color: white;
     border-radius: 6px;
     overflow: hidden;
@@ -1338,8 +1533,8 @@ body.modal-open {
     transition: all 0.2s ease;
     display: flex;
     flex-direction: column;
-    padding: 0;
-    margin: 0 1px;
+    height: auto;
+    min-height: calc(100vh - 150px); /* Increase to fill most of viewport */
 }
 
 .current-day-column {
@@ -1348,13 +1543,13 @@ body.modal-open {
 }
 
 .day-title {
-    padding: 5px;
+    padding: 8px;
     font-weight: 600;
     background-color: #f8f9fa;
     text-align: center;
     color: #555;
     border-bottom: 1px solid #edf2f7;
-    font-size: 0.8rem;
+    font-size: 0.9rem;
     flex-shrink: 0;
 }
 
@@ -1364,26 +1559,22 @@ body.modal-open {
 }
 
 .day-lectures {
-    padding: 3px;
-    overflow-y: hidden;
+    padding: 8px;
+    overflow-y: auto;
     flex: 1;
-    max-height: none;
 }
 
 .no-mini-lectures {
-    padding: 5px 0;
+    padding: 10px 0;
     text-align: center;
     color: #888;
     font-style: italic;
-    font-size: 0.7rem;
-    white-space: normal;
-    word-break: break-word;
-    overflow: visible;
+    font-size: 0.85rem;
 }
 
 .mini-lecture {
-    padding: 5px;
-    margin-bottom: 5px;
+    padding: 8px;
+    margin-bottom: 8px;
     background-color: rgba(79, 192, 229, 0.05);
     border-left: 3px solid #4fc0e5;
     border-radius: 4px;
@@ -1403,24 +1594,51 @@ body.modal-open {
 
 .mini-time {
     display: block;
-    font-size: 0.7rem;
+    font-size: 0.8rem;
     color: #216e87;
-    margin-bottom: 2px;
+    margin-bottom: 3px;
+    font-weight: 500;
 }
 
 .mini-title {
     display: block;
     font-weight: 500;
-    font-size: 0.75rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 0.9rem;
+    word-wrap: break-word; /* Allow text to wrap */
+    white-space: normal; /* Allow text to wrap */
+    overflow-wrap: break-word; /* Help with long words */
 }
 
 /* Media queries to ensure responsiveness */
+@media (max-width: 992px) {
+    .schedule-content-wrapper {
+        flex-direction: column;
+    }
+    
+    .main-content, .side-content {
+        flex: 1;
+        width: 100%;
+        order: unset;
+        min-height: calc(50vh - 80px); /* Adjust height for smaller screens */
+    }
+    
+    .day-column {
+        min-width: 120px;
+        min-height: calc(50vh - 100px); /* Adjust height for smaller screens */
+    }
+    
+    .schedule-view-container {
+        min-height: calc(50vh - 80px); /* Adjust height for smaller screens */
+    }
+    
+    .day-schedule-list {
+        height: calc(50vh - 100px); /* Adjust height for smaller screens */
+    }
+}
+
 @media (max-width: 768px) {
     .enhanced-schedule-layout {
-        padding: 0.5rem;
+        padding: 0.25rem; /* Reduce padding further on mobile */
     }
     
     .weekly-grid {
@@ -1429,7 +1647,70 @@ body.modal-open {
     
     .day-column {
         min-width: 110px;
+        flex: 0 0 110px;
     }
+    
+    .Schedule {
+        margin-top: 50px; /* Adjust for smaller navbar on mobile */
+        min-height: calc(100vh - 50px); /* Adjust for smaller navbar */
+        width: 100vw;
+        padding: 0 5px;
+    }
+    
+    .enhanced-schedule-layout {
+        height: calc(100vh - 90px);
+        width: 100%;
+        padding: 0 5px;
+    }
+    
+    .schedule-content-wrapper {
+        padding: 0 0 5px;
+    }
+    
+    .teacher-lectures {
+        margin: 0 5px 10px;
+        width: calc(100% - 10px);
+    }
+}
+
+/* Add styles to ensure the component takes up the full screen */
+main {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.attendance-modal {
+    position: fixed; /* Ensure modal is fixed on screen */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000; /* Ensure it's above everything */
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.attendance-modal-content {
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.mini-id {
+    display: block;
+    font-size: 0.7rem;
+    color: #777;
+    margin-top: 2px;
+    font-family: monospace;
+    word-wrap: break-word;
+    white-space: normal;
 }
 </style>
 
@@ -1613,12 +1894,9 @@ export default {
             this.currentTime = now.toLocaleTimeString();
         },
         isCurrentDay(dayIndex) {
-            if (this.testDay !== '') {
-                return dayIndex === parseInt(this.testDay);
-            }
             const today = new Date().getDay();
             const adjustedToday = today === 0 ? 4 : today - 1;
-            return dayIndex === adjustedToday;
+            return dayIndex === adjustedToday || dayIndex === parseInt(this.testDay);
         },
         async fetchTodaySchedule() {
             // Skip for teachers
