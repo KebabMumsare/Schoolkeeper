@@ -229,15 +229,14 @@
 .nav-link-active::before {
   content: '';
   position: absolute;
-  bottom: -18px;
+  bottom: -22px;
   left: 50%;
   transform: translateX(-50%);
-  width: 30px;
+  width: 40px;
   height: 15px;
   background-color: white;
   border-radius: 0 0 15px 15px;
   z-index: 1;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease-in-out;
 }
 
