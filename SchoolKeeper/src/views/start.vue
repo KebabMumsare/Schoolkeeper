@@ -66,7 +66,7 @@
                     <!-- Time grid background -->
                     <div class="time-grid-background">
                         <div class="time-column">
-                            <div v-for="marker in timeMarkers" :key="marker.value" class="time-cell"
+                            <div v-for="marker in timeMarkers" :key="marker.valuel" class="time-cell"
                                  :style="{ height: (60 * pixelsPerMinute) + 'px' }">
                                 {{ marker.label }}
                             </div>

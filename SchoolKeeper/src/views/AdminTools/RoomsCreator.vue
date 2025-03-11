@@ -4,64 +4,114 @@
     width: 100vw;
     height: 100vh;
     overflow: hidden;
+    background-color: #f0f2f5;
+    background-image: linear-gradient(135deg, #f5f7fa 0%, #e4efe9 100%);
 }
 
 /* Left Sidebar Styles */
 .components {
-    width: 20vw;
-    background-color: #f5f5f5;
+    width: 350px;
+    background-color: #fff;
     position: relative;
     display: flex;
     flex-direction: column;
-    border-right: 1px solid #ddd;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.07);
+    z-index: 10;
+    border-right: 1px solid #eee;
 }
 
 .components-header {
-    padding: 1rem;
+    padding: 1.2rem;
     display: flex;
     align-items: center;
-    gap: 1rem;
-    background-color: #216e87;
-    border-bottom: 1px solid #ddd;
+    gap: 1.5rem;
+    border-bottom: 1px solid #eee;
+    background-color: #f9f9f9;
 }
 
 .components-header h2 {
     margin: 0;
-    color: white;
+    color: #333;
+    font-size: 1.4rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .sidebar-content {
     flex: 1;
     padding: 1rem;
     overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #834d9b #f0f2f5;
+}
+
+.sidebar-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar-content::-webkit-scrollbar-track {
+    background: #f0f2f5;
+}
+
+.sidebar-content::-webkit-scrollbar-thumb {
+    background: #834d9b;
+    border-radius: 3px;
 }
 
 .search-bar {
     width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+    padding: 0.8rem;
+    border: 1px solid #eee;
+    border-radius: 8px;
     margin-bottom: 1rem;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.search-bar:focus {
+    border-color: #834d9b;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(131, 77, 155, 0.2);
 }
 
 .room-list {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.8rem;
 }
 
 .room-item {
     background-color: white;
     padding: 1rem;
-    border-radius: 4px;
-    border: 1px solid #ddd;
+    border-radius: 8px;
+    border: 1px solid #eee;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.room-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, #834d9b 0%, #d04ed6 100%);
+    transition: height 0.3s ease;
 }
 
 .room-item:hover {
-    background-color: #f0f0f0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+    border-color: #834d9b;
+}
+
+.room-item:hover::before {
+    height: 6px;
 }
 
 /* Main Content Area Styles */
@@ -73,44 +123,77 @@
 }
 
 .main-header {
-    padding: 1rem;
-    background-color: #4fc0e5;
+    padding: 1.2rem;
+    background: linear-gradient(90deg, #834d9b 0%, #d04ed6 100%);
     color: white;
 }
 
 .main-header h2 {
     margin: 0;
+    font-size: 1.4rem;
+    font-weight: 600;
 }
 
 .main-content {
     flex: 1;
-    padding: 1rem;
+    padding: 1.5rem;
     overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #834d9b #f0f2f5;
 }
 
-/* Reuse the same button, modal, and other styles from GroupCreator */
+.main-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.main-content::-webkit-scrollbar-track {
+    background: #f0f2f5;
+}
+
+.main-content::-webkit-scrollbar-thumb {
+    background: #834d9b;
+    border-radius: 3px;
+}
+
+/* Button Styles */
 .button-wrapper {
-    padding: 1rem;
-    border-top: 1px solid #ddd;
+    padding: 1.2rem;
+    border-top: 1px solid #eee;
+    background: linear-gradient(to top, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.8));
 }
 
 .create-button, .back-button, .add-equipment-button {
-    background-color: #4fc0e5;
-    padding: 0.5rem;
-    border-radius: 0.5rem;
+    background: linear-gradient(90deg, #834d9b 0%, #d04ed6 100%);
+    padding: 1rem;
+    border-radius: 8px;
     border: none;
     cursor: pointer;
     font-size: 1rem;
-    font-weight: bold;
+    font-weight: 600;
     color: #fff;
     width: 100%;
-    transition: background-color 0.2s;
+    box-shadow: 0 4px 10px rgba(131, 77, 155, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
+
 .back-button {
-    width: 30%;
+    padding: 0.6rem 1rem;
+    width: auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: 6px;
+    font-size: 0.9rem;
 }
+
+.back-button::before {
+    content: '←';
+    font-size: 1.1rem;
+}
+
 .create-button:hover, .back-button:hover, .add-equipment-button:hover {
-    background-color: #216e87;
+    box-shadow: 0 6px 15px rgba(131, 77, 155, 0.3);
+    transform: translateY(-2px);
 }
 
 /* Modal Styles */
@@ -125,50 +208,81 @@
     justify-content: center;
     align-items: center;
     z-index: 1000;
+    backdrop-filter: blur(3px);
 }
 
 .modal-content {
     background-color: #fff;
-    border-radius: 5px;
+    border-radius: 12px;
     padding: 2rem;
     width: 90%;
     max-width: 500px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    animation: modalFadeIn 0.4s;
+}
+
+@keyframes modalFadeIn {
+    from { opacity: 0; transform: translateY(-40px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .modal-content h3 {
-    color: #216e87;
+    color: #333;
     margin-top: 0;
+    margin-bottom: 1.5rem;
+    position: relative;
+    padding-bottom: 0.8rem;
+    font-size: 1.5rem;
+}
+
+.modal-content h3::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, #834d9b 0%, #d04ed6 100%);
+    border-radius: 2px;
 }
 
 .modal-content input {
     width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+    padding: 0.8rem;
+    border: 1px solid #eee;
+    border-radius: 8px;
     margin-bottom: 1rem;
-    font-size: 1rem;
+    font-size: 0.95rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.modal-content input:focus {
+    border-color: #834d9b;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(131, 77, 155, 0.2);
 }
 
 .modal-buttons {
     display: flex;
     gap: 1rem;
     justify-content: flex-end;
+    margin-top: 1rem;
 }
 
 .cancel-button {
-    background-color: #f0f0f0;
-    color: #216e87;
-    border: none;
-    padding: 0.5rem 2rem;
-    border-radius: 0.5rem;
+    background-color: #f5f5f5;
+    color: #666;
+    border: 1px solid #eee;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
     font-size: 1rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: background-color 0.3s ease;
 }
 
 .cancel-button:hover {
-    background-color: #e0e0e0;
+    background-color: #e5e5e5;
 }
 
 .info-container {
@@ -180,10 +294,10 @@
 .room-details-box,
 .equipment-box {
     flex: 1;
-    background-color: #f5f5f5;
-    border-radius: 8px;
+    background-color: #fff;
+    border-radius: 12px;
     padding: 1.5rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.07);
 }
 
 .equipment-header {
@@ -192,15 +306,61 @@
     align-items: center;
     margin-bottom: 1rem;
     padding-bottom: 0.5rem;
-    border-bottom: 2px solid #4fc0e5;
+    border-bottom: 2px solid #834d9b;
+}
+
+.equipment-header h3 {
+    color: #333;
+    margin: 0;
+    font-size: 1.3rem;
 }
 
 .equipment-item {
     background-color: white;
-    padding: 0.75rem;
-    margin-bottom: 0.5rem;
-    border-radius: 4px;
-    border: 1px solid #ddd;
+    padding: 0.8rem 1rem;
+    margin-bottom: 0.8rem;
+    border-radius: 8px;
+    border: 1px solid #eee;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.equipment-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(to bottom, #834d9b, #d04ed6);
+}
+
+.equipment-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.no-equipment {
+    color: #888;
+    text-align: center;
+    margin-top: 2rem;
+    font-style: italic;
+}
+
+.room-details-box h3 {
+    color: #333;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #834d9b;
+    font-size: 1.3rem;
+}
+
+.details-content p {
+    margin: 0.8rem 0;
+    line-height: 1.6;
+    color: #555;
 }
 </style>
 <template>
@@ -209,9 +369,9 @@
         <div class="components">
             <div class="components-header">
                 <button @click="goBack" class="back-button">
-                    Back
+                    Tillbaka
                 </button>
-                <h2>Rooms</h2>
+                <h2>Salar</h2>
             </div>
 
             <!-- Search and List in Sidebar -->
@@ -219,7 +379,7 @@
                 <input 
                     type="text" 
                     v-model="searchQuery" 
-                    placeholder="Search Rooms..." 
+                    placeholder="Sök salar..." 
                     class="search-bar"
                 />
                 <div class="room-list">
@@ -230,37 +390,37 @@
                         @click="selectRoom(room)"
                     >
                         <div class="room-info">
-                            <strong>Name:</strong> {{ room.name }} <br />
-                            <strong>Type:</strong> {{ room.type }}
+                            <strong>Namn:</strong> {{ room.name }} <br />
+                            <strong>Kapacitet:</strong> {{ room.capacity }}
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="button-wrapper">
-                <button @click="openModal" class="create-button">Create New Room</button>
+                <button @click="openModal" class="create-button">Skapa ny sal</button>
             </div>
         </div>
 
         <!-- Main Content Area -->
         <div class="main-container">
             <div class="main-header">
-                <h2>Room Details</h2>
+                <h2>Saldetaljer</h2>
             </div>
             <div class="main-content">
                 <div class="info-container">
                     <div class="room-details-box">
-                        <h3>Room Information</h3>
+                        <h3>Salinformation</h3>
                         <div class="details-content">
-                            <p><strong>Name:</strong> {{ selectedRoom?.name || 'No room selected' }}</p>
-                            <p><strong>Capacity:</strong> {{ selectedRoom?.capacity || 'N/A' }}</p>
+                            <p><strong>Namn:</strong> {{ selectedRoom?.name || 'Ingen sal vald' }}</p>
+                            <p><strong>Kapacitet:</strong> {{ selectedRoom?.capacity || 'Ej tillgänglig' }}</p>
                         </div>
                     </div>
                     <div class="equipment-box">
                         <div class="equipment-header">
-                            <h3>Room Equipment</h3>
+                            <h3>Utrustning</h3>
                             <button v-if="selectedRoom" @click="openAddEquipmentModal" class="add-equipment-button">
-                                Add Equipment
+                                Lägg till utrustning
                             </button>
                         </div>
                         <div class="equipment-list">
@@ -269,7 +429,7 @@
                                     {{ item.name }}
                                 </div>
                             </div>
-                            <p v-else class="no-equipment">No equipment in this room</p>
+                            <p v-else class="no-equipment">Ingen utrustning i denna sal</p>
                         </div>
                     </div>
                 </div>
@@ -280,18 +440,18 @@
     <!-- Create Room Modal -->
     <div v-if="showModal" class="modal">
         <div class="modal-content">
-            <h3>Create Room</h3>
+            <h3>Skapa sal</h3>
             <form @submit.prevent="createRoom">
-                <input v-model="newRoom.name" placeholder="Room Name" required />
+                <input v-model="newRoom.name" placeholder="Salnamn" required />
                 <input 
                     type="number" 
                     v-model="newRoom.capacity" 
-                    placeholder="Capacity" 
+                    placeholder="Kapacitet" 
                     required 
                 />
                 <div class="modal-buttons">
-                    <button type="submit" class="create-button">Create Room</button>
-                    <button @click="closeModal" class="cancel-button">Cancel</button>
+                    <button type="submit" class="create-button">Skapa sal</button>
+                    <button @click="closeModal" class="cancel-button">Avbryt</button>
                 </div>
             </form>
         </div>
@@ -341,10 +501,6 @@ export default {
             // TODO: Fetch room equipment when API is ready
             this.selectedRoomEquipment = [];
         },
-        createRoom() {
-            // TODO: Implement room creation when API is ready
-            this.closeModal();
-        },
         async fetchRooms() {
             const response = await axios.get('http://localhost:1010/api/rooms');
             this.rooms = response.data;
@@ -354,6 +510,10 @@ export default {
             this.rooms.push(response.data);
             this.closeModal();
             this.fetchRooms();
+        },
+        openAddEquipmentModal() {
+            // TODO: Implement when API is ready
+            alert('Funktionen för att lägga till utrustning är inte implementerad ännu.');
         }
     },
     mounted() {

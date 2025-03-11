@@ -72,12 +72,6 @@
         </div>
       </router-link>
     </div>
-    
-    <div class="back-section">
-      <button @click="goBack" class="back-button">
-        <span class="back-icon">←</span> Tillbaka
-      </button>
-    </div>
   </main>
 </div>
 <Footer />
@@ -261,33 +255,11 @@
 }
 
 .back-section {
-  display: flex;
-  justify-content: center;
-  margin-top: 2rem;
+  display: none;
 }
 
 .back-button {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 20px;
-  background-color: #f0f0f0;
-  color: #333;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
-
-.back-button:hover {
-  background-color: #e0e0e0;
-}
-
-.back-icon {
-  font-size: 1.2rem;
+  display: none;
 }
 
 @keyframes fadeIn {
@@ -337,11 +309,6 @@ export default {
     data() {
         return {
             currentUser: useStorage('currentUser', {id: '', name: '', access: '', class: ''}),
-        }
-    },
-    methods: {
-        goBack() {
-            this.router.push('/start');
         }
     }
 }
