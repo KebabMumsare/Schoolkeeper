@@ -51,12 +51,12 @@
         </ul>
       </nav>
       
-      <div v-if="currentUser" class="user-info">
+      <div v-if="currentUser" class="user-info" :class="{ 'user-info-expanded': isProfileExpanded }" @click="toggleProfileInfo">
         <div class="user-info-wrapper">
           <p class="user-name">{{ currentUser.name }} | {{ currentUser.class }}</p>
-          <a id="logout-button" href="/" @click.prevent="logout">Logga ut</a>
+          <a id="logout-button" href="/" @click.stop="logout">Logga ut</a>
         </div>
-        <div class="additional-info">
+        <div class="additional-info" :class="{ 'additional-info-expanded': isProfileExpanded }">
           <p><strong>ID:</strong> {{ currentUser.id || 'N/A' }}</p>
           <p><strong>Access:</strong> {{ currentUser.access }}</p>
           <p><strong>Last Login:</strong> Today</p>
@@ -262,7 +262,7 @@
   z-index: 110;
 }
 
-.user-info:hover {
+.user-info-expanded {
   min-width: 220px;
   background-color: #f9f9f9;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -286,7 +286,7 @@
   overflow: hidden;
 }
 
-.user-info:hover .user-name {
+.user-info-expanded .user-name {
   font-weight: 600;
 }
 
@@ -306,7 +306,7 @@
   padding: 0 15px;
 }
 
-.user-info:hover .additional-info {
+.additional-info-expanded {
   max-height: 120px;
   opacity: 1;
   padding: 0px 15px 12px;
@@ -352,7 +352,8 @@ export default {
       hoverTimer: null,
       resetTimer: null,
       isHovering: false,
-      resetDelay: 450
+      resetDelay: 450,
+      isProfileExpanded: false
     };
   },
   mounted() {
@@ -360,14 +361,33 @@ export default {
     this.$nextTick(() => {
       this.initializeIndicator();
     });
+    
+    // Close profile dropdown when clicking outside
+    document.addEventListener('click', this.closeProfileDropdown);
   },
   updated() {
     this.initializeIndicator();
   },
+  beforeUnmount() {
+    // Clean up event listener
+    document.removeEventListener('click', this.closeProfileDropdown);
+  },
   methods: {
-    logout() {
+    logout(event) {
+      event.preventDefault();
       localStorage.removeItem('currentUser'); 
       this.$router.replace('/');
+    },
+    toggleProfileInfo(event) {
+      event.stopPropagation();
+      this.isProfileExpanded = !this.isProfileExpanded;
+    },
+    closeProfileDropdown(event) {
+      // Check if click is outside the user info area
+      const userInfoElement = document.querySelector('.user-info');
+      if (userInfoElement && !userInfoElement.contains(event.target)) {
+        this.isProfileExpanded = false;
+      }
     },
     initializeIndicator() {
       const activeLink = this.$refs.activeLink || document.querySelector('.nav-link-active');
