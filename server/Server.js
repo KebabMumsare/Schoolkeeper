@@ -491,6 +491,17 @@ app.get("/api/schedulePresets/:groupId", async (req, res) => {
     res.status(500).json({ message: "Error fetching schedule presets", error: error.message });
   }
 });
+app.delete("/api/schedulePresets/:id", async (req, res) => {
+  try {
+    await SchedualPresetModel.findByIdAndDelete(req.params.id);
+    res.sendStatus(204);
+  } catch (error) { 
+    console.error('Error deleting schedule preset:', error);
+    res.status(500).json({ message: "Error deleting schedule preset", error: error.message });
+  }
+});
+
+
 
 
 // Classroom API
