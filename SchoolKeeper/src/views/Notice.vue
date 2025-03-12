@@ -220,7 +220,6 @@
     margin-bottom: 4px;
     line-height: 1.3;
 }
-
 .notice-date {
     font-size: 0.8rem;
     color: #666;

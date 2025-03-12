@@ -8,7 +8,6 @@
     background-image: linear-gradient(135deg, #f5f7fa 0%, #e4efe9 100%);
 }
 
-/* Left Sidebar Styles */
 .components {
     width: 350px;
     background-color: #fff;
@@ -114,7 +113,6 @@
     height: 6px;
 }
 
-/* Main Content Area Styles */
 .main-container {
     flex: 1;
     display: flex;
@@ -155,7 +153,6 @@
     border-radius: 3px;
 }
 
-/* Button Styles */
 .button-wrapper {
     padding: 1.2rem;
     border-top: 1px solid #eee;
@@ -196,7 +193,6 @@
     transform: translateY(-2px);
 }
 
-/* Modal Styles */
 .modal {
     position: fixed;
     top: 0;
@@ -365,7 +361,6 @@
 </style>
 <template>
     <div class="wraper">
-        <!-- Left Sidebar -->
         <div class="components">
             <div class="components-header">
                 <button @click="goBack" class="back-button">
@@ -374,7 +369,6 @@
                 <h2>Salar</h2>
             </div>
 
-            <!-- Search and List in Sidebar -->
             <div class="sidebar-content">
                 <input 
                     type="text" 
@@ -402,7 +396,6 @@
             </div>
         </div>
 
-        <!-- Main Content Area -->
         <div class="main-container">
             <div class="main-header">
                 <h2>Saldetaljer</h2>
@@ -437,7 +430,6 @@
         </div>
     </div>
 
-    <!-- Create Room Modal -->
     <div v-if="showModal" class="modal">
         <div class="modal-content">
             <h3>Skapa sal</h3>
@@ -498,7 +490,6 @@ export default {
         },
         selectRoom(room) {
             this.selectedRoom = room;
-            // TODO: Fetch room equipment when API is ready
             this.selectedRoomEquipment = [];
         },
         async fetchRooms() {
@@ -512,7 +503,6 @@ export default {
             this.fetchRooms();
         },
         openAddEquipmentModal() {
-            // TODO: Implement when API is ready
             alert('Funktionen för att lägga till utrustning är inte implementerad ännu.');
         }
     },

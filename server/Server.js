@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const multer = require("multer");
 const { createZip, deleteZip } = require("./FileHandling.js");
+const axios = require("axios");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -828,6 +829,40 @@ app.post("/api/tests", async (req, res) => {
   } catch (error) {
     console.error("Error creating test:", error);
     res.status(500).json({ message: "Error creating test", error: error.message });
+  }
+});
+
+// Skolverket API endpoints
+app.get("/api/skolverket/subjects", async (req, res) => {
+  try {
+    // Make the request to Skolverket API
+    const response = await axios.get('https://api.skolverket.se/syllabus/v1/subjects', {
+      headers: {
+        'accept': 'application/json',
+      }
+    });
+
+    // Send the data to the frontend
+    res.json(response.data);
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    res.status(500).json({ error: 'Failed to fetch data' });
+  }
+});
+
+// Endpoint for fetching subject details from Skolverket
+app.get("/api/skolverket/subjects/:code", async (req, res) => {
+  try {
+    const response = await axios.get(`https://api.skolverket.se/syllabus/v1/subjects/${req.params.code}`, {
+      headers: {
+        'accept': 'application/json',
+      }
+    });
+
+    res.json(response.data);
+  } catch (error) {
+    console.error('Error fetching subject details:', error);
+    res.status(500).json({ error: 'Failed to fetch subject details' });
   }
 });
 

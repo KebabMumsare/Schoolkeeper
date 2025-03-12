@@ -71,6 +71,23 @@
           <span>→</span>
         </div>
       </router-link>
+
+      <router-link 
+        to="/admintools/kurser" 
+        class="admintools-card"
+      >
+        <div class="card-icon">
+          <i class="fas fa-book"></i>
+        </div>
+        <div class="card-content">
+        <h3 class="card-title">Hantera Kurser</h3>
+        <p class="card-description">Lägg till och hantera kurser för elever</p>
+        </div>
+        <div class="card-arrow">
+        <span>→</span>
+        </div>
+      </router-link>
+
     </div>
   </main>
 </div>
