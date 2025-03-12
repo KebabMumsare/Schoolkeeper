@@ -177,6 +177,40 @@
     overflow: hidden;
 }
 
+.draggable-item-actions {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: flex;
+    gap: 5px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.draggable-item:hover .draggable-item-actions {
+    opacity: 1;
+}
+
+.delete-preset-btn {
+    background-color: #ff5e62;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.delete-preset-btn:hover {
+    background-color: #ff3d42;
+    transform: scale(1.1);
+}
+
 .draggable-item::before {
     content: '';
     position: absolute;
@@ -797,6 +831,15 @@
                     {{ preset.lecture }}
                     <div class="item-details">
                         <span>{{ getGroupName(preset.group) }}</span>
+                    </div>
+                    <div class="draggable-item-actions">
+                        <button 
+                            class="delete-preset-btn" 
+                            @click.stop="deletePreset(preset._id)"
+                            title="Delete preset"
+                        >
+                            ×
+                        </button>
                     </div>
                 </div>
             </div>
@@ -1504,6 +1547,22 @@ export default {
             } catch (error) {
                 console.error('Error creating schedule preset:', error);
                 alert('Error creating schedule preset. Please try again.');
+            }
+        },
+        async deletePreset(presetId) {
+            try {
+                if (confirm('Are you sure you want to delete this preset?')) {
+                    await axios.delete(`http://localhost:1010/api/schedulePreset/${presetId}`);
+                    
+                    // Remove the preset from the local array
+                    const index = this.schedulePresets.findIndex(p => p._id === presetId);
+                    if (index !== -1) {
+                        this.schedulePresets.splice(index, 1);
+                    }
+                }
+            } catch (error) {
+                console.error('Error deleting schedule preset:', error);
+                alert('Error deleting schedule preset. Please try again.');
             }
         },
         async fetchSchedulePresets(groupId = null) {
