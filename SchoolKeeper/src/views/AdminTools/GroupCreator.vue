@@ -34,6 +34,13 @@
 
             <div class="button-wrapper">
                 <button @click="openModal" class="create-button">Skapa ny grupp</button>
+                <button 
+                    @click="toggleEditMode" 
+                    class="edit-mode-button"
+                    :class="{ 'active': editMode }"
+                >
+                    Redigera
+                </button>
             </div>
         </div>
 
@@ -122,6 +129,28 @@
             <div class="modal-buttons">
                 <button @click="closeAddMemberModal" class="cancel-button">Stäng</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Edit Group Modal -->
+    <div v-if="showEditModal" class="modal">
+        <div class="modal-content">
+            <h3>Redigera grupp</h3>
+            <form @submit.prevent="updateGroup">
+                <input v-model="editingGroup.name" placeholder="Gruppnamn" required />
+                <select v-model="editingGroup.type" required>
+                    <option value="">Välj grupptyp</option>
+                    <option value="class">Klass</option>
+                    <option value="specialization">Specialisering</option>
+                    <option value="individual">Individuell</option>
+                    <option value="extra">Extra</option>
+                </select>
+                <div class="modal-buttons">
+                    <button type="submit" class="update-button">Uppdatera</button>
+                    <button @click="deleteGroup" class="delete-button">Ta bort grupp</button>
+                    <button @click="closeEditModal" class="cancel-button">Avbryt</button>
+                </div>
+            </form>
         </div>
     </div>
 </template>
@@ -292,6 +321,8 @@
     padding: 1.2rem;
     border-top: 1px solid #eee;
     background: linear-gradient(to top, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.8));
+    display: flex;
+    gap: 1rem;
 }
 
 .create-button {
@@ -337,6 +368,63 @@
 .back-button::before {
     content: '←';
     font-size: 1.1rem;
+}
+
+.edit-mode-button {
+    padding: 1rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fff;
+    flex: 1;
+    box-shadow: 0 4px 10px rgba(17, 153, 142, 0.2);
+    transition: all 0.3s ease;
+    background: linear-gradient(90deg, #2ecc71 0%, #27ae60 100%);
+}
+
+.edit-mode-button.active {
+    background: linear-gradient(90deg, #e74c3c 0%, #c0392b 100%);
+}
+
+.edit-mode-button:hover {
+    box-shadow: 0 6px 15px rgba(17, 153, 142, 0.3);
+    transform: translateY(-2px);
+}
+
+.delete-button {
+    background: linear-gradient(90deg, #e74c3c 0%, #c0392b 100%);
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fff;
+    transition: all 0.3s ease;
+}
+
+.delete-button:hover {
+    box-shadow: 0 6px 15px rgba(231, 76, 60, 0.3);
+    transform: translateY(-2px);
+}
+
+.update-button {
+    background: linear-gradient(90deg, #11998e 0%, #38ef7d 100%);
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fff;
+    transition: all 0.3s ease;
+}
+
+.update-button:hover {
+    box-shadow: 0 6px 15px rgba(17, 153, 142, 0.3);
+    transform: translateY(-2px);
 }
 
 /* Modal Styles */
@@ -644,11 +732,18 @@ export default {
         return {
             currentUser: useStorage('currentUser', { name: '', access: '', class: '' }),
             showModal: false,
+            showEditModal: false,
             showAddMemberModal: false,
+            editMode: false,
             groups: [],
             searchQuery: '',
             memberSearchQuery: '',
             newGroup: {
+                name: '',
+                type: ''
+            },
+            editingGroup: {
+                _id: null,
                 name: '',
                 type: ''
             },
@@ -689,12 +784,41 @@ export default {
             this.showAddMemberModal = false;
             this.memberSearchQuery = '';
         },
-        async selectGroup(group) {
-            this.selectedGroup = group;
-            this.selectedGroup.teacher = (await axios.get(`http://localhost:1010/api/users/${group.teacher}`)).data.name;
-            this.fetchGroupMembers(group._id);
+        toggleEditMode() {
+            this.editMode = !this.editMode;
+            if (!this.editMode) {
+                this.closeEditModal();
+            }
         },
-
+        async selectGroup(group) {
+            if (this.editMode) {
+                this.editingGroup = { ...group };
+                this.showEditModal = true;
+                return;
+            }
+            
+            this.selectedGroup = group;
+            try {
+                if (group.teacher) {
+                    const teacherResponse = await axios.get(`http://localhost:1010/api/users/${group.teacher}`);
+                    this.selectedGroup.teacher = teacherResponse.data.name;
+                } else {
+                    this.selectedGroup.teacher = 'Ingen lärare tilldelad';
+                }
+            } catch (error) {
+                console.error('Error fetching teacher:', error);
+                this.selectedGroup.teacher = 'Kunde inte hämta lärare';
+            }
+            await this.fetchGroupMembers(group._id);
+        },
+        closeEditModal() {
+            this.showEditModal = false;
+            this.editingGroup = {
+                _id: null,
+                name: '',
+                type: ''
+            };
+        },
         async fetchAvailableUsers() {
             try {
                 const response = await axios.get('http://localhost:1010/api/users');
@@ -743,10 +867,47 @@ export default {
         },
         async addMemberToGroup(groupId, memberId) {
             try {
-                const response = await axios.post(`http://localhost:1010/api/groups/${groupId}/${memberId}`);
-                console.log(response.data);
+                await axios.post(`http://localhost:1010/api/groups/${groupId}/${memberId}`);
+                // Refresh the member list after successful addition
+                await this.fetchGroupMembers(groupId);
+                // Refresh available users list
+                await this.fetchAvailableUsers();
             } catch (error) {
                 console.error('Error adding member to group:', error);
+            }
+        },
+        async updateGroup() {
+            try {
+                await axios.put(`http://localhost:1010/api/groups/${this.editingGroup._id}`, {
+                    name: this.editingGroup.name,
+                    type: this.editingGroup.type
+                });
+                
+                // Update the group in the local list
+                const index = this.groups.findIndex(g => g._id === this.editingGroup._id);
+                if (index !== -1) {
+                    this.groups[index] = { ...this.groups[index], ...this.editingGroup };
+                }
+                
+                this.closeEditModal();
+                await this.fetchGroups(); // Refresh the groups list
+            } catch (error) {
+                console.error('Error updating group:', error);
+            }
+        },
+        async deleteGroup() {
+            if (confirm('Är du säker på att du vill ta bort denna grupp?')) {
+                try {
+                    await axios.delete(`http://localhost:1010/api/groups/${this.editingGroup._id}`);
+                    this.groups = this.groups.filter(g => g._id !== this.editingGroup._id);
+                    this.closeEditModal();
+                    if (this.selectedGroup?._id === this.editingGroup._id) {
+                        this.selectedGroup = null;
+                        this.selectedGroupMembers = [];
+                    }
+                } catch (error) {
+                    console.error('Error deleting group:', error);
+                }
             }
         }
     },
