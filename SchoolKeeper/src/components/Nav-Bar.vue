@@ -107,7 +107,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: white;
+  background-color: rgba(255, 255, 255, 0.8);
   border-radius: 12px;
   margin-left: 20px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -125,7 +125,7 @@
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  background-color: white;
+  background-color: rgba(255, 255, 255, 0.8);
   border-radius: 0px 0px 20px 20px;
   padding: 0 58px 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -133,6 +133,7 @@
   margin-top: 0;
   overflow: visible;
   height: auto;
+  backdrop-filter: blur(5px);
 }
 
 .nav-list {
@@ -234,10 +235,11 @@
   transform: translateX(-50%);
   width: 40px;
   height: 15px;
-  background-color: white;
+  background-color: rgba(255, 255, 255, 0.8);
   border-radius: 0 0 15px 15px;
   z-index: 1;
   transition: all 0.3s ease-in-out;
+  backdrop-filter: blur(5px);
 }
 
 .nav-icon:hover {
@@ -251,7 +253,7 @@
   margin-right: 0px;
   font-size: 0.85rem;
   color: #333;
-  background-color: white;
+  background-color: rgba(255, 255, 255, 0.8);
   border-radius: 0px 0px 0px 20px;
   padding: 8px 15px 10px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -260,11 +262,12 @@
   min-width: 180px;
   position: relative;
   z-index: 110;
+  backdrop-filter: blur(5px);
 }
 
 .user-info-expanded {
   min-width: 220px;
-  background-color: #f9f9f9;
+  background-color: rgba(249, 249, 249, 0.9);
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   border-radius: 12px 12px 0 0;
 }
@@ -299,11 +302,12 @@
   position: absolute;
   top: 100%;
   right: 0;
-  background-color: #f9f9f9;
+  background-color: rgba(249, 249, 249, 0.9);
   border-radius: 0 0 12px 20px;
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
   z-index: 100;
   padding: 0 15px;
+  backdrop-filter: blur(5px);
 }
 
 .additional-info-expanded {
@@ -362,14 +366,12 @@ export default {
       this.initializeIndicator();
     });
     
-    // Close profile dropdown when clicking outside
     document.addEventListener('click', this.closeProfileDropdown);
   },
   updated() {
     this.initializeIndicator();
   },
   beforeUnmount() {
-    // Clean up event listener
     document.removeEventListener('click', this.closeProfileDropdown);
   },
   methods: {
@@ -383,7 +385,6 @@ export default {
       this.isProfileExpanded = !this.isProfileExpanded;
     },
     closeProfileDropdown(event) {
-      // Check if click is outside the user info area
       const userInfoElement = document.querySelector('.user-info');
       if (userInfoElement && !userInfoElement.contains(event.target)) {
         this.isProfileExpanded = false;
