@@ -81,7 +81,7 @@
         </div>
         <div class="card-content">
         <h3 class="card-title">Hantera Kurser</h3>
-        <p class="card-description">Lägg till och hantera kurser för elever</p>
+        <p class="card-description">Skolverkets kurser</p>
         </div>
         <div class="card-arrow">
         <span>→</span>
@@ -198,6 +198,10 @@
   background: linear-gradient(90deg, #834d9b 0%, #d04ed6 100%);
 }
 
+.admintools-card:nth-child(5)::before {
+  background: linear-gradient(90deg, #4776E6 0%, #8E54E9 100%);
+}
+
 .admintools-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
@@ -238,6 +242,11 @@
 .admintools-card:nth-child(4) .card-icon {
   background-color: #f7e6ff;
   color: #834d9b;
+}
+
+.admintools-card:nth-child(5) .card-icon {
+  background-color: #e8e6ff;
+  color: #4776E6;
 }
 
 .card-content {
