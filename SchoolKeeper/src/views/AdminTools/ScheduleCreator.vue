@@ -1386,8 +1386,7 @@ export default {
                 this.selectedGroupIds.push(groupId);
                 // Fetch schedule for this group
                 this.fetchGroupSchedule(groupId);
-                // Fetch presets for this group
-                this.fetchSchedulePresets(groupId);
+                // Don't fetch presets here - let the watcher handle it
             } else {
                 // Remove group from selection
                 this.selectedGroupIds.splice(index, 1);
@@ -1567,31 +1566,31 @@ export default {
         },
         async fetchSchedulePresets(groupId = null) {
             try {
-                // If a specific group is provided, fetch presets for that group
-                if (groupId) {
-                    const response = await axios.get(`http://localhost:1010/api/schedulePresets/${groupId}`);
-                    // Add new presets to the existing ones (avoiding duplicates)
-                    const newPresets = response.data;
-                    const existingIds = this.schedulePresets.map(p => p._id);
+                // If we're fetching for all selected groups (no specific groupId provided)
+                if (!groupId) {
+                    // Clear existing presets and start fresh
+                    this.schedulePresets = [];
                     
-                    for (const preset of newPresets) {
-                        if (!existingIds.includes(preset._id)) {
-                            this.schedulePresets.push(preset);
+                    if (this.selectedGroupIds.length > 0) {
+                        const addedIds = new Set(); // Track IDs we've already added
+                        
+                        for (const groupId of this.selectedGroupIds) {
+                            const response = await axios.get(`http://localhost:1010/api/schedulePresets/${groupId}`);
+                            
+                            // Only add presets that haven't been added yet
+                            for (const preset of response.data) {
+                                if (!addedIds.has(preset._id)) {
+                                    this.schedulePresets.push(preset);
+                                    addedIds.add(preset._id);
+                                }
+                            }
                         }
                     }
                 } 
-                // If no group is specified but we have selected groups, fetch for all selected groups
-                else if (this.selectedGroupIds.length > 0) {
-                    this.schedulePresets = []; // Clear existing presets
-                    
-                    for (const groupId of this.selectedGroupIds) {
-                        const response = await axios.get(`http://localhost:1010/api/schedulePresets/${groupId}`);
-                        this.schedulePresets = [...this.schedulePresets, ...response.data];
-                    }
-                }
-                // If no groups are selected, clear presets
+                // If we're fetching for a specific group (during createSchedulePreset)
                 else {
-                    this.schedulePresets = [];
+                    // We'll refresh all presets to ensure consistency
+                    this.fetchSchedulePresets(); // Call without groupId to refresh everything
                 }
             } catch (error) {
                 console.error('Error fetching schedule presets:', error);
