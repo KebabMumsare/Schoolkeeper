@@ -130,12 +130,14 @@
 .button-wrapper {
     position: absolute;
     bottom: 0;
+    left: 0;
     width: 100%;
     padding: 20px;
     display: flex;
     justify-content: center;
     background: linear-gradient(to top, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.8));
     border-top: 1px solid #eee;
+    z-index: 11;
 }
 
 .draggable-items {
@@ -144,6 +146,7 @@
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: #FF5E62 #f0f2f5;
+    margin-bottom: 80px;
 }
 
 .draggable-items::-webkit-scrollbar {
@@ -581,6 +584,174 @@
     box-shadow: 0 6px 15px rgba(255, 94, 98, 0.3);
     transform: translateY(-2px);
 }
+
+.group-tag {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: white;
+    margin-right: 5px;
+}
+
+.group-selector {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    background-color: white;
+    box-shadow: -4px 0 16px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    z-index: 20;
+    width: 300px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.group-selector.open {
+    transform: translateX(0);
+}
+
+.group-selector h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.group-list {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 15px;
+}
+
+.group-toggle-btn {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    background: linear-gradient(90deg, #FF9966 0%, #FF5E62 100%);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    z-index: 15;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.group-toggle-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+.group-toggle-btn i {
+    font-size: 1.5rem;
+}
+
+.group-close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #666;
+    transition: color 0.2s;
+}
+
+.group-close-btn:hover {
+    color: #FF5E62;
+}
+
+.selected-groups-indicator {
+    position: fixed;
+    bottom: 140px;
+    right: 20px;
+    background-color: white;
+    border-radius: 20px;
+    padding: 5px 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    max-width: 300px;
+    flex-wrap: wrap;
+}
+
+.selected-group-pill {
+    display: flex;
+    align-items: center;
+    padding: 3px 8px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: white;
+    margin: 2px;
+}
+
+.selected-group-count {
+    background-color: rgba(0, 0, 0, 0.1);
+    color: #333;
+    padding: 3px 8px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.group-item {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    border-radius: 6px;
+    margin-bottom: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.group-item:hover {
+    background-color: #f5f5f5;
+}
+
+.group-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.group-checkbox {
+    margin-right: 10px;
+}
+
+.draggable-item-group-indicator {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 4px;
+    width: 100%;
+}
+
+.scheduled-item-group-indicator {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 2px 6px;
+    border-radius: 0 8px 0 8px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: white;
+}
 </style>
 
 <template>
@@ -603,13 +774,20 @@
 
             <div class="draggable-items">
                 <div 
-                    v-for="preset in schedulePresets" 
+                    v-for="preset in filteredSchedulePresets" 
                     :key="preset._id"
                     class="draggable-item"
                     draggable="true"
                     @dragstart="startDrag($event, preset)"
                 >
+                    <div 
+                        class="draggable-item-group-indicator" 
+                        :style="{ backgroundColor: getGroupColor(preset.group) }"
+                    ></div>
                     {{ preset.lecture }}
+                    <div class="item-details">
+                        <span>{{ getGroupName(preset.group) }}</span>
+                    </div>
                 </div>
             </div>
             
@@ -649,12 +827,13 @@
 
                     <div class="schedule-grid">
                         <div 
-                            v-for="scheduledItem in schedules[selectedDay]" 
+                            v-for="scheduledItem in filteredScheduledItems" 
                             :key="scheduledItem.id" 
                             class="scheduled-item"
                             :style="{ 
                                 height: `${scheduledItem.duration}px`,
-                                top: `${scheduledItem.startMinutes}px` 
+                                top: `${scheduledItem.startMinutes}px`,
+                                borderLeftColor: getGroupColor(scheduledItem.groupId)
                             }"
                             draggable="true"
                             @dragstart="startDragScheduledItem($event, scheduledItem)"
@@ -676,25 +855,76 @@
                             </div>
 
                             <div 
+                                class="scheduled-item-group-indicator"
+                                :style="{ backgroundColor: getGroupColor(scheduledItem.groupId) }"
+                            >
+                                {{ getGroupShortName(scheduledItem.groupId) }}
+                            </div>
+
+                            <div 
                                 class="resize-handle bottom"
                                 @mousedown="startResize($event, scheduledItem, 'bottom')"
                             ></div>
                         </div>
                     </div>
                     
-                    <div class="schedule-controls">
-                        <select v-model="selectedGroupId" class="schedule-dropdown" required>
-                            <option value="" disabled>Välj grupp</option>
-                            <option v-for="group in availableGroups" :key="group._id" :value="group._id">
-                                {{ group.name }}
-                            </option>
-                        </select>
-                        <button @click="saveSchedule" class="schedule-save-btn">
+                    <!-- Group toggle button and save button at the bottom right -->
+                    <div style="position: fixed; bottom: 20px; right: 20px; z-index: 10;">
+                        <button @click="toggleGroupSelector" class="group-toggle-btn">
+                            <span>G</span>
+                        </button>
+                        
+                        <!-- Selected groups indicator -->
+                        <div v-if="selectedGroupIds.length > 0" class="selected-groups-indicator">
+                            <div 
+                                v-for="(groupId, index) in selectedGroupIds.slice(0, 3)" 
+                                :key="groupId"
+                                class="selected-group-pill"
+                                :style="{ backgroundColor: getGroupColor(groupId) }"
+                            >
+                                {{ getGroupShortName(groupId) }}
+                            </div>
+                            <div v-if="selectedGroupIds.length > 3" class="selected-group-count">
+                                +{{ selectedGroupIds.length - 3 }}
+                            </div>
+                        </div>
+                        
+                        <button @click="saveSchedule" class="schedule-save-btn" style="margin-top: 15px;">
                             Spara schema
                         </button>
                     </div>
                 </div>
             </div>
+        </div>
+
+        <!-- Group selector slide panel -->
+        <div class="group-selector" :class="{ open: isGroupSelectorOpen }">
+            <h3>Välj grupper</h3>
+            <button @click="toggleGroupSelector" class="group-close-btn">×</button>
+            
+            <div class="group-list">
+                <div 
+                    v-for="group in availableGroups" 
+                    :key="group._id"
+                    class="group-item"
+                    @click="toggleGroupSelection(group._id)"
+                >
+                    <input 
+                        type="checkbox" 
+                        :checked="selectedGroupIds.includes(group._id)"
+                        class="group-checkbox"
+                    />
+                    <div 
+                        class="group-color"
+                        :style="{ backgroundColor: getGroupColor(group._id) }"
+                    ></div>
+                    <span>{{ group.name }}</span>
+                </div>
+            </div>
+            
+            <button @click="saveSchedule" class="schedule-save-btn">
+                Spara schema
+            </button>
         </div>
 
         <div v-if="showModal" class="modal-overlay">
@@ -707,6 +937,19 @@
                             v-model="newItem.name" 
                             placeholder="Ange objektnamn"
                         />
+                    </div>
+                    <div class="form-group">
+                        <label>Grupp:</label>
+                        <select v-model="newItem.group" required>
+                            <option value="" disabled>Välj grupp</option>
+                            <option 
+                                v-for="group in availableGroups" 
+                                :key="group._id" 
+                                :value="group._id"
+                            >
+                                {{ group.name }}
+                            </option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label>Lärare:</label>
@@ -770,8 +1013,9 @@ export default {
                 'thursday': 'Torsdag',
                 'friday': 'Fredag'
             },
-            selectedGroupId: '',
+            selectedGroupIds: [],
             availableGroups: [],
+            groupColors: {},
             resizing: false,
             currentItem: null,
             resizingDirection: null,
@@ -780,14 +1024,40 @@ export default {
             resizingStartTop: 0,
             dragStartY: 0,
             showModal: false,
+            isGroupSelectorOpen: false,
             newItem: {
                 name: '',
                 teacher: '',
-                room: ''
+                room: '',
+                group: ''
             },
             schedulePresets: [],
             teachersList: [],
             roomsList: []
+        }
+    },
+    computed: {
+        filteredScheduledItems() {
+            // If no groups are selected, show all items
+            if (this.selectedGroupIds.length === 0) {
+                return this.schedules[this.selectedDay];
+            }
+            
+            // Otherwise, filter items by selected groups
+            return this.schedules[this.selectedDay].filter(item => 
+                this.selectedGroupIds.includes(item.groupId)
+            );
+        },
+        filteredSchedulePresets() {
+            // If no groups are selected, show all presets
+            if (this.selectedGroupIds.length === 0) {
+                return this.schedulePresets;
+            }
+            
+            // Otherwise, filter presets by selected groups
+            return this.schedulePresets.filter(preset => 
+                this.selectedGroupIds.includes(preset.group)
+            );
         }
     },
     mounted() {
@@ -810,15 +1080,17 @@ export default {
             this.newItem = {
                 name: '',
                 teacher: '',
-                room: ''
+                room: '',
+                group: ''
             };
         },
         submitItem() {
-            if (this.newItem.name.trim()) {
+            if (this.newItem.name.trim() && this.newItem.group) {
                 this.items.push({
                     name: this.newItem.name,
                     teacher: this.newItem.teacher,
-                    room: this.newItem.room
+                    room: this.newItem.room,
+                    group: this.newItem.group
                 });
                 this.closeModal();
             }
@@ -860,6 +1132,7 @@ export default {
                     teacherId: teacherData ? teacherData._id : itemData.teacher,
                     room: roomData ? roomData.name : itemData.room,
                     roomId: roomData ? roomData._id : itemData.room,
+                    groupId: itemData.group,
                     duration: 60,
                     startMinutes: Math.max(0, snapY - 30)
                 });
@@ -949,25 +1222,55 @@ export default {
             this.$router.push('/admintools');
         },
         createSchedule() {
-            if (this.selectedGroupId) {
-                this.fetchGroupSchedule(this.selectedGroupId);
+            if (this.selectedGroupIds.length > 0) {
+                // Fetch schedules for all selected groups
+                this.selectedGroupIds.forEach(groupId => {
+                    this.fetchGroupSchedule(groupId);
+                });
             } else {
-                this.schedules = {
-                    monday: [],
-                    tuesday: [],
-                    wednesday: [],
-                    thursday: [],
-                    friday: []
-                };
+                this.clearSchedules();
             }
         },
         async fetchGroups() {
             try {
                 const response = await axios.get('http://localhost:1010/api/groups');
                 this.availableGroups = response.data;
+                
+                // Generate colors for each group
+                this.availableGroups.forEach((group, index) => {
+                    // Generate a color based on index
+                    const hue = (index * 137) % 360; // Golden ratio to distribute colors
+                    this.groupColors[group._id] = `hsl(${hue}, 70%, 50%)`;
+                });
             } catch (error) {
                 console.error('Error fetching groups:', error);
                 this.availableGroups = [];
+            }
+        },
+        getGroupColor(groupId) {
+            return this.groupColors[groupId] || '#FF5E62';
+        },
+        getGroupName(groupId) {
+            const group = this.availableGroups.find(g => g._id === groupId);
+            return group ? group.name : 'Unknown Group';
+        },
+        getGroupShortName(groupId) {
+            const name = this.getGroupName(groupId);
+            // Return first 3 characters or the whole name if shorter
+            return name.length > 3 ? name.substring(0, 3) : name;
+        },
+        toggleGroupSelection(groupId) {
+            const index = this.selectedGroupIds.indexOf(groupId);
+            if (index === -1) {
+                // Add group to selection
+                this.selectedGroupIds.push(groupId);
+                // Fetch schedule for this group
+                this.fetchGroupSchedule(groupId);
+                // Fetch presets for this group
+                this.fetchSchedulePresets(groupId);
+            } else {
+                // Remove group from selection
+                this.selectedGroupIds.splice(index, 1);
             }
         },
         async fetchTeacher(teacherId) {
@@ -1006,11 +1309,8 @@ export default {
                 this.roomsList = [];
             }
         },
-        async fetchGroupSchedule(groupId, day) {
+        async fetchGroupSchedule(groupId) {
             try {
-                // Reset schedules first
-                this.clearSchedules();
-
                 // Fetch schedule for each day
                 const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
                 
@@ -1043,18 +1343,18 @@ export default {
                             teacher: teacherData ? teacherData.name : '',
                             teacherId: item.teacher || '',
                             room: roomData ? roomData.name : '',
-                            roomId: item.room || ''
+                            roomId: item.room || '',
+                            groupId: groupId // Add group ID to track which group this item belongs to
                         });
                     }
 
-                    // Use lowercase day to match the selectedDay state
-                    this.schedules[day] = formattedItems;
+                    // Add these items to the schedule (don't replace existing items)
+                    this.schedules[day] = [...this.schedules[day], ...formattedItems];
                 }
 
                 console.log('Loaded schedules:', this.schedules);
             } catch (error) {
                 console.error('Error loading schedule:', error);
-                this.clearSchedules();
             }
         },
         clearSchedules() {
@@ -1067,74 +1367,115 @@ export default {
             };
         },
         async saveSchedule() {
-            if (!this.selectedGroupId) {
-                alert('Please select a group first');
+            if (this.selectedGroupIds.length === 0) {
+                alert('Please select at least one group first');
                 return;
             }
 
             try {
-                const formattedSchedules = {};
-                for (const [day, items] of Object.entries(this.schedules)) {
-                    formattedSchedules[day.toLowerCase()] = items.map(item => ({
-                        lecture: item.name,
-                        teacher: item.teacherId,
-                        room: item.roomId,
-                        startMinutes: item.startMinutes,
-                        duration: item.duration
-                    }));
-                }
+                // Save schedule for each selected group
+                for (const groupId of this.selectedGroupIds) {
+                    const formattedSchedules = {};
+                    
+                    for (const [day, items] of Object.entries(this.schedules)) {
+                        // Filter items for this specific group
+                        const groupItems = items.filter(item => item.groupId === groupId);
+                        
+                        formattedSchedules[day.toLowerCase()] = groupItems.map(item => ({
+                            lecture: item.name,
+                            teacher: item.teacherId,
+                            room: item.roomId,
+                            startMinutes: item.startMinutes,
+                            duration: item.duration
+                        }));
+                    }
 
-                const response = await axios.post('http://localhost:1010/api/schedule', {
-                    selectedGroupId: this.selectedGroupId,
-                    schedules: formattedSchedules
-                });
+                    const response = await axios.post('http://localhost:1010/api/schedule', {
+                        selectedGroupId: groupId,
+                        schedules: formattedSchedules
+                    });
 
-                if (response.status === 201) {
-                    alert('Schedule saved successfully!');
-                } else {
-                    throw new Error('Failed to save schedule');
+                    if (response.status !== 201) {
+                        throw new Error(`Failed to save schedule for group ${this.getGroupName(groupId)}`);
+                    }
                 }
+                
+                alert('Schedules saved successfully!');
             } catch (error) {
-                console.error('Error saving schedule:', error);
-                alert('Error saving schedule. Please try again.');
+                console.error('Error saving schedules:', error);
+                alert('Error saving schedules. Please try again.');
             }
         },
         async createSchedulePreset() {
-            if (!this.selectedGroupId) {
-                alert('Please select a group first');
+            if (!this.newItem.group) {
+                alert('Please select a group for this item');
                 return;
             }
             
             try {
                 const payload = {
-                    group: this.selectedGroupId,
+                    group: this.newItem.group,
                     lecture: this.newItem.name,
                     teacher: this.newItem.teacher,
                     room: this.newItem.room
                 };
                 const response = await axios.post('http://localhost:1010/api/schedulePreset', payload);
-                this.fetchSchedulePresets();
+                
+                // Fetch presets for the selected group
+                this.fetchSchedulePresets(this.newItem.group);
                 this.closeModal();
             } catch (error) {
                 console.error('Error creating schedule preset:', error);
                 alert('Error creating schedule preset. Please try again.');
             }
         },
-        async fetchSchedulePresets() {
-            const response = await axios.get(`http://localhost:1010/api/schedulePresets/${this.selectedGroupId}`);
-            console.log(response);
-            this.schedulePresets = response.data;
+        async fetchSchedulePresets(groupId = null) {
+            try {
+                // If a specific group is provided, fetch presets for that group
+                if (groupId) {
+                    const response = await axios.get(`http://localhost:1010/api/schedulePresets/${groupId}`);
+                    // Add new presets to the existing ones (avoiding duplicates)
+                    const newPresets = response.data;
+                    const existingIds = this.schedulePresets.map(p => p._id);
+                    
+                    for (const preset of newPresets) {
+                        if (!existingIds.includes(preset._id)) {
+                            this.schedulePresets.push(preset);
+                        }
+                    }
+                } 
+                // If no group is specified but we have selected groups, fetch for all selected groups
+                else if (this.selectedGroupIds.length > 0) {
+                    this.schedulePresets = []; // Clear existing presets
+                    
+                    for (const groupId of this.selectedGroupIds) {
+                        const response = await axios.get(`http://localhost:1010/api/schedulePresets/${groupId}`);
+                        this.schedulePresets = [...this.schedulePresets, ...response.data];
+                    }
+                }
+                // If no groups are selected, clear presets
+                else {
+                    this.schedulePresets = [];
+                }
+            } catch (error) {
+                console.error('Error fetching schedule presets:', error);
+            }
         },
         getDayName(day) {
             return this.dayTranslations[day] || day;
+        },
+        toggleGroupSelector() {
+            this.isGroupSelectorOpen = !this.isGroupSelectorOpen;
         }
     },
     watch: {
-        selectedGroupId(newId) {
-            if (newId) {
-                this.fetchGroupSchedule(newId);
-                this.fetchSchedulePresets();
-            }
+        selectedGroupIds: {
+            handler(newIds) {
+                if (newIds.length > 0) {
+                    this.fetchSchedulePresets();
+                }
+            },
+            deep: true
         }
     }
 }
