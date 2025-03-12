@@ -386,6 +386,16 @@
     transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
 
+.scheduled-item.left-side {
+    right: 50%;
+    margin-right: 5px;
+}
+
+.scheduled-item.right-side {
+    left: 50%;
+    margin-left: 5px;
+}
+
 .scheduled-item:hover {
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
     transform: translateY(-2px);
@@ -827,9 +837,13 @@
 
                     <div class="schedule-grid">
                         <div 
-                            v-for="scheduledItem in filteredScheduledItems" 
+                            v-for="scheduledItem in processedScheduledItems" 
                             :key="scheduledItem.id" 
                             class="scheduled-item"
+                            :class="{
+                                'left-side': scheduledItem.position === 'left',
+                                'right-side': scheduledItem.position === 'right'
+                            }"
                             :style="{ 
                                 height: `${scheduledItem.duration}px`,
                                 top: `${scheduledItem.startMinutes}px`,
@@ -1022,6 +1036,7 @@ export default {
             resizingStartY: 0,
             resizingStartHeight: 0,
             resizingStartTop: 0,
+            resizingItemId: null,
             dragStartY: 0,
             showModal: false,
             isGroupSelectorOpen: false,
@@ -1058,6 +1073,51 @@ export default {
             return this.schedulePresets.filter(preset => 
                 this.selectedGroupIds.includes(preset.group)
             );
+        },
+        processedScheduledItems() {
+            const items = this.filteredScheduledItems;
+            if (!items || items.length === 0) return [];
+            
+            // Create a copy of the items to avoid modifying the original
+            const processedItems = JSON.parse(JSON.stringify(items));
+            
+            // Sort items by start time
+            processedItems.sort((a, b) => a.startMinutes - b.startMinutes);
+            
+            // Check for overlaps and assign positions
+            for (let i = 0; i < processedItems.length; i++) {
+                processedItems[i].position = 'full'; // Default position
+                
+                // Check for overlaps with previous items
+                for (let j = 0; j < i; j++) {
+                    const itemA = processedItems[i];
+                    const itemB = processedItems[j];
+                    
+                    // Check if items overlap
+                    const overlapStart = Math.max(itemA.startMinutes, itemB.startMinutes);
+                    const overlapEnd = Math.min(
+                        itemA.startMinutes + itemA.duration, 
+                        itemB.startMinutes + itemB.duration
+                    );
+                    
+                    if (overlapEnd > overlapStart) {
+                        // Items overlap
+                        if (itemB.position === 'full') {
+                            // If the other item is full width, make it left and this one right
+                            itemB.position = 'left';
+                            itemA.position = 'right';
+                        } else if (itemB.position === 'left') {
+                            // If the other item is already left, make this one right
+                            itemA.position = 'right';
+                        } else if (itemB.position === 'right') {
+                            // If the other item is already right, make this one left
+                            itemA.position = 'left';
+                        }
+                    }
+                }
+            }
+            
+            return processedItems;
         }
     },
     mounted() {
@@ -1167,6 +1227,7 @@ export default {
             this.resizingStartY = evt.clientY;
             this.resizingStartHeight = item.duration;
             this.resizingStartTop = item.startMinutes;
+            this.resizingItemId = item.id;
             evt.preventDefault();
         },
         handleResize(evt) {
@@ -1180,6 +1241,13 @@ export default {
                 
                 if (this.currentItem.startMinutes + newHeight <= 1440) {
                     this.currentItem.duration = newHeight;
+                    
+                    const originalItem = this.schedules[this.selectedDay].find(
+                        item => item.id === this.resizingItemId
+                    );
+                    if (originalItem) {
+                        originalItem.duration = newHeight;
+                    }
                 }
             } else {
                 let newTop = Math.round((this.resizingStartTop + deltaY) / 5) * 5;
@@ -1193,12 +1261,21 @@ export default {
                 if (newTop >= 0) {
                     this.currentItem.startMinutes = newTop;
                     this.currentItem.duration = newHeight;
+                    
+                    const originalItem = this.schedules[this.selectedDay].find(
+                        item => item.id === this.resizingItemId
+                    );
+                    if (originalItem) {
+                        originalItem.startMinutes = newTop;
+                        originalItem.duration = newHeight;
+                    }
                 }
             }
         },
         stopResize() {
             this.resizing = false;
             this.currentItem = null;
+            this.resizingItemId = null;
         },
         getTimeRange(item) {
             const startMinutes = item.startMinutes;
