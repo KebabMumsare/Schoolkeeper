@@ -378,10 +378,15 @@ export default {
 </script>
 
 <style scoped>
+body {
+  padding: 0;
+  margin: 0;
+}
+
 .kurser-container {
   padding: 20px;
-  width: 90vw;
-  max-width: 1200px;
+  width: 100vw;
+  max-width: 100vw;
   margin: 0 auto;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   color: #333;
@@ -389,6 +394,8 @@ export default {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background-color: #f0f2f5;
+  background-image: linear-gradient(135deg, #f5f7fa 0%, #e4efe9 100%);
 }
 
 .header {
@@ -419,20 +426,21 @@ export default {
   display: flex;
   align-items: center;
   padding: 10px 15px;
-  background-color: #f8f9fa;
-  border: 1px solid #e0e0e0;
+  background: linear-gradient(90deg, #4776E6 0%, #8E54E9 100%);
+  border: none;
   border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
   font-weight: 600;
-  color: #2c3e50;
+  color: white;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .back-to-admin-button:hover {
-  background-color: #e9ecef;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(90deg, #3665d5 0%, #7d43d8 100%);
 }
 
 .back-arrow {
@@ -460,8 +468,8 @@ export default {
 
 .search-input:focus {
   outline: none;
-  border-color: #3498db;
-  box-shadow: 0 2px 10px rgba(52, 152, 219, 0.2);
+  border-color: #4776E6;
+  box-shadow: 0 2px 10px rgba(71, 118, 230, 0.2);
 }
 
 .subjects-container {
@@ -502,18 +510,29 @@ export default {
   padding: 25px;
   box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
   cursor: pointer;
-  transition: transform 0.3s, box-shadow 0.3s;
+  transition: all 0.3s ease;
   border: 1px solid #f0f0f0;
   height: 150px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  position: relative;
+  overflow: hidden;
 }
 
-.subject-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
-  border-color: #e0e0e0;
+.subject-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, #4776E6 0%, #8E54E9 100%);
+  transition: height 0.3s ease;
+}
+
+.subject-card:hover::before {
+  height: 8px;
 }
 
 .subject-card h2 {
@@ -649,21 +668,22 @@ export default {
   top: 25px;
   left: 25px;
   padding: 12px 24px;
-  background-color: #f8f9fa;
-  border: 1px solid #e0e0e0;
+  background: linear-gradient(90deg, #4776E6 0%, #8E54E9 100%);
+  border: none;
   border-radius: 8px;
   cursor: pointer;
   font-size: 16px;
   font-weight: 600;
-  color: #2c3e50;
+  color: white;
   z-index: 1001;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .back-button:hover {
-  background-color: #e9ecef;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(90deg, #3665d5 0%, #7d43d8 100%);
 }
 
 .info-section {
@@ -950,5 +970,10 @@ export default {
 
 .central-content-text li:last-child {
   margin-bottom: 0;
+}
+
+.subject-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
 }
 </style>
