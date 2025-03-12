@@ -2058,13 +2058,29 @@ export default {
         },
         sortScheduleByTime(schedule) {
             return [...schedule].sort((a, b) => {
-                const timeA = this.convertTimeToMinutes(a.time);
-                const timeB = this.convertTimeToMinutes(b.time);
+                // Handle different time formats
+                let timeA, timeB;
+                
+                // If time contains a range (e.g. "09:00 - 10:30"), use the start time
+                if (a.time.includes('-')) {
+                    timeA = this.convertTimeToMinutes(a.time.split('-')[0].trim());
+                } else {
+                    timeA = this.convertTimeToMinutes(a.time);
+                }
+                
+                if (b.time.includes('-')) {
+                    timeB = this.convertTimeToMinutes(b.time.split('-')[0].trim());
+                } else {
+                    timeB = this.convertTimeToMinutes(b.time);
+                }
+                
                 return timeA - timeB;
             });
         },
         convertTimeToMinutes(timeStr) {
-            const [hours, minutes] = timeStr.split(':').map(Number);
+            // Make sure we're working with a clean time string
+            const cleanTimeStr = timeStr.trim();
+            const [hours, minutes] = cleanTimeStr.split(':').map(Number);
             return hours * 60 + minutes;
         },
         attendanceRoute() {
