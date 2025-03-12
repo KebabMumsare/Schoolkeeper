@@ -13,7 +13,6 @@
             </div>
         </div>
         
-        <!-- Permanent Create Notice Form -->
         <div v-if="currentUser.access === 'Admin' || currentUser.access === 'Lärare'" class="create-notice-section">
             <div class="create-notice-container">
                 <h3 class="create-notice-title">Skapa Ny Notis</h3>
@@ -79,12 +78,11 @@
     scroll-behavior: smooth;
 }
 
-/* New styles for the permanent create notice form */
 .create-notice-section {
     margin-left: 3rem;
     flex: 2;
     max-width: 700px;
-    padding-top: 0; /* Remove top padding to align with notifications */
+    padding-top: 0;
 }
 
 .create-notice-container {
@@ -92,19 +90,19 @@
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     padding: 2.5rem;
-    padding-top: 1.5rem; /* Reduce top padding */
+    padding-top: 1.5rem;
     animation: fadeIn 0.5s ease-out;
     height: 75vh;
     display: flex;
     flex-direction: column;
     user-drag: none;
     -webkit-user-drag: none;
-    margin-top: 1rem; /* Match the first notification's position */
+    margin-top: 1rem;
 }
 
 .create-notice-title {
     margin-top: 0;
-    margin-bottom: 1rem; /* Reduced from 1.5rem */
+    margin-bottom: 1rem;
     color: #333;
     font-size: 1.4rem;
     text-align: center;
@@ -250,6 +248,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 1000;
 }
 
 .notice-details-content {
@@ -308,7 +307,7 @@
     width: 100%;
 }
 
-/* Customize scrollbar for WebKit browsers */
+
 .notice-container::-webkit-scrollbar {
     width: 6px;
 }
@@ -320,7 +319,6 @@
     border-radius: 10px;
 }
 
-/* Staggered animation for cards */
 @keyframes fadeInUp {
     to {
         opacity: 1;
@@ -360,7 +358,6 @@ export default {
                     const dateA = new Date(a.created_at);
                     const dateB = new Date(b.created_at);
 
-                    // Check for invalid dates
                     if (isNaN(dateA) && isNaN(dateB)) return 0; 
                     if (isNaN(dateA)) return 1; 
                     if (isNaN(dateB)) return -1; 
@@ -383,17 +380,14 @@ export default {
                     const payload = {
                         title: this.newNotice.title,
                         message: this.newNotice.message,
-                        created_at: new Date().toISOString(), // Include created_at timestamp
+                        created_at: new Date().toISOString(),
                     };
                     const response = await axios.post('http://localhost:1010/api/notice', payload);
                     
-                    // Add the new notice to the beginning of the notices array
                     this.notice.unshift(response.data);
                     
-                    // Clear the input fields
                     this.newNotice = { title: '', message: '' };
                     
-                    // Show success message or feedback
                     alert('Notis skapad!');
                 } catch (error) {
                     console.error('Error creating notice:', error);
@@ -403,7 +397,6 @@ export default {
     },
     mounted() {
         this.fetchNotice().then(() => {
-            // Set staggered animation delays after notices are loaded
             setTimeout(() => {
                 const cards = document.querySelectorAll('.notice-card');
                 cards.forEach((card, index) => {
