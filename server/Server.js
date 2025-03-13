@@ -436,11 +436,48 @@ app.get("/api/groups/:id", async (req, res) => {
     res.sendStatus(500);
   }
 });
-app.delete("/api/groups/:id", async (req, res) => {
+app.post("/api/groups/:id", async (req, res) => {
   try {
-    await GroupModel.findByIdAndDelete(req.params.id);
+    const group = await GroupModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.json(group);
+  } catch (error) {
+    console.error("Error updating group:", error);
+    res.status(500).json({ message: "Error updating group", error: error.message });
+  }
+});
+  
+app.delete("/api/groups/:id", async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  
+  try {
+    const groupId = req.params.id;
+    
+    // Delete the group
+    await GroupModel.findByIdAndDelete(groupId).session(session);
+    
+    // Remove group from all users
+    await UserModel.updateMany(
+      { groups: groupId },
+      { $pull: { groups: groupId } }
+    ).session(session);
+    
+    // Delete related schedules
+    await SchedualModel.deleteMany({ group: groupId }).session(session);
+    
+    // Delete related schedule presets
+    await SchedualPresetModel.deleteMany({ group: groupId }).session(session);
+    
+    // Commit the transaction
+    await session.commitTransaction();
+    session.endSession();
+    
     res.sendStatus(204);
   } catch (error) {
+    // Abort transaction on error
+    await session.abortTransaction();
+    session.endSession();
+    
     console.error("Error deleting group:", error);
     res.sendStatus(500);
   }
@@ -501,9 +538,6 @@ app.delete("/api/schedulePresets/:id", async (req, res) => {
     res.status(500).json({ message: "Error deleting schedule preset", error: error.message });
   }
 });
-
-
-
 
 // Classroom API
 app.get("/api/classrooms/", async (req, res) => {

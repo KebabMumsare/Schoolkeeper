@@ -202,6 +202,7 @@
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: #11998e #f0f2f5;
+    padding-bottom: 6rem;
 }
 
 .sidebar-content::-webkit-scrollbar {
@@ -323,6 +324,11 @@
     background: linear-gradient(to top, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.8));
     display: flex;
     gap: 1rem;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 10;
 }
 
 .create-button {
@@ -878,7 +884,7 @@ export default {
         },
         async updateGroup() {
             try {
-                await axios.put(`http://localhost:1010/api/groups/${this.editingGroup._id}`, {
+                await axios.post(`http://localhost:1010/api/groups/${this.editingGroup._id}`, {
                     name: this.editingGroup.name,
                     type: this.editingGroup.type
                 });
