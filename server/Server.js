@@ -509,6 +509,16 @@ app.get("/api/schema/:day/:groupId", async (req, res) => {
     });
   }
 });
+app.get("/api/schema/teacher/:day/:teacher", async (req, res) => {
+  try {
+    const teacherLectures = await SchedualModel.find({ teacher: req.params.teacher, day: req.params.day });
+    res.json(teacherLectures);
+  } catch (error) { 
+    console.error('Error fetching teacher lectures:', error);
+    res.status(500).json({ message: "Error fetching teacher lectures", error: error.message });
+  }
+});
+
 app.post("/api/schedulePreset", async (req, res) => {
   try {
     const schedual = new SchedualPresetModel(req.body);
