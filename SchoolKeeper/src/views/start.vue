@@ -1669,7 +1669,6 @@ import NavBar from "@/components/Nav-Bar.vue";
 import axios from "axios";
 import { useStorage } from "@vueuse/core";  // Named import
 import Footer from "@/components/Footer.vue";
-import draggable from 'vuedraggable';
 
 export default {
     name: 'Start',
@@ -1849,8 +1848,8 @@ export default {
             return dayIndex === adjustedToday || dayIndex === parseInt(this.testDay);
         },
         async fetchTodaySchedule() {
-            // Skip for teachers
-            if (this.isTeacher) return;
+            // Remove the early return for teachers
+            // if (this.isTeacher) return;
             
             const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
             const dayIndex = this.testDay !== '' ? parseInt(this.testDay) : new Date().getDay() - 1;
@@ -1864,6 +1863,35 @@ export default {
             try {
                 console.log(`Fetching schedule for ${dayName}`);
                 
+                // Different fetch logic for teachers vs students
+                if (this.isTeacher) {
+                    // Teacher-specific schedule fetch
+                    if (!this.currentUser.id) {
+                        console.error('Teacher ID missing, cannot fetch today\'s schedule');
+                        this.todaySchedule = [];
+                        this.calculateScheduleLayout();
+                        this.updateCurrentTimePosition();
+                        return;
+                    }
+                    
+                    console.log(`Making API request to fetch lectures for teacher ID: ${this.currentUser.id} for ${dayName}`);
+                    const response = await axios.get(`http://localhost:1010/api/schema/teacher/${dayName}/${this.currentUser.id}`);
+                    
+                    if (response.data && response.data.length > 0) {
+                        console.log(`Received ${response.data.length} lectures from server for today`);
+                        this.todaySchedule = this.sortScheduleByTime(response.data);
+                    } else {
+                        console.log('No lectures found for teacher today');
+                        this.todaySchedule = [];
+                    }
+                    
+                    // Calculate layout and update time position
+                    this.calculateScheduleLayout();
+                    this.updateCurrentTimePosition();
+                    return;
+                }
+                
+                // Student schedule fetch logic (existing code)
                 // If user has no groups, return empty schedule
                 if (!this.currentUser.groups || !this.currentUser.groups.length) {
                     console.log('No groups found, returning empty schedule');
@@ -1993,9 +2021,10 @@ export default {
             return now >= lectureStart && now < lectureEnd;
         },
         updateSchedules() {
-            if (!this.isTeacher) {
-                this.fetchTodaySchedule();
-            }
+            // Remove the condition that prevents fetching for teachers
+            // if (!this.isTeacher) {
+            this.fetchTodaySchedule();
+            // }
         },
         hasTest(subject) {
             return this.testSchedule.some(test => 
