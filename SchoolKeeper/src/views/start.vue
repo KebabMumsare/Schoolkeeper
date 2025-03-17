@@ -44,7 +44,8 @@
                              :style="positionLectureByTime(lecture)"
                              @click="hasAttendancePermission ? openAttendanceModal(lecture) : null">
                             <div class="lecture-time">
-                                {{ lecture.time.includes('-') ? lecture.time : lecture.time + (lecture.endTime ? ' - ' + lecture.endTime : '') }}
+                                <div class="time-start">{{ lecture.time.includes('-') ? lecture.time.split('-')[0].trim() : lecture.time }}</div>
+                                <div class="time-end">{{ lecture.time.includes('-') ? lecture.time.split('-')[1].trim() : (lecture.endTime ? lecture.endTime : '') }}</div>
                             </div>
                             <div class="lecture-content">
                                 <div class="lecture-title">{{ lecture.lecture }}</div>
@@ -1335,7 +1336,7 @@ body.modal-open {
     position: absolute; /* Use absolute positioning to place at exact time */
     left: 65px;
     right: 15px;
-    padding: 8px 10px;
+    padding: 1px 3px;
     background-color: rgba(79, 192, 229, 0.1);
     border-left: 4px solid #4fc0e5;
     border-radius: 8px;
@@ -1370,7 +1371,7 @@ body.modal-open {
 .schedule-lecture-item .lecture-time {
     font-weight: 600;
     color: #216e87;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     white-space: nowrap; /* Prevent the time from wrapping */
     flex-shrink: 0; /* Prevent the time from shrinking */
     min-width: 60px; /* Give the time a minimum width */
@@ -1384,8 +1385,8 @@ body.modal-open {
 }
 
 .schedule-lecture-item .lecture-title {
-    font-weight: 500;
-    font-size: 1rem;
+    font-weight: bold;
+    font-size: 0.9rem;
     color: #333;
     word-wrap: break-word; /* Allow text to wrap */
     white-space: normal; /* Allow text to wrap */
