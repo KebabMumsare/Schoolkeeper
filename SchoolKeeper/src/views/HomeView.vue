@@ -24,12 +24,12 @@ export default {
     validateEmail() {
       this.emailError = '';
       if (!this.email) {
-        this.emailError = 'Email is required';
+        this.emailError = 'E-post krävs';
         return false;
       }
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(this.email)) {
-        this.emailError = 'Please enter a valid email address';
+        this.emailError = 'Vänligen ange en giltig e-postadress';
         return false;
       }
       return true;
@@ -38,7 +38,7 @@ export default {
     validatePassword() {
       this.passwordError = '';
       if (!this.password) {
-        this.passwordError = 'Password is required';
+        this.passwordError = 'Lösenord krävs';
         return false;
       }
       return true;
@@ -48,7 +48,6 @@ export default {
       this.formSubmitted = true;
       this.errorMessage = '';
       
-      // Validate inputs
       const isEmailValid = this.validateEmail();
       const isPasswordValid = this.validatePassword();
       
@@ -73,18 +72,17 @@ export default {
         console.error('Login error:', error);
         
         if (error.response) {
-          // Handle different error status codes
           if (error.response.status === 401) {
-            this.errorMessage = 'Incorrect email or password. Please try again.';
+            this.errorMessage = 'Felaktig e-post eller lösenord. Försök igen.';
           } else if (error.response.status === 404) {
-            this.errorMessage = 'User not found. Please check your email.';
+            this.errorMessage = 'Användaren hittades inte. Kontrollera din e-post.';
           } else if (error.response.status === 403) {
-            this.errorMessage = 'Your account is locked. Please contact an administrator.';
+            this.errorMessage = 'Ditt konto är låst. Kontakta en administratör.';
           } else {
-            this.errorMessage = 'Login failed. Please try again later.';
+            this.errorMessage = 'Inloggningen misslyckades. Försök igen senare.';
           }
         } else {
-          this.errorMessage = 'Unable to connect to the server. Please check your internet connection.';
+          this.errorMessage = 'Kunde inte ansluta till servern. Kontrollera din internetanslutning.';
         }
       } finally {
         this.isLoading = false;
@@ -121,7 +119,7 @@ export default {
       
       // Show confirmation and reset
       this.supportEmail = '';
-      alert('Your request has been submitted. An administrator will contact you shortly.');
+      alert('Din förfrågan har skickats. En administratör kommer att kontakta dig inom kort.');
     }
   },
   components: {
@@ -135,18 +133,18 @@ export default {
   <main class="login-page">
     <div class="login-container">
       <div class="login-header">
-        <h2>Welcome to SchoolKeeper</h2>
-        <p class="subtitle">Sign in to continue</p>
+        <h2>Välkommen till SchoolKeeper</h2>
+        <p class="subtitle">Logga in för att fortsätta</p>
       </div>
       
       <form @submit.prevent="submitLogin" class="login-form">
         <div class="form-group" :class="{ 'has-error': emailError && formSubmitted }">
-          <label for="email">Email</label>
+          <label for="email">E-post</label>
           <input 
             type="email" 
             id="email" 
             v-model="email" 
-            placeholder="Enter your email" 
+            placeholder="Ange din e-post" 
             required 
             autocomplete="email"
             @blur="validateEmail"
@@ -155,12 +153,12 @@ export default {
         </div>
 
         <div class="form-group" :class="{ 'has-error': passwordError && formSubmitted }">
-          <label for="password">Password</label>
+          <label for="password">Lösenord</label>
           <input 
             type="password" 
             id="password" 
             v-model="password" 
-            placeholder="Enter your password" 
+            placeholder="Ange ditt lösenord" 
             required 
             autocomplete="current-password"
             @blur="validatePassword"
@@ -171,7 +169,7 @@ export default {
         <div class="form-group">
           <button type="submit" class="login-button" :disabled="isLoading">
             <span v-if="isLoading" class="spinner"></span>
-            <span v-else>Sign In</span>
+            <span v-else>Logga in</span>
           </button>
         </div>
       </form>
@@ -181,7 +179,7 @@ export default {
       </div>
       
       <div class="login-footer">
-        <p><a href="#" @click.prevent="showHelpModal = true">Need help? Contact your administrator</a></p>
+        <p><a href="#" @click.prevent="showHelpModal = true">Behöver du hjälp? Kontakta din administratör</a></p>
       </div>
     </div>
     
@@ -190,7 +188,7 @@ export default {
       <div v-if="showHelpModal" class="help-modal-overlay" @click="showHelpModal = false">
         <div class="help-modal" @click.stop>
           <div class="help-modal-header">
-            <h3>Support Center</h3>
+            <h3>Supportcenter</h3>
             <button class="close-button" @click="showHelpModal = false">&times;</button>
           </div>
           
@@ -199,19 +197,19 @@ export default {
               :class="['tab-button', { active: activeHelpTab === 'faq' }]" 
               @click="setActiveHelpTab('faq')"
             >
-              <i class="tab-icon">❓</i> FAQ
+              <i class="tab-icon">❓</i> Vanliga frågor
             </button>
             <button 
               :class="['tab-button', { active: activeHelpTab === 'contact' }]" 
               @click="setActiveHelpTab('contact')"
             >
-              <i class="tab-icon">✉️</i> Contact
+              <i class="tab-icon">✉️</i> Kontakt
             </button>
             <button 
               :class="['tab-button', { active: activeHelpTab === 'troubleshoot' }]" 
               @click="setActiveHelpTab('troubleshoot')"
             >
-              <i class="tab-icon">🔧</i> Troubleshoot
+              <i class="tab-icon">🔧</i> Felsökning
             </button>
           </div>
           
@@ -219,14 +217,14 @@ export default {
             <!-- FAQ Tab -->
             <div v-if="activeHelpTab === 'faq'" class="tab-content">
               <div class="faq-item" v-for="(item, index) in [
-                { q: 'I forgot my password. What should I do?', 
-                  a: 'Please contact your school administrator to reset your password.' },
-                { q: 'Why can\'t I log in with my correct credentials?', 
-                  a: 'Your account may be locked or deactivated. Try clearing your browser cache or contact your administrator.' },
-                { q: 'How do I update my profile information?', 
-                  a: 'After logging in, go to your profile settings to update your information.' },
-                { q: 'Is my data secure?', 
-                  a: 'Yes, we use industry-standard encryption to protect all user data.' }
+                { q: 'Jag har glömt mitt lösenord. Vad ska jag göra?', 
+                  a: 'Kontakta din skoladministratör för att återställa ditt lösenord.' },
+                { q: 'Varför kan jag inte logga in med mina uppgifter?', 
+                  a: 'Ditt konto kan vara låst eller inaktiverat. Prova att rensa webbläsarens cache eller kontakta din administratör.' },
+                { q: 'Hur uppdaterar jag min profilinformation?', 
+                  a: 'Efter inloggning, gå till dina profilinställningar för att uppdatera din information.' },
+                { q: 'Är mina uppgifter säkra?', 
+                  a: 'Ja, vi använder branschstandard kryptering för att skydda alla användardata.' }
               ]" :key="index">
                 <details>
                   <summary>{{ item.q }}</summary>
@@ -241,32 +239,32 @@ export default {
                 <div class="contact-method">
                   <div class="contact-icon">📧</div>
                   <div class="contact-details">
-                    <h4>Email Support</h4>
-                    <p>Send us an email at <a href="mailto:support@schoolkeeper.edu">support@schoolkeeper.edu</a></p>
+                    <h4>E-postsupport</h4>
+                    <p>Skicka e-post till <a href="mailto:support@schoolkeeper.edu">support@schoolkeeper.edu</a></p>
                   </div>
                 </div>
                 
                 <div class="contact-method">
                   <div class="contact-icon">📞</div>
                   <div class="contact-details">
-                    <h4>Phone Support</h4>
-                    <p>Call us at <a href="tel:+11234567890">(123) 456-7890</a></p>
-                    <p class="contact-hours">Available Monday-Friday, 8am-5pm</p>
+                    <h4>Telefonsupport</h4>
+                    <p>Ring oss på <a href="tel:+11234567890">(123) 456-7890</a></p>
+                    <p class="contact-hours">Tillgänglig måndag-fredag, 08:00-17:00</p>
                   </div>
                 </div>
               </div>
               
               <div class="support-form">
-                <h4>Request Support</h4>
-                <p>Leave your email and we'll get back to you</p>
+                <h4>Begär support</h4>
+                <p>Lämna din e-post så återkommer vi till dig</p>
                 <div class="form-row">
                   <input 
                     type="email" 
                     v-model="supportEmail" 
-                    placeholder="Your email address"
+                    placeholder="Din e-postadress"
                     class="support-input"
                   />
-                  <button @click="submitSupportRequest" class="support-button">Submit</button>
+                  <button @click="submitSupportRequest" class="support-button">Skicka</button>
                 </div>
               </div>
             </div>
@@ -274,39 +272,39 @@ export default {
             <!-- Troubleshoot Tab -->
             <div v-if="activeHelpTab === 'troubleshoot'" class="tab-content">
               <div class="troubleshoot-steps">
-                <h4>Common Login Issues</h4>
+                <h4>Vanliga inloggningsproblem</h4>
                 
                 <div class="step">
                   <div class="step-number">1</div>
                   <div class="step-content">
-                    <h5>Check Your Credentials</h5>
-                    <p>Make sure your email and password are entered correctly. Passwords are case-sensitive.</p>
+                    <h5>Kontrollera dina uppgifter</h5>
+                    <p>Se till att din e-post och lösenord är korrekt angivna. Lösenord är skiftlägeskänsliga.</p>
                   </div>
                 </div>
                 
                 <div class="step">
                   <div class="step-number">2</div>
                   <div class="step-content">
-                    <h5>Clear Browser Cache</h5>
-                    <p>Try clearing your browser cache and cookies, then restart your browser.</p>
-                    <button class="action-button" @click="window.location.reload(true)">Refresh Page</button>
+                    <h5>Rensa webbläsarens cache</h5>
+                    <p>Prova att rensa webbläsarens cache och cookies, starta sedan om webbläsaren.</p>
+                    <button class="action-button" @click="window.location.reload(true)">Uppdatera sidan</button>
                   </div>
                 </div>
                 
                 <div class="step">
                   <div class="step-number">3</div>
                   <div class="step-content">
-                    <h5>Check Internet Connection</h5>
-                    <p>Ensure you have a stable internet connection.</p>
-                    <button class="action-button" @click="window.open('https://www.speedtest.net/', '_blank')">Test Connection</button>
+                    <h5>Kontrollera internetanslutning</h5>
+                    <p>Säkerställ att du har en stabil internetanslutning.</p>
+                    <button class="action-button" @click="window.open('https://www.speedtest.net/', '_blank')">Testa anslutning</button>
                   </div>
                 </div>
                 
                 <div class="step">
                   <div class="step-number">4</div>
                   <div class="step-content">
-                    <h5>Still Having Issues?</h5>
-                    <p>Contact your administrator or switch to the Contact tab for support options.</p>
+                    <h5>Fortfarande problem?</h5>
+                    <p>Kontakta din administratör eller gå till Kontakt-fliken för supportalternativ.</p>
                   </div>
                 </div>
               </div>
