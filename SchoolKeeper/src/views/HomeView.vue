@@ -14,7 +14,10 @@ export default {
       isLoading: false,
       emailError: '',
       passwordError: '',
-      formSubmitted: false
+      formSubmitted: false,
+      showHelpModal: false,
+      activeHelpTab: 'faq',
+      supportEmail: ''
     };
   },
   methods: {
@@ -103,6 +106,22 @@ export default {
       }
 
       console.log('Updated currentUser:', currentUser.value);
+    },
+    setActiveHelpTab(tab) {
+      this.activeHelpTab = tab;
+    },
+    
+    submitSupportRequest() {
+      if (!this.supportEmail.trim()) {
+        return;
+      }
+      
+      // Here you would typically send this to your backend
+      console.log('Support request submitted with email:', this.supportEmail);
+      
+      // Show confirmation and reset
+      this.supportEmail = '';
+      alert('Your request has been submitted. An administrator will contact you shortly.');
     }
   },
   components: {
@@ -162,9 +181,140 @@ export default {
       </div>
       
       <div class="login-footer">
-        <p>Need help? Contact your administrator</p>
+        <p><a href="#" @click.prevent="showHelpModal = true">Need help? Contact your administrator</a></p>
       </div>
     </div>
+    
+    <!-- Advanced Help Modal -->
+    <transition name="fade">
+      <div v-if="showHelpModal" class="help-modal-overlay" @click="showHelpModal = false">
+        <div class="help-modal" @click.stop>
+          <div class="help-modal-header">
+            <h3>Support Center</h3>
+            <button class="close-button" @click="showHelpModal = false">&times;</button>
+          </div>
+          
+          <div class="help-tabs">
+            <button 
+              :class="['tab-button', { active: activeHelpTab === 'faq' }]" 
+              @click="setActiveHelpTab('faq')"
+            >
+              <i class="tab-icon">❓</i> FAQ
+            </button>
+            <button 
+              :class="['tab-button', { active: activeHelpTab === 'contact' }]" 
+              @click="setActiveHelpTab('contact')"
+            >
+              <i class="tab-icon">✉️</i> Contact
+            </button>
+            <button 
+              :class="['tab-button', { active: activeHelpTab === 'troubleshoot' }]" 
+              @click="setActiveHelpTab('troubleshoot')"
+            >
+              <i class="tab-icon">🔧</i> Troubleshoot
+            </button>
+          </div>
+          
+          <div class="help-modal-content">
+            <!-- FAQ Tab -->
+            <div v-if="activeHelpTab === 'faq'" class="tab-content">
+              <div class="faq-item" v-for="(item, index) in [
+                { q: 'I forgot my password. What should I do?', 
+                  a: 'Please contact your school administrator to reset your password.' },
+                { q: 'Why can\'t I log in with my correct credentials?', 
+                  a: 'Your account may be locked or deactivated. Try clearing your browser cache or contact your administrator.' },
+                { q: 'How do I update my profile information?', 
+                  a: 'After logging in, go to your profile settings to update your information.' },
+                { q: 'Is my data secure?', 
+                  a: 'Yes, we use industry-standard encryption to protect all user data.' }
+              ]" :key="index">
+                <details>
+                  <summary>{{ item.q }}</summary>
+                  <p>{{ item.a }}</p>
+                </details>
+              </div>
+            </div>
+            
+            <!-- Contact Tab -->
+            <div v-if="activeHelpTab === 'contact'" class="tab-content">
+              <div class="contact-card">
+                <div class="contact-method">
+                  <div class="contact-icon">📧</div>
+                  <div class="contact-details">
+                    <h4>Email Support</h4>
+                    <p>Send us an email at <a href="mailto:support@schoolkeeper.edu">support@schoolkeeper.edu</a></p>
+                  </div>
+                </div>
+                
+                <div class="contact-method">
+                  <div class="contact-icon">📞</div>
+                  <div class="contact-details">
+                    <h4>Phone Support</h4>
+                    <p>Call us at <a href="tel:+11234567890">(123) 456-7890</a></p>
+                    <p class="contact-hours">Available Monday-Friday, 8am-5pm</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="support-form">
+                <h4>Request Support</h4>
+                <p>Leave your email and we'll get back to you</p>
+                <div class="form-row">
+                  <input 
+                    type="email" 
+                    v-model="supportEmail" 
+                    placeholder="Your email address"
+                    class="support-input"
+                  />
+                  <button @click="submitSupportRequest" class="support-button">Submit</button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Troubleshoot Tab -->
+            <div v-if="activeHelpTab === 'troubleshoot'" class="tab-content">
+              <div class="troubleshoot-steps">
+                <h4>Common Login Issues</h4>
+                
+                <div class="step">
+                  <div class="step-number">1</div>
+                  <div class="step-content">
+                    <h5>Check Your Credentials</h5>
+                    <p>Make sure your email and password are entered correctly. Passwords are case-sensitive.</p>
+                  </div>
+                </div>
+                
+                <div class="step">
+                  <div class="step-number">2</div>
+                  <div class="step-content">
+                    <h5>Clear Browser Cache</h5>
+                    <p>Try clearing your browser cache and cookies, then restart your browser.</p>
+                    <button class="action-button" @click="window.location.reload(true)">Refresh Page</button>
+                  </div>
+                </div>
+                
+                <div class="step">
+                  <div class="step-number">3</div>
+                  <div class="step-content">
+                    <h5>Check Internet Connection</h5>
+                    <p>Ensure you have a stable internet connection.</p>
+                    <button class="action-button" @click="window.open('https://www.speedtest.net/', '_blank')">Test Connection</button>
+                  </div>
+                </div>
+                
+                <div class="step">
+                  <div class="step-number">4</div>
+                  <div class="step-content">
+                    <h5>Still Having Issues?</h5>
+                    <p>Contact your administrator or switch to the Contact tab for support options.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </transition>
   </main>
   <Footer />
 </template>
@@ -371,6 +521,364 @@ h2 {
   margin-top: 2rem;
   color: #666;
   font-size: 0.9rem;
+}
+
+.login-footer a {
+  color: #4776E6;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.login-footer a:hover {
+  color: #8E54E9;
+  text-decoration: underline;
+}
+
+/* Advanced Help Modal Styles */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.3s;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+}
+
+.help-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+
+.help-modal {
+  background-color: white;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow: hidden;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+}
+
+.help-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #eee;
+  background: linear-gradient(90deg, #4776E6 0%, #8E54E9 100%);
+}
+
+.help-modal-header h3 {
+  margin: 0;
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+  color: white;
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+}
+
+.close-button:hover {
+  opacity: 1;
+}
+
+.help-tabs {
+  display: flex;
+  border-bottom: 1px solid #eee;
+  background-color: #f9f9f9;
+}
+
+.tab-button {
+  flex: 1;
+  padding: 1rem 0.5rem;
+  background: none;
+  border: none;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.tab-button.active {
+  color: #4776E6;
+  background-color: white;
+}
+
+.tab-button.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, #4776E6 0%, #8E54E9 100%);
+}
+
+.tab-icon {
+  margin-right: 0.5rem;
+  font-style: normal;
+}
+
+.help-modal-content {
+  padding: 0;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.tab-content {
+  padding: 1.5rem 2rem;
+}
+
+/* FAQ Tab Styles */
+.faq-item {
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.faq-item details {
+  padding-bottom: 1rem;
+}
+
+.faq-item summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: #333;
+  padding: 0.8rem 0;
+  position: relative;
+  list-style: none;
+}
+
+.faq-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq-item summary::after {
+  content: '+';
+  position: absolute;
+  right: 0;
+  font-size: 1.2rem;
+  color: #4776E6;
+  transition: transform 0.3s ease;
+}
+
+.faq-item details[open] summary::after {
+  transform: rotate(45deg);
+}
+
+.faq-item p {
+  margin: 0.5rem 0 1rem;
+  padding-left: 1rem;
+  color: #666;
+  line-height: 1.5;
+}
+
+/* Contact Tab Styles */
+.contact-card {
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.contact-method {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+}
+
+.contact-method:last-child {
+  margin-bottom: 0;
+}
+
+.contact-icon {
+  font-size: 1.8rem;
+  margin-right: 1rem;
+  background-color: rgba(71, 118, 230, 0.1);
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.contact-details {
+  flex: 1;
+}
+
+.contact-details h4 {
+  margin: 0 0 0.5rem;
+  color: #333;
+}
+
+.contact-details p {
+  margin: 0;
+  color: #666;
+}
+
+.contact-hours {
+  font-size: 0.85rem;
+  margin-top: 0.5rem !important;
+  color: #888 !important;
+}
+
+.support-form {
+  background-color: white;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.support-form h4 {
+  margin: 0 0 0.5rem;
+  color: #333;
+}
+
+.support-form p {
+  margin: 0 0 1rem;
+  color: #666;
+}
+
+.form-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.support-input {
+  flex: 1;
+  padding: 0.8rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.support-button {
+  padding: 0.8rem 1.5rem;
+  background: linear-gradient(90deg, #4776E6 0%, #8E54E9 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.support-button:hover {
+  box-shadow: 0 4px 10px rgba(71, 118, 230, 0.3);
+}
+
+/* Troubleshoot Tab Styles */
+.troubleshoot-steps {
+  padding: 0.5rem;
+}
+
+.troubleshoot-steps h4 {
+  margin: 0 0 1.5rem;
+  color: #333;
+  text-align: center;
+}
+
+.step {
+  display: flex;
+  margin-bottom: 1.5rem;
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  padding: 1rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.step:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.step-number {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(90deg, #4776E6 0%, #8E54E9 100%);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  margin-right: 1rem;
+  flex-shrink: 0;
+}
+
+.step-content {
+  flex: 1;
+}
+
+.step-content h5 {
+  margin: 0 0 0.5rem;
+  color: #333;
+}
+
+.step-content p {
+  margin: 0 0 0.8rem;
+  color: #666;
+}
+
+.action-button {
+  background-color: #f0f0f0;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  color: #4776E6;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.action-button:hover {
+  background-color: #e0e0e0;
+}
+
+@media (max-width: 768px) {
+  .help-modal {
+    width: 95%;
+    max-height: 80vh;
+  }
+  
+  .tab-button {
+    padding: 0.8rem 0.3rem;
+    font-size: 0.9rem;
+  }
+  
+  .tab-content {
+    padding: 1.2rem;
+  }
+  
+  .form-row {
+    flex-direction: column;
+  }
+  
+  .support-button {
+    margin-top: 0.5rem;
+  }
 }
 
 /* Responsive adjustments */
