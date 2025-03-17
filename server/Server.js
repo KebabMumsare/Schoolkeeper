@@ -495,7 +495,7 @@ app.get("/api/schema/:day/:groupId", async (req, res) => {
     const schedule = await SchedualModel.find({ 
       day: req.params.day.toLowerCase(),
       group: req.params.groupId
-    }).populate('group');  // Add this to populate group details
+    }).populate('group').populate('room');  // Add this to populate group details
     
     console.log('Found schedule:', schedule);
     res.json(schedule);
@@ -511,7 +511,7 @@ app.get("/api/schema/:day/:groupId", async (req, res) => {
 });
 app.get("/api/schema/teacher/:day/:teacher", async (req, res) => {
   try {
-    const teacherLectures = await SchedualModel.find({ teacher: req.params.teacher, day: req.params.day });
+    const teacherLectures = await SchedualModel.find({ teacher: req.params.teacher, day: req.params.day }).populate('room');
     res.json(teacherLectures);
   } catch (error) { 
     console.error('Error fetching teacher lectures:', error);

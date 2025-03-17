@@ -48,7 +48,7 @@
                             </div>
                             <div class="lecture-content">
                                 <div class="lecture-title">{{ lecture.lecture }}</div>
-                                <div class="lecture-location" v-if="lecture.room">{{ lecture.room }}</div>
+                                <div class="lecture-location" v-if="lecture.room">{{ lecture.room.name }}</div>
                                 <div class="lecture-id" v-if="lecture.id">{{ lecture.id }}</div>
                             </div>
                             <span v-if="hasAttendancePermission" class="attendance-button">📋</span>
