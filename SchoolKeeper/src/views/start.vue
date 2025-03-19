@@ -5,58 +5,8 @@
             <h3 class="schedule-title">Schema</h3>
         </div>
         
-        <!-- Teacher's Lectures Section (only visible to teachers) -->
-        <div v-if="isTeacher" class="teacher-lectures">
-            <h4>Mina Lektioner</h4>
-            <div class="teacher-lectures-container">
-                <div v-if="teacherLectures.length > 0" class="teacher-lectures-list">
-                    <div v-for="(lecture, index) in teacherLectures" :key="index" 
-                         class="teacher-lecture-item"
-                         :class="{
-                             'status-current': lecture.locationStatus === 'current',
-                             'status-changed': lecture.locationStatus === 'change',
-                             'status-custom': lecture.locationStatus === 'custom',
-                             'status-canceled': lecture.locationStatus === 'canceled'
-                         }">
-                        <div class="teacher-lecture-day">{{ getDayName(lecture.day) }}</div>
-                        <div class="teacher-lecture-time">{{ lecture.time }}</div>
-                        <div class="teacher-lecture-name">{{ lecture.lecture }}</div>
-                        <div class="teacher-lecture-group">{{ lecture.group }}</div>
-                        <div class="teacher-lecture-location">
-                            <select v-model="lecture.locationStatus" class="location-select" @click.stop @change="handleLocationChange(lecture)">
-                                <option value="current">Nuvarande sal</option>
-                                <option value="change">Ändra sal</option>
-                                <option value="custom">Valfri plats</option>
-                                <option value="canceled">Inställd</option>
-                            </select>
-                            
-                            <!--KOLLA HÄR JESPER-->
-                            <select 
-                                v-if="lecture.locationStatus === 'change'" 
-                                v-model="lecture.newRoom" 
-                                class="room-select"
-                                @click.stop
-                                @change="saveLocationChange(lecture)"
-                            >
-                                <option value="" disabled selected>Välj sal</option>
-                                <option v-for="room in availableRooms" :key="room.id" :value="room.id">
-                                    {{ room.name }}
-                                </option>
-                            </select>
-                        </div>
-                        <div class="teacher-lecture-actions">
-                            <span class="attendance-icon" @click.stop="openAttendanceModal(lecture)">📋</span>
-                        </div>
-                    </div>
-                </div>
-                <div v-else class="no-lectures">
-                    Du har inga lektioner tilldelade.
-                </div>
-            </div>
-        </div>
-        
         <!-- Replace the regular schedule layout with a time-grid layout -->
-        <div v-if="!isTeacher" class="enhanced-schedule-layout">
+        <div class="enhanced-schedule-layout">
             <!-- Removed day selector from here -->
             
             <div class="schedule-content-wrapper">
@@ -94,11 +44,12 @@
                              :style="positionLectureByTime(lecture)"
                              @click="hasAttendancePermission ? openAttendanceModal(lecture) : null">
                             <div class="lecture-time">
-                                {{ lecture.time.includes('-') ? lecture.time : lecture.time + (lecture.endTime ? ' - ' + lecture.endTime : '') }}
+                                <div class="time-start">{{ lecture.time.includes('-') ? lecture.time.split('-')[0].trim() : lecture.time }}</div>
+                                <div class="time-end">{{ lecture.time.includes('-') ? lecture.time.split('-')[1].trim() : (lecture.endTime ? lecture.endTime : '') }}</div>
                             </div>
                             <div class="lecture-content">
                                 <div class="lecture-title">{{ lecture.lecture }}</div>
-                                <div class="lecture-location" v-if="lecture.room">{{ lecture.room }}</div>
+                                <div class="lecture-location" v-if="lecture.room">{{ lecture.room.name }}</div>
                                 <div class="lecture-id" v-if="lecture.id">{{ lecture.id }}</div>
                             </div>
                             <span v-if="hasAttendancePermission" class="attendance-button">📋</span>
@@ -1385,7 +1336,7 @@ body.modal-open {
     position: absolute; /* Use absolute positioning to place at exact time */
     left: 65px;
     right: 15px;
-    padding: 8px 10px;
+    padding: 1px 3px;
     background-color: rgba(79, 192, 229, 0.1);
     border-left: 4px solid #4fc0e5;
     border-radius: 8px;
@@ -1420,7 +1371,7 @@ body.modal-open {
 .schedule-lecture-item .lecture-time {
     font-weight: 600;
     color: #216e87;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     white-space: nowrap; /* Prevent the time from wrapping */
     flex-shrink: 0; /* Prevent the time from shrinking */
     min-width: 60px; /* Give the time a minimum width */
@@ -1434,8 +1385,8 @@ body.modal-open {
 }
 
 .schedule-lecture-item .lecture-title {
-    font-weight: 500;
-    font-size: 1rem;
+    font-weight: bold;
+    font-size: 0.9rem;
     color: #333;
     word-wrap: break-word; /* Allow text to wrap */
     white-space: normal; /* Allow text to wrap */
@@ -1719,7 +1670,6 @@ import NavBar from "@/components/Nav-Bar.vue";
 import axios from "axios";
 import { useStorage } from "@vueuse/core";  // Named import
 import Footer from "@/components/Footer.vue";
-import draggable from 'vuedraggable';
 
 export default {
     name: 'Start',
@@ -1899,8 +1849,8 @@ export default {
             return dayIndex === adjustedToday || dayIndex === parseInt(this.testDay);
         },
         async fetchTodaySchedule() {
-            // Skip for teachers
-            if (this.isTeacher) return;
+            // Remove the early return for teachers
+            // if (this.isTeacher) return;
             
             const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
             const dayIndex = this.testDay !== '' ? parseInt(this.testDay) : new Date().getDay() - 1;
@@ -1914,6 +1864,35 @@ export default {
             try {
                 console.log(`Fetching schedule for ${dayName}`);
                 
+                // Different fetch logic for teachers vs students
+                if (this.isTeacher) {
+                    // Teacher-specific schedule fetch
+                    if (!this.currentUser.id) {
+                        console.error('Teacher ID missing, cannot fetch today\'s schedule');
+                        this.todaySchedule = [];
+                        this.calculateScheduleLayout();
+                        this.updateCurrentTimePosition();
+                        return;
+                    }
+                    
+                    console.log(`Making API request to fetch lectures for teacher ID: ${this.currentUser.id} for ${dayName}`);
+                    const response = await axios.get(`http://localhost:1010/api/schema/teacher/${dayName}/${this.currentUser.id}`);
+                    
+                    if (response.data && response.data.length > 0) {
+                        console.log(`Received ${response.data.length} lectures from server for today`);
+                        this.todaySchedule = this.sortScheduleByTime(response.data);
+                    } else {
+                        console.log('No lectures found for teacher today');
+                        this.todaySchedule = [];
+                    }
+                    
+                    // Calculate layout and update time position
+                    this.calculateScheduleLayout();
+                    this.updateCurrentTimePosition();
+                    return;
+                }
+                
+                // Student schedule fetch logic (existing code)
                 // If user has no groups, return empty schedule
                 if (!this.currentUser.groups || !this.currentUser.groups.length) {
                     console.log('No groups found, returning empty schedule');
@@ -2043,9 +2022,10 @@ export default {
             return now >= lectureStart && now < lectureEnd;
         },
         updateSchedules() {
-            if (!this.isTeacher) {
-                this.fetchTodaySchedule();
-            }
+            // Remove the condition that prevents fetching for teachers
+            // if (!this.isTeacher) {
+            this.fetchTodaySchedule();
+            // }
         },
         hasTest(subject) {
             return this.testSchedule.some(test => 
@@ -2168,174 +2148,38 @@ export default {
             };
             return days[day] || day;
         },
-        async fetchTeacherLectures() {
-            if (!this.isTeacher) return;
-            
-            console.log("Attempting to fetch teacher lectures...");
-            console.log("Current user:", this.currentUser);
-            
+        async fetchTeacherLectures(i) {
+            let day = "";
+                switch (i) {
+                    case 0: day = "monday"; break;
+                    case 1: day = "tuesday"; break;
+                    case 2: day = "wednesday"; break;
+                    case 3: day = "thursday"; break;
+                    case 4: day = "friday"; break;
+                }
             try {
                 // Check if we have a user ID before making the request
                 if (!this.currentUser.id) {
-                    console.error("Teacher ID missing, cannot fetch lectures");
-                    // Add fallback test data since the ID is missing
-                    this.teacherLectures = [
-                        {
-                            id: 1,
-                            day: 'monday',
-                            time: '09:00',
-                            lecture: 'Matematik',
-                            group: 'TE2',
-                            room: 'A101',
-                            locationStatus: 'current'
-                        },
-                        {
-                            id: 2,
-                            day: 'monday',
-                            time: '13:00',
-                            lecture: 'Programmering',
-                            group: 'TE2',
-                            room: 'B204',
-                            locationStatus: 'current'
-                        },
-                        {
-                            id: 3,
-                            day: 'tuesday',
-                            time: '10:30',
-                            lecture: 'Matematik',
-                            group: 'NA3',
-                            room: 'A101',
-                            locationStatus: 'current'
-                        },
-                        {
-                            id: 4,
-                            day: 'wednesday',
-                            time: '09:00',
-                            lecture: 'Programmering',
-                            group: 'TE2',
-                            room: 'B204',
-                            locationStatus: 'current'
-                        },
-                        {
-                            id: 5,
-                            day: 'friday',
-                            time: '13:15',
-                            lecture: 'Matematik',
-                            group: 'TE2',
-                            room: 'A101',
-                            locationStatus: 'current'
-                        }
-                    ];
+                    console.error(`Teacher ID missing, cannot fetch lectures for ${day}`);
                     return;
                 }
                 
-                console.log(`Making API request to fetch lectures for teacher ID: ${this.currentUser.id}`);
-                const response = await axios.get(`http://localhost:1010/api/teacher-lectures/${this.currentUser.id}`);
+                console.log(`Making API request to fetch lectures for teacher ID: ${this.currentUser.id} for ${day}`);
+                // Use the same endpoint as the other method but with day parameter
+                const response = await axios.get(`http://localhost:1010/api/schema/teacher/${day}/${this.currentUser.id}`);
                 
                 if (response.data && response.data.length > 0) {
-                    console.log(`Received ${response.data.length} lectures from server`);
-                    this.teacherLectures = this.sortLecturesByDayAndTime(response.data);
+                    console.log(`Received ${response.data.length} lectures from server for ${day}`);
+                    // Store the lectures for this specific day
+                    this.schema[i] = this.sortScheduleByTime(response.data);
                 } else {
-                    console.log("No lectures returned from server, using fallback data");
-                    // Add fallback test data since no data was returned
-                    this.teacherLectures = [
-                        {
-                            id: 1,
-                            day: 'monday',
-                            time: '09:00',
-                            lecture: 'Matematik',
-                            group: 'TE2',
-                            room: 'A101',
-                            locationStatus: 'current'
-                        },
-                        {
-                            id: 2,
-                            day: 'monday',
-                            time: '13:00',
-                            lecture: 'Programmering',
-                            group: 'TE2',
-                            room: 'B204',
-                            locationStatus: 'current'
-                        },
-                        {
-                            id: 3,
-                            day: 'tuesday',
-                            time: '10:30',
-                            lecture: 'Matematik',
-                            group: 'NA3',
-                            room: 'A101',
-                            locationStatus: 'current'
-                        },
-                        {
-                            id: 4,
-                            day: 'wednesday',
-                            time: '09:00',
-                            lecture: 'Programmering',
-                            group: 'TE2',
-                            room: 'B204',
-                            locationStatus: 'current'
-                        },
-                        {
-                            id: 5,
-                            day: 'friday',
-                            time: '13:15',
-                            lecture: 'Matematik',
-                            group: 'TE2',
-                            room: 'A101',
-                            locationStatus: 'current'
-                        }
-                    ];
+                    console.log(`No lectures returned from server for ${day}, using empty array`);
+                    this.schema[i] = [];
                 }
             } catch (error) {
-                console.error('Error fetching teacher lectures:', error);
-                // Add fallback test data since there was an error
-                this.teacherLectures = [
-                    {
-                        id: 1,
-                        day: 'monday',
-                        time: '09:00',
-                        lecture: 'Matematik',
-                        group: 'TE2',
-                        room: 'A101',
-                        locationStatus: 'current'
-                    },
-                    {
-                        id: 2,
-                        day: 'monday',
-                        time: '13:00',
-                        lecture: 'Programmering',
-                        group: 'TE2',
-                        room: 'B204',
-                        locationStatus: 'current'
-                    },
-                    {
-                        id: 3,
-                        day: 'tuesday',
-                        time: '10:30',
-                        lecture: 'Matematik',
-                        group: 'NA3',
-                        room: 'A101',
-                        locationStatus: 'current'
-                    },
-                    {
-                        id: 4,
-                        day: 'wednesday',
-                        time: '09:00',
-                        lecture: 'Programmering',
-                        group: 'TE2',
-                        room: 'B204',
-                        locationStatus: 'current'
-                    },
-                    {
-                        id: 5,
-                        day: 'friday',
-                        time: '13:15',
-                        lecture: 'Matematik',
-                        group: 'TE2',
-                        room: 'A101',
-                        locationStatus: 'current'
-                    }
-                ];
+                console.error(`Error fetching teacher lectures for ${day}:`, error);
+                console.log(`Using empty array for ${day} due to error`);
+                this.schema[i] = [];
             }
         },
         sortLecturesByDayAndTime(lectures) {
@@ -2585,6 +2429,7 @@ export default {
         
         for (let i = 0; i < 5; i++) {
             this.fetchSchema(i);
+            this.fetchTeacherLectures(i);
         }
         
         setTimeout(() => {
