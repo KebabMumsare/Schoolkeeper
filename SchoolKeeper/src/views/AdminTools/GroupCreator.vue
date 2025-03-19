@@ -17,6 +17,51 @@
                     placeholder="Sök grupper..." 
                     class="search-bar" 
                 />
+                
+                <!-- Filter Dropdown -->
+                <div class="filter-dropdown" v-click-outside="closeFilterDropdown">
+                    <button @click="toggleFilterDropdown" class="filter-dropdown-button">
+                        {{ filterLabel }} <span class="dropdown-icon" :class="{ 'open': showFilterDropdown }">▼</span>
+                    </button>
+                    <div v-if="showFilterDropdown" class="filter-dropdown-content">
+                        <div 
+                            @click="setTypeFilter('all')" 
+                            :class="{ active: activeTypeFilter === 'all' }"
+                            class="filter-option"
+                        >
+                            Alla
+                        </div>
+                        <div 
+                            @click="setTypeFilter('class')" 
+                            :class="{ active: activeTypeFilter === 'class' }"
+                            class="filter-option"
+                        >
+                            Klasser
+                        </div>
+                        <div 
+                            @click="setTypeFilter('specialization')" 
+                            :class="{ active: activeTypeFilter === 'specialization' }"
+                            class="filter-option"
+                        >
+                            Specialisering
+                        </div>
+                        <div 
+                            @click="setTypeFilter('individual')" 
+                            :class="{ active: activeTypeFilter === 'individual' }"
+                            class="filter-option"
+                        >
+                            Individuell
+                        </div>
+                        <div 
+                            @click="setTypeFilter('extra')" 
+                            :class="{ active: activeTypeFilter === 'extra' }"
+                            class="filter-option"
+                        >
+                            Extra
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="group-list">
                     <div 
                         v-for="group in filteredGroups"  
@@ -726,14 +771,117 @@
 .search-container {
     margin-bottom: 1rem;
 }
+
+/* Filter Dropdown Styles */
+.filter-dropdown {
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.filter-dropdown-button {
+    background: linear-gradient(90deg, #11998e 0%, #38ef7d 100%);
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: white;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    width: 100%;
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(17, 153, 142, 0.2);
+    transition: all 0.3s ease;
+}
+
+.filter-dropdown-button:hover {
+    box-shadow: 0 4px 8px rgba(17, 153, 142, 0.3);
+    transform: translateY(-2px);
+}
+
+.dropdown-icon {
+    margin-left: 0.5rem;
+    transition: transform 0.3s ease;
+}
+
+.dropdown-icon.open {
+    transform: rotate(180deg);
+}
+
+.filter-dropdown-content {
+    position: absolute;
+    top: calc(100% + 5px);
+    left: 0;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #eaeaea;
+    animation: dropdownFadeIn 0.2s ease;
+}
+
+@keyframes dropdownFadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.filter-option {
+    padding: 0.8rem 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    align-items: center;
+}
+
+.filter-option:last-child {
+    border-bottom: none;
+}
+
+.filter-option:hover {
+    background-color: #f5f5f5;
+    padding-left: 1.2rem;
+}
+
+.filter-option.active {
+    background: linear-gradient(90deg, #11998e 0%, #38ef7d 100%);
+    color: white;
+}
+
+.filter-option.active:hover {
+    background: linear-gradient(90deg, #0e8a81 0%, #32d36f 100%);
+}
 </style>
 
 <script>
 import axios from 'axios';
 import { useStorage } from "@vueuse/core";
 
+// Click outside directive
+const clickOutside = {
+    beforeMount: (el, binding) => {
+        el.clickOutsideEvent = (event) => {
+            if (!(el === event.target || el.contains(event.target))) {
+                binding.value();
+            }
+        };
+        document.addEventListener('click', el.clickOutsideEvent);
+    },
+    unmounted: (el) => {
+        document.removeEventListener('click', el.clickOutsideEvent);
+    },
+};
+
 export default {
     name: 'group-creator',
+    directives: {
+        'click-outside': clickOutside
+    },
     data() {
         return {
             currentUser: useStorage('currentUser', { name: '', access: '', class: '' }),
@@ -755,20 +903,38 @@ export default {
             },
             selectedGroup: null,
             selectedGroupMembers: [],
-            availableUsers: []
+            availableUsers: [],
+            activeTypeFilter: 'all',
+            showFilterDropdown: false
         };
     },
 
     computed: {
         filteredGroups() {
-            return this.groups.filter(group => 
-                group.name.toLowerCase().includes(this.searchQuery.toLowerCase())
-            );
+            return this.groups.filter(group => {
+                // Apply text search filter
+                const matchesSearch = group.name.toLowerCase().includes(this.searchQuery.toLowerCase());
+                
+                // Apply type filter (if not 'all')
+                const matchesType = this.activeTypeFilter === 'all' || group.type === this.activeTypeFilter;
+                
+                return matchesSearch && matchesType;
+            });
         },
         filteredAvailableUsers() {
             return this.availableUsers.filter(user => 
                 user.name.toLowerCase().includes(this.memberSearchQuery.toLowerCase())
             );
+        },
+        filterLabel() {
+            const labels = {
+                'all': 'Visa alla',
+                'class': 'Visa klasser',
+                'specialization': 'Visa specialisering',
+                'individual': 'Visa individuell',
+                'extra': 'Visa extra'
+            };
+            return labels[this.activeTypeFilter] || 'Filtrera';
         }
     },
     methods: {
@@ -828,11 +994,10 @@ export default {
         async fetchAvailableUsers() {
             try {
                 const response = await axios.get('http://localhost:1010/api/users');
-                // Filter out users that are already in the group and only include students
                 const memberIds = this.selectedGroupMembers.map(member => member._id);
                 this.availableUsers = response.data.filter(user => 
                     !memberIds.includes(user._id) && 
-                    user.access === 'Elev'  // Only include students
+                    user.access === 'Elev'
                 );
             } catch (error) {
                 console.error('Error fetching available users:', error);
@@ -874,9 +1039,7 @@ export default {
         async addMemberToGroup(groupId, memberId) {
             try {
                 await axios.post(`http://localhost:1010/api/groups/${groupId}/${memberId}`);
-                // Refresh the member list after successful addition
                 await this.fetchGroupMembers(groupId);
-                // Refresh available users list
                 await this.fetchAvailableUsers();
             } catch (error) {
                 console.error('Error adding member to group:', error);
@@ -889,14 +1052,13 @@ export default {
                     type: this.editingGroup.type
                 });
                 
-                // Update the group in the local list
                 const index = this.groups.findIndex(g => g._id === this.editingGroup._id);
                 if (index !== -1) {
                     this.groups[index] = { ...this.groups[index], ...this.editingGroup };
                 }
                 
                 this.closeEditModal();
-                await this.fetchGroups(); // Refresh the groups list
+                await this.fetchGroups();
             } catch (error) {
                 console.error('Error updating group:', error);
             }
@@ -915,10 +1077,21 @@ export default {
                     console.error('Error deleting group:', error);
                 }
             }
+        },
+        setTypeFilter(type) {
+            this.activeTypeFilter = type;
+            this.showFilterDropdown = false;
+        },
+        toggleFilterDropdown() {
+            this.showFilterDropdown = !this.showFilterDropdown;
+        },
+        closeFilterDropdown() {
+            this.showFilterDropdown = false;
         }
     },
     mounted() {
         this.fetchGroups();
+        this.activeTypeFilter = 'all';
     }
 };
 </script>
