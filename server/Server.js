@@ -423,6 +423,15 @@ app.post("/api/groups", async (req, res) => {
     res.status(500).json({ message: "Error creating group", error: error.message });
   }
 });
+app.get("/api/groups/students/:groupId", async (req, res) => {
+  try {
+    const students = await UserModel.find({ groups: req.params.groupId });
+    res.json(students);
+  } catch (error) {
+    console.error("Error fetching group:", error);
+    res.sendStatus(500);
+  }
+});
 app.get("/api/groups/:id", async (req, res) => {
   try {
     const group = await GroupModel.findById(req.params.id);
@@ -445,7 +454,6 @@ app.post("/api/groups/:id", async (req, res) => {
     res.status(500).json({ message: "Error updating group", error: error.message });
   }
 });
-  
 app.delete("/api/groups/:id", async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();

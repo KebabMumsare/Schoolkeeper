@@ -101,6 +101,7 @@
                 <div class="attendance-modal-body">
                     <p><strong>Tid:</strong> {{ selectedLecture.time }}</p>
                     <div class="attendance-list">
+                    
                         <div v-for="(student, index) in students" :key="index" 
                              class="student-attendance-item"
                              :class="{
@@ -2086,21 +2087,10 @@ export default {
         
         async fetchStudentsForLecture(lecture) {
             try {
-                const response = await axios.get(`http://localhost:1010/api/students/${lecture.group}`);
-                
-                if (!response.data || response.data.length === 0) {
-                    this.students = [
-                        { id: 1, name: 'Anna Andersson', attendanceStatus: 'present' },
-                        { id: 2, name: 'Erik Eriksson', attendanceStatus: 'present' },
-                        { id: 3, name: 'Maria Svensson', attendanceStatus: 'present' },
-                        { id: 4, name: 'Johan Johansson', attendanceStatus: 'present' },
-                        { id: 5, name: 'Lina Lindberg', attendanceStatus: 'present' },
-                    ];
-                } else {
-                    this.students = response.data.map(student => ({
-                        ...student,
-                        attendanceStatus: 'present'
-                    }));
+                const response = await axios.get(`http://localhost:1010/api/groups/students/${lecture.group}`);
+                console.log(response.data);
+                if (response.data && response.data.length !== 0) {
+                    this.students = response.data;
                 }
             } catch (error) {
                 console.error('Error fetching students:', error);
